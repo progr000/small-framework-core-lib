@@ -1,0 +1,25 @@
+{
+    "name": "maksym/core",
+    "type": "library",
+    "description": "Package framework core lib",
+    "keywords": ["framework"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Maksym Haivoronskyi",
+            "email": "maksym.haivoronskyi@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.0",
+        "ext-json": "*",
+	    "ext-mbstring": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Core\\": "src/"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
