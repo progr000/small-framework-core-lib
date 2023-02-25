@@ -1,5 +1,5 @@
 {
-    "name": "maksym/core",
+    "name": "maksym/small-framework-core-lib",
     "type": "library",
     "description": "Package framework core lib",
     "keywords": ["framework"],
