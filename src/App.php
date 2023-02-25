@@ -8,8 +8,6 @@ use Core\Exceptions\HttpForbiddenException;
 use Core\Exceptions\HttpNotFoundException;
 use Core\Exceptions\NotImplementedException;
 
-//require_once __DIR__ . "/DumperDriver.php";
-
 
 class App
 {
@@ -31,6 +29,8 @@ class App
      */
     private function __construct($config_dir)
     {
+        require_once __DIR__ . "/DumperDriver.php";
+
         self::$config = ConfigDriver::getInstance($config_dir);
         self::$route = RouteDriver::getInstance();
         self::$request = new RequestDriver();
