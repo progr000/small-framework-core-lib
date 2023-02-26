@@ -210,15 +210,25 @@ class RouteDriver
             }
             $this->action = $controllerAndAction['action'];
 
-            /**/
+            /* try to get params and if params is class, create some object */
             if (method_exists($controller, $controllerAndAction['action'])) {
 
                 $r = new \ReflectionMethod($controllerAndAction['controller'], $controllerAndAction['action']);
                 $params = $r->getParameters();
                 foreach ($params as $param) {
-                    $className = $param->getClass();
-                    if (!is_null($className) && isset($className->name)) {
-                        $execClassName = $className->name;
+                    unset($className, $execClassName);
+                    if (version_compare(phpversion(), '8', '>=')) {
+                        $className = $param->getType();
+                        if (is_object($className) && method_exists($className, 'getName')) {
+                            $execClassName = $className->getName();
+                        }
+                    } else {
+                        $className = $param->getClass();
+                        if (!is_null($className) && isset($className->name)) {
+                            $execClassName = $className->name;
+                        }
+                    }
+                    if (isset($execClassName)) {
                         $reflect[] = new $execClassName();
                     }
                 }
