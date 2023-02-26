@@ -226,6 +226,7 @@ class ResponseDriver
          * Or, you can add %%%DEBUG-DATA%%% in your template,
          * then all debug output will be shown on that place
          * instead %%%DEBUG-DATA%%% */
+        $this->body === null && $this->body = "";
         if (defined('IS_DEBUG') && IS_DEBUG && !is_null($this->debug_data)) {
             if (strrpos($this->body, "%%%DEBUG-DATA%%%") !== false) {
                 $this->body = str_replace("%%%DEBUG-DATA%%%", $this->debug_data, $this->body);
