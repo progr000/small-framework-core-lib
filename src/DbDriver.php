@@ -132,7 +132,12 @@ class DbDriver
     public function exec($sql, $params = [])
     {
         $this->errors = [];
+
         try {
+
+            if (!$this->pdo) {
+                throw new DbException("PDO not initialized. Probably not set params for db-connections in config");
+            }
 
             foreach ($params as $key => $val) {
                 if (strrpos($sql, ":$key") === false) {
@@ -154,9 +159,11 @@ class DbDriver
 
         } catch (Exception $e) {
             $this->errors[] = $e->getMessage();
-            $this->errors[] = $this->pdo->errorInfo();
-            if ($this->pdo->inTransaction()) {
-                $this->pdo->rollBack();
+            if ($this->pdo) {
+                $this->errors[] = $this->pdo->errorInfo();
+                if ($this->pdo->inTransaction()) {
+                    $this->pdo->rollBack();
+                }
             }
             return false;
         }
@@ -168,7 +175,7 @@ class DbDriver
      */
     public function beginTransaction()
     {
-        $this->pdo->beginTransaction();
+        $this->pdo && $this->pdo->beginTransaction();
     }
 
     /**
@@ -177,7 +184,7 @@ class DbDriver
      */
     public function commit()
     {
-        if ($this->pdo->inTransaction()) {
+        if ($this->pdo && $this->pdo->inTransaction()) {
             $this->pdo->commit();
         }
     }
@@ -188,17 +195,20 @@ class DbDriver
      */
     public function rollBack()
     {
-        if ($this->pdo->inTransaction()) {
+        if ($this->pdo && $this->pdo->inTransaction()) {
             $this->pdo->rollBack();
         }
     }
 
     /**
      * Return last id for inserted record
-     * @return int
+     * @return int|null
      */
     public function lastInsert()
     {
-        return intval($this->pdo->lastInsertId());
+        if ($this->pdo) {
+            return intval($this->pdo->lastInsertId());
+        }
+        return null;
     }
 }
