@@ -1,4 +1,6 @@
 <?php
+if (function_exists('xdebug_disable')) xdebug_disable();
+ini_set('xdebug.overload_var_dump', false);
 
 if (!function_exists('dumpIntoStr')) {
     /**
