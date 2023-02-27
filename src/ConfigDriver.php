@@ -69,4 +69,32 @@ class ConfigDriver
         }
         return $this->container->$param;
     }
+
+    /**
+     * Check exist or not param in config
+     * @param string $param
+     * @return bool
+     */
+    public function exist($param)
+    {
+        return property_exists($this->container, $param);
+    }
+
+    /**
+     * Set some params into config container
+     * @param string|array $param
+     * @param mixed|null $value
+     * @return true
+     */
+    public function set($param, $value = null)
+    {
+        if (gettype($param) === 'array') {
+            foreach ($param as $k => $v) {
+                $this->container->$k = $v;
+            }
+        } else {
+            $this->container->$param = $value;
+        }
+        return true;
+    }
 }

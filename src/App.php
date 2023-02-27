@@ -26,6 +26,7 @@ class App
 
     /**
      * Constructor
+     * @throws \Core\Exceptions\IntegrityException
      */
     private function __construct($config_dir)
     {
@@ -41,6 +42,7 @@ class App
     /**
      * Initialization App
      * @return App
+     * @throws \Core\Exceptions\IntegrityException
      */
     public static function init($config_dir)
     {

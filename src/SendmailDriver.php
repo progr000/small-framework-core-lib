@@ -12,7 +12,9 @@ class SendmailDriver
     private static $instancesCount = 0;
 
     /** @var string */
-    private $html = '';
+    private $bodyHtml = '';
+    /** @var string */
+    private $bodyText = '';
     /** @var string */
     private $attachments = '';
     /** @var string */
@@ -175,14 +177,14 @@ class SendmailDriver
     }
 
     /**
-     * @param string $html
-     * @param array $replaceData
-     * @return $this
+     * @param string $text
+     * @param array $data
+     * @return string
      */
-    public function setBody($html, array $replaceData = [])
+    private static function replaceData($text, array $data=[])
     {
-        foreach ($replaceData as $key => $val) {
-            $html = str_replace([
+        foreach ($data as $key => $val) {
+            $text = str_replace([
                 '{'.$key.'}',
                 '{{'.$key.'}}',
                 '['.$key.']',
@@ -194,9 +196,30 @@ class SendmailDriver
                 '{'.mb_strtolower($key).'}',
                 '{{'.mb_strtolower($key).'}}',
                 '['.mb_strtolower($key).']',
-            ], "$val", $html);
+            ], "$val", $text);
         }
-        $this->html = utf8_decode($html);
+        return utf8_decode($text);
+    }
+
+    /**
+     * @param string $html
+     * @param array $replaceData
+     * @return $this
+     */
+    public function setBodyHtml($html, array $replaceData = [])
+    {
+        $this->bodyHtml = self::replaceData($html, $replaceData);
+        return $this;
+    }
+
+    /**
+     * @param string $html
+     * @param array $replaceData
+     * @return $this
+     */
+    public function setBodyText($text, array $replaceData = [])
+    {
+        $this->bodyText = self::replaceData($text, $replaceData);
         return $this;
     }
 
@@ -248,21 +271,6 @@ class SendmailDriver
      */
     private function prepareLetter()
     {
-        /**
-         * it is usually more correct to create two templates for
-         * the letter first in plain-text and second in html-format,
-         * but here we have only one in html, that then converted in plain-text
-         * I do not want to disassemble this stuf in include_once() and create some new on it,
-         * so function html2text() will be used directly from this file
-         */
-        try {
-            include_once(__DIR__ . "/../../admin/mailsystem/utils/html2text.php");
-            $text = html2text($this->html);
-        } catch (Exception $e) {
-            $this->errors[] = $e->getMessage();
-            $text = strip_tags($this->html);
-        }
-
         $body =
             "Content-Type: multipart/alternative; boundary=\"PHP-alt-{$this->random_hash}\"" . self::$newLine .
             self::$newLine .
@@ -270,13 +278,13 @@ class SendmailDriver
             "Content-Type: text/plain; charset=\"utf-8\"" . self::$newLine .
             "Content-Transfer-Encoding: 7bit" . self::$newLine .
             self::$newLine .
-            $text . self::$newLine .
+            $this->bodyText . self::$newLine .
             self::$newLine .
             "--PHP-alt-{$this->random_hash}" . self::$newLine .
             "Content-Type: text/html . charset=\"utf-8\"" . self::$newLine .
             "Content-Transfer-Encoding: 7bit" . self::$newLine .
             self::$newLine .
-            $this->html . self::$newLine .
+            $this->bodyHtml . self::$newLine .
             self::$newLine .
             "--PHP-alt-$this->random_hash--" . self::$newLine;
 
@@ -296,7 +304,7 @@ class SendmailDriver
     /**
      * Create sign for message by openssl
      * @return string
-     * @throws Exception
+     * @throws Exceptions\ConfigException
      */
     private function signLetter()
     {
@@ -305,18 +313,18 @@ class SendmailDriver
         file_put_contents($file_name_unsigned, $this->prepareLetter());
         chmod($file_name_unsigned, 0666);
 
-        $cert_dir = App::$config->get('cert_dir');
+        $cert_dir = App::$config->get('sendmail_cert_dir');
         if (
-            file_exists("$cert_dir/{$this->from['email']}.crt.pem") &&
-            file_exists("$cert_dir/{$this->from['email']}.key.pem") &&
-            file_exists("$cert_dir/ca-certs.pem")
+            file_exists("{$cert_dir}/{$this->from['email']}.crt.pem") &&
+            file_exists("{$cert_dir}/{$this->from['email']}.key.pem") &&
+            file_exists("{$cert_dir}/ca-certs.pem")
         ) {
             try {
                 openssl_pkcs7_sign(
                     $file_name_unsigned,
                     $file_name_signed,
-                    "file://$cert_dir/{$this->from['email']}.crt.pem",
-                    array("file://$cert_dir/{$this->from['email']}.key.pem", ""),
+                    "file://{$cert_dir}/{$this->from['email']}.crt.pem",
+                    array("file://{$cert_dir}/{$this->from['email']}.key.pem", ""),
                     $this->headers,
                     PKCS7_DETACHED | PKCS7_BINARY,
                     "$cert_dir/ca-certs.pem"
@@ -352,7 +360,13 @@ class SendmailDriver
             return false;
         }
         $this->setHeaders();
-        $letter_file = $this->signLetter();
+
+        if (App::$config->exist('sendmail_cert_dir')) {
+            $letter_file = $this->signLetter();
+        } else {
+            $letter_file = sys_get_temp_dir() . "/sendmail-{$this->random_hash}.unsigned.txt";
+            file_put_contents($letter_file, implode(self::$newLine, $this->headers) . self::$newLine . $this->prepareLetter());
+        }
 
         if (!file_exists($letter_file)) {
             $this->errors[] = "letter-file not found. Sending impossible";

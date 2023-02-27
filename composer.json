@@ -15,7 +15,9 @@
         "ext-json": "*",
 	    "ext-mbstring": "*",
         "ext-fileinfo": "*",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "ext-iconv": "*",
+        "ext-openssl": "*"
     },
     "autoload": {
         "psr-4": {
