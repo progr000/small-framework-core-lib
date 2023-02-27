@@ -39,7 +39,7 @@ class DbDriver
         $this->table_prefix = isset($conn['table_prefix']) ? $conn['table_prefix'] : "";
 
         /* connect to DB */
-        if (isset($conn['dsn'], $conn['user'], $conn['password'])) {
+        if (!empty($conn['dsn']) && !empty($conn['user']) && !empty($conn['password'])) {
             $this->pdo = new PDO(
                 $conn['dsn'],
                 $conn['user'],
