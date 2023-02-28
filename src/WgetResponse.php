@@ -33,6 +33,8 @@ class WgetResponse
             $this->request_headers = curl_getinfo($curl_resource, CURLINFO_HEADER_OUT);
             if ($response === false) {
                 $this->errors[] = 'Curl return false';
+                $this->errors[] = curl_error($curl_resource);
+                $this->errors[] = curl_errno($curl_resource);
                 return;
             }
             $this->status = intval(curl_getinfo($curl_resource, CURLINFO_HTTP_CODE));
