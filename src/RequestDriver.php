@@ -81,6 +81,12 @@ class RequestDriver
         }
         $this->headers = function_exists('getallheaders') ? getallheaders() : [];
 
+        /* check protocol via proxy */
+        $check_proxy_proto = $this->header('X-Forwarded-Proto');
+        if ($check_proxy_proto) {
+            $this->protocol = $check_proxy_proto;
+        }
+
         if (!empty($_POST)) {
             $this->post = $_POST;
         }
