@@ -2,6 +2,7 @@
 
 namespace Core;
 
+use Exception;
 use Core\Exceptions\ConfigException;
 use Core\Exceptions\HttpNotFoundException;
 
@@ -13,7 +14,21 @@ use Core\Exceptions\HttpNotFoundException;
 class ViewDriver
 {
     /** @var string */
-    public static $layout = '/layouts/main';
+    public static $layout = 'layouts/main';
+
+    /**
+     * @param string $template
+     * @param array $vars
+     * @return string|void
+     */
+    public function renderView($template, array &$vars = [])
+    {
+        try {
+            return self::renderPart($template, $vars);
+        } catch (Exception $exception) {
+            return "";
+        }
+    }
 
     /**
      * @param string $templateName
@@ -25,12 +40,13 @@ class ViewDriver
     public static function renderPart($templateName, array &$vars = [])
     {
         $tpl_path = App::$config->get('templatePath');
-        if (!file_exists( "{$tpl_path}/{$templateName}.php")) {
+        
+        if (!file_exists( "{$tpl_path}/{$templateName}.php")) 
             throw new HttpNotFoundException("Template <b>{$tpl_path}/{$templateName}.php</b> not exist.", 404);
-        }
-
+        
         ob_start();
         ob_implicit_flush(false);
+        $vars['view'] = new self();
         extract($vars, EXTR_OVERWRITE);
         include("{$tpl_path}/{$templateName}.php");
         $buffer = ob_get_contents();
@@ -56,19 +72,18 @@ class ViewDriver
     public static function render($templateName, array $vars = [], $layout = null)
     {
         $tpl_path = App::$config->get('templatePath');
-        if (!is_null($layout))
-            $layout = dirname(self::$layout) . '/' . $layout;
-        else
+        
+        if (is_null($layout))
             $layout = self::$layout;
-        if (!file_exists( "{$tpl_path}/{$layout}.php")) {
+        
+        if (!file_exists( "{$tpl_path}/{$layout}.php")) 
             throw new HttpNotFoundException("Layout <b>{$tpl_path}/{$layout}.php</b> not found.", 404);
-        }
-
-
+        
         $content = self::renderPart($templateName, $vars);
 
         ob_start();
         ob_implicit_flush(false);
+        $vars['view'] = new self();
         extract($vars, EXTR_OVERWRITE);
         include("{$tpl_path}/{$layout}.php");
         $buffer = ob_get_contents();
