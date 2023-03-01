@@ -107,7 +107,7 @@ class DbDriver
             }
             if (in_array($type, ["boolean", "integer"])) {
                 $params[$key] = intval($val);
-            } else {
+            } elseif ($type !== "NULL") {
                 $params[$key] = $this->pdo->quote($val);
             }
         }
