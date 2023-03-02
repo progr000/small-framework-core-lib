@@ -33,7 +33,9 @@ class SendmailDriver
     /** @var string|null */
     private $XMailer = null;
     /** @var string */
-    private $subject;
+    private $subject = "";
+    /** @var array */
+    private $replaceData = [];
 
     /** @var array */
     private $headers = [];
@@ -154,7 +156,7 @@ class SendmailDriver
     }
 
     /**
-     * @return $this
+     *
      */
     private function setHeaders()
     {
@@ -172,54 +174,64 @@ class SendmailDriver
         if (!empty($this->cc)) $this->headers[] = "CC: {$this->cc}";
         if (!empty($this->bcc)) $this->headers[] = "BCC: {$this->bcc}";
         if (!empty($this->replyTo)) $this->headers[] = "Reply-To: {$this->replyTo}";
+    }
 
+    /**
+     *
+     */
+    private function replaceData()
+    {
+        foreach ($this->replaceData as $key => $val) {
+            $replace_arr = [
+                '{' . $key . '}',
+                '{{' . $key . '}}',
+                '[' . $key . ']',
+                '%' . $key . '%',
+                '{%' . $key . '}',
+                '{{%' . $key . '}}',
+                '[%' . $key . ']',
+
+                '{' . mb_strtoupper($key) . '}',
+                '{{' . mb_strtoupper($key) . '}}',
+                '[' . mb_strtoupper($key) . ']',
+                '%' . mb_strtoupper($key) . '%',
+                '{%' . mb_strtoupper($key) . '}',
+                '{{%' . mb_strtoupper($key) . '}}',
+                '[%' . mb_strtoupper($key) . ']',
+
+                '{' . mb_strtolower($key) . '}',
+                '{{' . mb_strtolower($key) . '}}',
+                '[' . mb_strtolower($key) . ']',
+                '%' . mb_strtolower($key) . '%',
+                '{%' . mb_strtolower($key) . '}',
+                '{{%' . mb_strtolower($key) . '}}',
+                '[%' . mb_strtolower($key) . ']',
+            ];
+            $this->subject  = str_replace($replace_arr, "$val", $this->subject);
+            $this->bodyText = str_replace($replace_arr, "$val", $this->bodyText);
+            $this->bodyHtml = str_replace($replace_arr, "$val", $this->bodyHtml);
+        }
+        $this->bodyText = utf8_decode($this->bodyText);
+        $this->bodyHtml = utf8_decode($this->bodyHtml);
+    }
+
+    /**
+     * @param string $html
+     * @return $this
+     */
+    public function setBodyHtml($html)
+    {
+        $this->bodyHtml = $html;
         return $this;
     }
 
     /**
      * @param string $text
-     * @param array $data
-     * @return string
-     */
-    private static function replaceData($text, array $data=[])
-    {
-        foreach ($data as $key => $val) {
-            $text = str_replace([
-                '{'.$key.'}',
-                '{{'.$key.'}}',
-                '['.$key.']',
-
-                '{'.mb_strtoupper($key).'}',
-                '{{'.mb_strtoupper($key).'}}',
-                '['.mb_strtoupper($key).']',
-
-                '{'.mb_strtolower($key).'}',
-                '{{'.mb_strtolower($key).'}}',
-                '['.mb_strtolower($key).']',
-            ], "$val", $text);
-        }
-        return utf8_decode($text);
-    }
-
-    /**
-     * @param string $html
-     * @param array $replaceData
      * @return $this
      */
-    public function setBodyHtml($html, array $replaceData = [])
+    public function setBodyText($text)
     {
-        $this->bodyHtml = self::replaceData($html, $replaceData);
-        return $this;
-    }
-
-    /**
-     * @param string $html
-     * @param array $replaceData
-     * @return $this
-     */
-    public function setBodyText($text, array $replaceData = [])
-    {
-        $this->bodyText = self::replaceData($text, $replaceData);
+        $this->bodyText = $text;
         return $this;
     }
 
@@ -262,6 +274,16 @@ class SendmailDriver
         $this->attachments .= self::$newLine;
         $this->attachments .= chunk_split(base64_encode($content)) . self::$newLine;
         $this->attachments .= self::$newLine;
+        return $this;
+    }
+
+    /**
+     * @param array $data
+     * @return $this
+     */
+    public function setReplaceData(array $data)
+    {
+        $this->replaceData = $data;
         return $this;
     }
 
@@ -355,12 +377,17 @@ class SendmailDriver
      */
     public function send()
     {
+        /* do not anything if no sender or receiver */
         if (empty($this->from['email']) || empty($this->to['email'])) {
             $this->errors[] = "email-to or email-from are not set.";
             return false;
         }
+
+        /* replace data in body, subject and prepare letter-headers */
+        $this->replaceData();
         $this->setHeaders();
 
+        /* sign letter if cert enabled and prepare letter-file for sendmail program */
         if (App::$config->exist('sendmail_cert_dir')) {
             $letter_file = $this->signLetter();
         } else {
@@ -368,16 +395,19 @@ class SendmailDriver
             file_put_contents($letter_file, implode(self::$newLine, $this->headers) . self::$newLine . $this->prepareLetter());
         }
 
+        /* just check previous step */
         if (!file_exists($letter_file)) {
             $this->errors[] = "letter-file not found. Sending impossible";
             return false;
         }
 
+        /* do send throw sendmail program */
         $sendmail = ini_get("sendmail_path");
         //$cmd = "{$sendmail} -vv -f {$this->from['email']} < {$letter_file}  2>&1 ; rm -f {$letter_file}";
         $cmd = "{$sendmail} -vv -f {$this->from['email']} < {$letter_file}  2>&1";
         exec($cmd, $output, $code);
 
+        /* processing answer from sendmail-program */
         return self::getAnswer($output);
     }
 
