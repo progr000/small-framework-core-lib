@@ -166,6 +166,7 @@ class SendmailDriver
             "X-Sender: <{$this->from['name']}>",
             "X-Mailer: {$this->XMailer}",
             "Reply-To: {$this->from['email']}",
+            "X-Subject: {$this->subject}",
             "Subject: " . substr(iconv_mime_encode('Subject', $this->subject, [
                 'input-charset' => 'UTF-8',
                 'output-charset' => 'UTF-8',
@@ -283,7 +284,7 @@ class SendmailDriver
      */
     public function setReplaceData(array $data)
     {
-        $this->replaceData = $data;
+        $this->replaceData = array_merge($this->replaceData, $data);
         return $this;
     }
 
