@@ -373,7 +373,7 @@ class SendmailDriver
     /**
      * Try to send message
      * @return false|array
-     * @throws Exception
+     * @throws Exceptions\ConfigException
      */
     public function send()
     {
