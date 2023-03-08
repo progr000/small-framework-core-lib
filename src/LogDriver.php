@@ -82,7 +82,7 @@ class LogDriver
 
     /**
      * Set log file for output
-     * @param string $path_to_log_file
+     * @param string|null $path_to_log_file
      * @return bool
      */
     public static function setLog($path_to_log_file)
@@ -94,7 +94,7 @@ class LogDriver
             @chmod(self::$path_to_log_file, 0666);
         }
         self::$path_to_log_file = $path_to_log_file;
-        if (!file_exists(self::$path_to_log_file)) {
+        if (self::$path_to_log_file && !file_exists(self::$path_to_log_file)) {
             @touch(self::$path_to_log_file);
             @chmod(self::$path_to_log_file, 0666);
         }
