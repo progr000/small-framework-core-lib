@@ -176,12 +176,14 @@ class RouteDriver
         if (isset($matches)) unset($matches[0]);
         if (!isset($matches)) $matches = [];
 
-        /* middleware check and execute */
+        /* middleware check and apply */
+        $allMiddleware = App::$config->get('global-middleware', []);
         if (isset($controllerAndAction['middleware']) && is_array($controllerAndAction['middleware'])) {
-            foreach ($controllerAndAction['middleware'] as $middleware) {
-                $m = new $middleware();
-                $m->handle(App::$request);
-            }
+            $allMiddleware = array_merge($allMiddleware, $controllerAndAction['middleware']);
+        }
+        foreach ($allMiddleware as $middleware) {
+            $m = new $middleware();
+            $m->handle(App::$request);
         }
 
         /**/
@@ -229,7 +231,15 @@ class RouteDriver
                         }
                     }
                     if (isset($execClassName)) {
-                        $reflect[] = new $execClassName();
+                        $tmpObj = new $execClassName();
+                        if ($tmpObj instanceof RequestDriver) {
+                            /* middleware apply to Request */
+                            foreach ($allMiddleware as $middleware) {
+                                $m = new $middleware();
+                                $m->handle($tmpObj);
+                            }
+                        }
+                        $reflect[] = $tmpObj;
                     }
                 }
                 if (isset($reflect)) {

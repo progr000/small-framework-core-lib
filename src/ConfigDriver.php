@@ -3,7 +3,6 @@
 namespace Core;
 
 use stdClass;
-use Core\Exceptions\ConfigException;
 use Core\Exceptions\IntegrityException;
 
 
@@ -55,17 +54,13 @@ class ConfigDriver
     /**
      * Return value for param name
      * @param string $param
+     * @param mixed $default
      * @return mixed
-     * @throws ConfigException
      */
-    public function get($param)
+    public function get($param, $default = null)
     {
         if (!property_exists($this->container, $param)) {
-            if (defined('IS_DEBUG') && IS_DEBUG) {
-                throw new ConfigException("Param '{$param}' missed in the config '" . realpath(__DIR__ . '/../config/main.php') . "'", 500);
-            } else {
-                return null;
-            }
+            return $default;
         }
         return $this->container->$param;
     }

@@ -47,6 +47,8 @@ class RequestDriver
     protected $referer;
     /** @var mixed|string */
     protected $ip;
+    /** @var array */
+    protected $trustProxies = [];
 
     /** variables in which are stored data after validation based on rules() */
     /** @var array */
@@ -70,15 +72,7 @@ class RequestDriver
         $this->query = App::$route->getQuery();
         $this->full_url = $this->route . ($this->query ? '?' . $this->query : '');
         $this->referer = App::$route->getReferer();
-        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-            $this->ip = $_SERVER['HTTP_CLIENT_IP'];
-        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $this->ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        } elseif (!empty($_SERVER['REMOTE_ADDR'])) {
-            $this->ip = $_SERVER['REMOTE_ADDR'];
-        } else {
-            $this->ip = '0.0.0.0';
-        }
+        $this->ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
         $this->headers = function_exists('getallheaders') ? getallheaders() : [];
 
         /* check protocol via proxy */
@@ -132,6 +126,26 @@ class RequestDriver
         }
     }
 
+    /**
+     * @param array $ips
+     * @return $this
+     */
+    public function setTrustProxies(array $ips = [])
+    {
+        $this->trustProxies = $ips;
+        if (in_array($this->ip, $this->trustProxies)) {
+            if (!empty($_SERVER['HTTP_X_REAL_IP'])) {
+                $this->ip = $_SERVER['HTTP_X_REAL_IP'];
+            } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+                $this->ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+            } elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+                $this->ip = $_SERVER['HTTP_CLIENT_IP'];
+            }
+        }
+        return $this;
+    }
+    
+    
     /** ========== Validation methods ============== */
     /**
      * This method must return rules for validation
