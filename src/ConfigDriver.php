@@ -59,10 +59,21 @@ class ConfigDriver
      */
     public function get($param, $default = null)
     {
+        $test = explode('->', $param);
+        if (isset($test[1])) {
+            $key = $test[1];
+            $param = $test[0];
+        }
         if (!property_exists($this->container, $param)) {
             return $default;
         }
-        return $this->container->$param;
+        if (isset($key)) {
+            return isset($this->container->{$param}[$key])
+                ? $this->container->{$param}[$key]
+                : $default;
+        } else {
+            return $this->container->$param;
+        }
     }
 
     /**
