@@ -35,7 +35,6 @@ class WgetDriver
     /**
      * Create new instance
      * @return WgetDriver
-     * @throws Exceptions\ConfigException
      */
     public static function init()
     {
@@ -46,7 +45,7 @@ class WgetDriver
         curl_setopt($instance->curl, CURLINFO_HEADER_OUT, true);
         curl_setopt($instance->curl, CURLOPT_VERBOSE, true);
         curl_setopt($instance->curl, CURLOPT_HEADER, true);
-        if (App::$config->get('IGNORE_SSL_ERRORS')) {
+        if (App::$config->get('IGNORE_SSL_ERRORS', false)) {
             curl_setopt($instance->curl, CURLOPT_SSL_VERIFYHOST, 0);
             curl_setopt($instance->curl, CURLOPT_SSL_VERIFYPEER, 0);
         }

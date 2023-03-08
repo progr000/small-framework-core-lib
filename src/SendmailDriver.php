@@ -337,7 +337,7 @@ class SendmailDriver
         chmod($file_name_unsigned, 0666);
 
         $cert_dir = App::$config->get('sendmail_cert_dir');
-        if (
+        if ($cert_dir &&
             file_exists("{$cert_dir}/{$this->from['email']}.crt.pem") &&
             file_exists("{$cert_dir}/{$this->from['email']}.key.pem") &&
             file_exists("{$cert_dir}/ca-certs.pem")

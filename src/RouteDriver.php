@@ -2,6 +2,7 @@
 
 namespace Core;
 
+use Core\Exceptions\ConfigException;
 use Core\Exceptions\HttpNotFoundException;
 
 
@@ -33,12 +34,15 @@ class RouteDriver
 
     /**
      * Route constructor.
-     * @throws \Exception
+     * @throws ConfigException
      */
     private function __construct()
     {
         /* get list of available routes from config */
         $routes = App::$config->get('routes');
+        if (!$routes) {
+            throw new ConfigException('routes is required parameter in config (must be an special array)');
+        }
 
         /* prepare routes from config data */
         foreach ($routes as $k => $v) {

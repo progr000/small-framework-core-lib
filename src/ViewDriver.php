@@ -39,7 +39,10 @@ class ViewDriver
      */
     public static function renderPart($templateName, array &$vars = [])
     {
-        $tpl_path = App::$config->get('templatePath');
+        $tpl_path = App::$config->get('template-path');
+        if (!$tpl_path) {
+            throw new ConfigException('template-path is required parameter in config (must be a string, real path to dir with templates)');
+        }
         
         if (!file_exists( "{$tpl_path}/{$templateName}.php")) 
             throw new HttpNotFoundException("Template <b>{$tpl_path}/{$templateName}.php</b> not exist.", 404);
@@ -71,8 +74,11 @@ class ViewDriver
      */
     public static function render($templateName, array $vars = [], $layout = null)
     {
-        $tpl_path = App::$config->get('templatePath');
-        
+        $tpl_path = App::$config->get('template-path');
+        if (!$tpl_path) {
+            throw new ConfigException('template-path is required parameter in config (must be a string, real path to dir with templates)');
+        }
+
         if (is_null($layout))
             $layout = self::$layout;
         

@@ -30,7 +30,7 @@ class DbDriver
     }
 
     /**
-     * @throws Exceptions\ConfigException
+     *
      */
     private function __construct()
     {
@@ -39,7 +39,7 @@ class DbDriver
         $this->table_prefix = isset($conn['table_prefix']) ? $conn['table_prefix'] : "";
 
         /* connect to DB */
-        if (!empty($conn['dsn']) && !empty($conn['user']) && !empty($conn['password'])) {
+        if (is_array($conn) && !empty($conn['dsn']) && !empty($conn['user']) && !empty($conn['password'])) {
             $this->pdo = new PDO(
                 $conn['dsn'],
                 $conn['user'],
