@@ -327,7 +327,6 @@ class SendmailDriver
     /**
      * Create sign for message by openssl
      * @return string
-     * @throws Exceptions\ConfigException
      */
     private function signLetter()
     {
@@ -374,7 +373,6 @@ class SendmailDriver
     /**
      * Try to send message
      * @return false|array
-     * @throws Exceptions\ConfigException
      */
     public function send()
     {
