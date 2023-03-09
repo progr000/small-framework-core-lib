@@ -4,6 +4,7 @@ namespace Core;
 
 use Core\Exceptions\ConfigException;
 use Core\Exceptions\HttpNotFoundException;
+use Core\Interfaces\RequestInterface;
 
 
 /**
@@ -236,7 +237,7 @@ class RouteDriver
                     }
                     if (isset($execClassName)) {
                         $tmpObj = new $execClassName();
-                        if ($tmpObj instanceof RequestDriver) {
+                        if ($tmpObj instanceof RequestInterface) {
                             /* middleware apply to Request */
                             foreach ($allMiddleware as $middleware) {
                                 $m = new $middleware();
