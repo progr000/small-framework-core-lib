@@ -307,9 +307,17 @@ class RequestDriver implements RequestInterface
     }
 
     /**
+     * @return string|null
+     */
+    public function userAgent()
+    {
+        return $this->header('User-Agent');
+    }
+
+    /**
      * @param string|null $key
      * @param mixed|null $default
-     * @return string|string[]
+     * @return mixed
      */
     public function header($key = null, $default = null)
     {
