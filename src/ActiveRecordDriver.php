@@ -2,6 +2,7 @@
 
 namespace Core;
 
+use Core\Exceptions\DbException;
 use ReflectionObject;
 use stdClass;
 use PDO;
@@ -33,6 +34,7 @@ abstract class ActiveRecordDriver
 
     /**
      * @return array|null
+     * @throws DbException
      */
     public static function findAll()
     {
@@ -46,6 +48,7 @@ abstract class ActiveRecordDriver
     /**
      * @param int $id
      * @return stdClass|null
+     * @throws DbException
      */
     public static function findById($id)
     {
@@ -55,6 +58,7 @@ abstract class ActiveRecordDriver
     /**
      * @param array $condition
      * @return stdClass|null
+     * @throws DbException
      */
     public static function findOne(array $condition)
     {
@@ -79,6 +83,11 @@ abstract class ActiveRecordDriver
         return null;
     }
 
+    /**
+     * @param array $condition
+     * @return array|false|null
+     * @throws DbException
+     */
     public static function find(array $condition)
     {
         $WHERE = "";
@@ -101,6 +110,7 @@ abstract class ActiveRecordDriver
     /**
      * Save ActiveRecord
      * @return bool
+     * @throws DbException
      */
     public function save()
     {
@@ -116,6 +126,7 @@ abstract class ActiveRecordDriver
     /**
      * @param array $mappedProperties
      * @return bool
+     * @throws DbException
      */
     private function update(array $mappedProperties)
     {
@@ -133,6 +144,7 @@ abstract class ActiveRecordDriver
     /**
      * @param array $mappedProperties
      * @return bool
+     * @throws DbException
      */
     private function insert(array $mappedProperties)
     {
@@ -158,7 +170,7 @@ abstract class ActiveRecordDriver
     }
 
     /**
-     *
+     * @throws DbException
      */
     public function delete()
     {

@@ -2,6 +2,7 @@
 
 namespace Core;
 
+use Core\Exceptions\DbException;
 use Exception;
 
 
@@ -31,6 +32,7 @@ class MigrationDriver
 
     /**
      * Constructor
+     * @throws DbException
      */
     private function __construct()
     {
@@ -46,6 +48,7 @@ class MigrationDriver
     }
 
     /**
+     * @param string $migration_dir
      * @return MigrationDriver
      * @throws Exception
      */
@@ -57,7 +60,7 @@ class MigrationDriver
         //@unlink(self::$lock_file);
         if (file_exists(self::$lock_file)) {
             LogDriver::error("Now another migration process has been started. It is not possible to start a new process until the previous one is finished.");
-            throw new Exception('');
+            throw new Exception('', 500);
         } else {
             @file_put_contents(self::$lock_file, date("Y-m-d H:i:s"));
         }
@@ -73,6 +76,7 @@ class MigrationDriver
      * Initialization before migrations begin
      * Get data abut done and undone migrations
      * @return void
+     * @throws DbException
      */
     private function init()
     {
@@ -87,14 +91,19 @@ class MigrationDriver
             }
         }
 
-        $list_in_db = App::$db->getAll("SELECT " . self::COLUMN_NAME . " as m FROM " . self::TABLE_LIST_MIGRATIONS . " ORDER BY migration_name");
-        if ($list_in_db) {
-            foreach ($list_in_db as $v) {
-                $this->done_list[] = $v['m'];
+        try {
+            $list_in_db = App::$db->getAll("SELECT " . self::COLUMN_NAME . " as m FROM " . self::TABLE_LIST_MIGRATIONS . " ORDER BY migration_name");
+            if ($list_in_db) {
+                foreach ($list_in_db as $v) {
+                    $this->done_list[] = $v['m'];
+                }
             }
-        }
 
-        $this->undone_list = array_diff($fs_list, $this->done_list);
+            $this->undone_list = array_diff($fs_list, $this->done_list);
+        } catch (DbException $e) {
+            @unlink(self::$lock_file);
+            throw new DbException($e->getMessage(), $e->getCode());
+        }
     }
 
     /**
@@ -114,6 +123,7 @@ class MigrationDriver
      * Execute UP method for all (or count=steps) undone migration classes
      * @param int|null $steps
      * @return bool
+     * @throws DbException
      */
     public function up($steps = null)
     {
@@ -148,6 +158,7 @@ class MigrationDriver
      * Execute DOWN method for last one (or last count=steps) done migration classes
      * @param int $steps
      * @return bool
+     * @throws DbException
      */
     public function down($steps = null)
     {
@@ -194,7 +205,7 @@ class MigrationDriver
         }
 
         /**/
-        if (!file_exists(self::TPL)) {
+        if (!file_exists(self::$TPL)) {
             LogDriver::error("System error: the template for create migration file not found.", 0);
             return false;
         }
@@ -208,7 +219,7 @@ class MigrationDriver
 
         /**/
         $name = "m" . date('Ymd_His_') . $name;
-        $content = file_get_contents(self::TPL);
+        $content = file_get_contents(self::$TPL);
         $content = str_replace("__NEW_CLASS_NAME__", $name, $content);
         $file_name = self::$FOLDER . "/{$name}.php";
         file_put_contents($file_name, $content);
@@ -219,6 +230,7 @@ class MigrationDriver
     /**
      * Undone all migration and then done all migrations
      * @return void
+     * @throws DbException
      */
     public function reset()
     {
@@ -229,6 +241,7 @@ class MigrationDriver
     /**
      * Undone all migrations
      * @return void
+     * @throws DbException
      */
     public function refresh()
     {

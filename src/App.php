@@ -2,11 +2,13 @@
 
 namespace Core;
 
-use Exception;
 use Core\Exceptions\ConfigException;
+use Core\Exceptions\DbException;
 use Core\Exceptions\HttpForbiddenException;
 use Core\Exceptions\HttpNotFoundException;
+use Core\Exceptions\IntegrityException;
 use Core\Exceptions\NotImplementedException;
+use ReflectionException;
 
 
 class App
@@ -25,8 +27,8 @@ class App
     public static $db;
 
     /**
-     * Constructor
-     * @throws \Core\Exceptions\IntegrityException
+     * @param string $config_dir
+     * @throws IntegrityException
      */
     private function __construct($config_dir)
     {
@@ -42,7 +44,7 @@ class App
     /**
      * Initialization App
      * @return App
-     * @throws \Core\Exceptions\IntegrityException
+     * @throws IntegrityException
      */
     public static function init($config_dir)
     {
@@ -56,6 +58,7 @@ class App
      * @return void
      * @throws ConfigException
      * @throws HttpNotFoundException
+     * @throws ReflectionException
      */
     public function run()
     {
@@ -87,7 +90,7 @@ class App
             $throw_body = ['status' => false, 'code' => $e->getCode(), 'error' => $e->getMessage()];
             !self::$response->isJson() && $throw_body = ViewDriver::render('http-exceptions/405', $throw_body);
             self::$response->setBody($throw_body)->setStatus($e->getCode())->send();
-        } catch (Exception $e) {
+        } catch (DbException $e) {
             $throw_body = ['status' => false, 'code' => $e->getCode(), 'error' => $e->getMessage()];
             !self::$response->isJson() && $throw_body = ViewDriver::render('http-exceptions/500', $throw_body);
             self::$response->setBody($throw_body)->setStatus($e->getCode())->send();

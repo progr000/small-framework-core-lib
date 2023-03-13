@@ -77,8 +77,7 @@ class SendmailDriver
      */
     public static function init()
     {
-        $instance = new self();
-        return $instance;
+        return new self();
     }
 
     /**
@@ -247,7 +246,7 @@ class SendmailDriver
             $type = mime_content_type($path);
             return $this->addAttachment(basename($path), file_get_contents($path), $type);
         } else {
-            throw new Exception('File is not available.');
+            throw new Exception('File is not available.', 500);
         }
     }
 

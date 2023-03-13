@@ -5,6 +5,7 @@ namespace Core;
 use Exception;
 use PDO;
 use Core\Exceptions\DbException;
+use PDOStatement;
 
 class DbDriver
 {
@@ -64,6 +65,7 @@ class DbDriver
      * @param string $sql
      * @param array $params
      * @return array|false
+     * @throws DbException
      */
     public function getAll($sql, $params = [])
     {
@@ -80,6 +82,7 @@ class DbDriver
      * @param string $sql
      * @param array $params
      * @return false|mixed
+     * @throws DbException
      */
     public function getOne($sql, $params = [])
     {
@@ -103,7 +106,7 @@ class DbDriver
         foreach ($params as $key => $val) {
             $type = gettype($val);
             if (!in_array($type, ["boolean", "integer", "double", "string", "NULL"])) {
-                throw new DbException("Can't prepare Sql statement for this variable type {$type}");
+                throw new DbException("Can't prepare Sql statement for this variable type {$type}", 500);
             }
             if (in_array($type, ["boolean", "integer"])) {
                 $params[$key] = intval($val);
@@ -127,17 +130,18 @@ class DbDriver
      * Execute query
      * @param $sql
      * @param $params
-     * @return false|\PDOStatement
+     * @return false|PDOStatement
+     * @throws DbException
      */
     public function exec($sql, $params = [])
     {
         $this->errors = [];
 
-        try {
+        if (!$this->pdo) {
+            throw new DbException("PDO not initialized. Probably not set params for db-connections in config", 500);
+        }
 
-            if (!$this->pdo) {
-                throw new DbException("PDO not initialized. Probably not set params for db-connections in config");
-            }
+        try {
 
             foreach ($params as $key => $val) {
                 if (strrpos($sql, ":$key") === false) {

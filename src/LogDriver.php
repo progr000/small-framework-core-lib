@@ -2,6 +2,8 @@
 
 namespace Core;
 
+use stdClass;
+
 class LogDriver
 {
     /** @var array[] */
@@ -20,7 +22,7 @@ class LogDriver
     public static $log_resource = null;
     /** @var int */
     private static $verbose_level = 1;
-    /** @var \stdClass */
+    /** @var stdClass */
     private $msg;
     /** @var int */
     private static $instancesCount = 0;
@@ -241,7 +243,7 @@ class LogDriver
         $instance = new self();
         $message = self::dumpIntoStr($message);
         unset($instance->msg);
-        $instance->msg = new \stdClass();
+        $instance->msg = new stdClass();
         $instance->msg->text = $message;
         $instance->msg->type = $type;
         $instance->msg->level = $level;

@@ -4,7 +4,9 @@ namespace Core;
 
 use Core\Exceptions\ConfigException;
 use Core\Exceptions\HttpNotFoundException;
+use Core\Exceptions\IntegrityException;
 use Core\Interfaces\RequestInterface;
+use ReflectionException;
 
 
 /**
@@ -35,14 +37,14 @@ class RouteDriver
 
     /**
      * Route constructor.
-     * @throws ConfigException
+     * @throws IntegrityException
      */
     private function __construct()
     {
         /* get list of available routes from config */
         $routes = App::$config->get('routes');
         if (!$routes) {
-            throw new ConfigException('routes is required parameter in config (must be an special array)');
+            throw new IntegrityException('routes is required parameter in config (must be an special array)', 500);
         }
 
         /* prepare routes from config data */
@@ -147,7 +149,7 @@ class RouteDriver
      * and try to execute and return result
      * @return mixed
      * @throws HttpNotFoundException
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function processRoute()
     {

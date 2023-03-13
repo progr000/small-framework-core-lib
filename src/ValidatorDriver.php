@@ -72,13 +72,13 @@ class ValidatorDriver
                     if (method_exists($this, $tmp[0])) {
                         $methods[] = $tmp[0];
                     } else {
-                        throw new ValidatorException("Wrong rule in RequestClass " . get_class($this->request) . ". Validator-method {$tmp[0]}() doesn't exist.");
+                        throw new ValidatorException("Wrong rule in RequestClass " . get_class($this->request) . ". Validator-method {$tmp[0]}() doesn't exist.", 500);
                     }
                 }
             }
 
             if (empty($methods)) {
-                throw new ValidatorException('Wrong rule in RequestClass ' . get_class($this->request));
+                throw new ValidatorException('Wrong rule in RequestClass ' . get_class($this->request), 500);
             }
 
             $test_var = true;
@@ -199,7 +199,7 @@ class ValidatorDriver
         if (isset($params['min']) || isset($params['max']) || isset($params['length'])) {
 
             if (isset($params['length']) && (isset($params['min']) || isset($params['max']))) {
-                throw new ValidatorException('Wrong rule in RequestClass ' . get_class($this->request) . "Param length can't correspond with params min or max");
+                throw new ValidatorException('Wrong rule in RequestClass ' . get_class($this->request) . "Param length can't correspond with params min or max", 500);
             }
 
             if (isset($params['min']) && mb_strlen($val) < intval($params['min'])) {

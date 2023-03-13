@@ -2,8 +2,8 @@
 
 namespace Core;
 
+use Core\Exceptions\IntegrityException;
 use Exception;
-use Core\Exceptions\ConfigException;
 use Core\Exceptions\HttpNotFoundException;
 
 
@@ -19,7 +19,7 @@ class ViewDriver
     /**
      * @param string $template
      * @param array $vars
-     * @return string|void
+     * @return string
      */
     public function renderView($template, array &$vars = [])
     {
@@ -34,14 +34,14 @@ class ViewDriver
      * @param string $templateName
      * @param array $vars
      * @return string
-     * @throws ConfigException
+     * @throws IntegrityException
      * @throws HttpNotFoundException
      */
     public static function renderPart($templateName, array &$vars = [])
     {
         $tpl_path = App::$config->get('template-path');
         if (!$tpl_path) {
-            throw new ConfigException('template-path is required parameter in config (must be a string, real path to dir with templates)');
+            throw new IntegrityException('template-path is required parameter in config (must be a string, real path to dir with templates)', 400);
         }
         
         if (!file_exists( "{$tpl_path}/{$templateName}.php")) 
@@ -69,14 +69,14 @@ class ViewDriver
      * @param array $vars
      * @param null $layout
      * @return string
-     * @throws ConfigException
+     * @throws IntegrityException
      * @throws HttpNotFoundException
      */
     public static function render($templateName, array $vars = [], $layout = null)
     {
         $tpl_path = App::$config->get('template-path');
         if (!$tpl_path) {
-            throw new ConfigException('template-path is required parameter in config (must be a string, real path to dir with templates)');
+            throw new IntegrityException('template-path is required parameter in config (must be a string, real path to dir with templates)', 400);
         }
 
         if (is_null($layout))

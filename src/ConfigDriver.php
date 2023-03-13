@@ -32,7 +32,7 @@ class ConfigDriver
     private function __construct($config_dir)
     {
         if (!file_exists($config_dir . '/main.php')) {
-            throw new IntegrityException("Configuration file is missing: '" . ($config_dir . '/main.php') . "'");
+            throw new IntegrityException("Configuration file is missing: '" . ($config_dir . '/main.php') . "'", 500);
         }
 
         $config = require $config_dir . '/main.php';
