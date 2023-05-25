@@ -11,32 +11,33 @@ class DbDriver
 {
     /** @var PDO  */
     private $pdo;
-    /** @var self */
-    private static $instance;
     /** @var array */
     private $errors;
     /** @var string */
     private $table_prefix = "";
 
     /**
+     * @param string $db_conf_name
      * @return DbDriver
      */
-    public static function getInstance($db_conf = 'db')
+    public static function getInstance($db_conf_name = 'db-main')
     {
-        if (!isset(self::$instance[$db_conf])) {
-            self::$instance[$db_conf] = new self($db_conf);
+        if (!isset(App::$DbInstances[$db_conf_name])) {
+            App::$DbInstances[$db_conf_name] = new self($db_conf_name);
         }
 
-        return self::$instance[$db_conf];
+        return App::$DbInstances[$db_conf_name];
     }
 
     /**
-     * @param string $db_conf
+     * @param string $db_conf_name
      */
-    private function __construct($db_conf = 'db')
+    private function __construct($db_conf_name = 'db-main')
     {
         /* try to obtain table prefix */
-        $conn = App::$config->get($db_conf);
+        $conn = isset(App::$config->get('databases', [])[$db_conf_name])
+            ? App::$config->get('databases', [])[$db_conf_name]
+            : [];
         $this->table_prefix = isset($conn['table_prefix']) ? $conn['table_prefix'] : "";
 
         /* connect to DB */

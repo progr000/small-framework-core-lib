@@ -2,7 +2,6 @@
 
 namespace Core;
 
-use Core\Exceptions\ConfigException;
 use Core\Exceptions\DbException;
 use Core\Exceptions\HttpForbiddenException;
 use Core\Exceptions\HttpNotFoundException;
@@ -25,6 +24,8 @@ class App
     public static $response;
     /** @var DbDriver */
     public static $db;
+    /** @var DbDriver[] */
+    public static $DbInstances;
 
     /**
      * @param string $config_dir
@@ -38,7 +39,19 @@ class App
         self::$route = RouteDriver::getInstance();
         self::$request = new RequestDriver();
         self::$response = new ResponseDriver();
-        self::$db = DbDriver::getInstance();
+
+        /**/
+        foreach (self::$config->get('databases', []) as $conn_name => $conn_params) {
+            if ($conn_name !== 'default-db-connection-name') {
+                DbDriver::getInstance($conn_name);
+            }
+        }
+        if (isset(self::$config->get('databases', [])['default-db-connection-name'])
+            && isset(App::$DbInstances[self::$config->get('databases', [])['default-db-connection-name']])
+        ) {
+            self::$db = DbDriver::getInstance(self::$config->get('databases', [])['default-db-connection-name']);
+        }
+
     }
 
     /**
@@ -56,9 +69,8 @@ class App
 
     /**
      * @return void
-     * @throws ConfigException
      * @throws HttpNotFoundException
-     * @throws ReflectionException
+     * @throws ReflectionException|IntegrityException
      */
     public function run()
     {

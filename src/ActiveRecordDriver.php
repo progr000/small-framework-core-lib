@@ -15,6 +15,29 @@ abstract class ActiveRecordDriver
     /** @var string */
     protected static $_table_name;
 
+    /** @var string */
+    protected static $connection_name;
+
+    /**
+     * @return DbDriver
+     * @throws DbException
+     */
+    protected static function getDbConnection()
+    {
+        if (!static::$connection_name) {
+            static::$connection_name = isset(App::$config->get('databases', [])['default-db-connection-name'])
+                ? App::$config->get('databases', [])['default-db-connection-name']
+                : 'db-main';
+        }
+
+        if (isset(App::$DbInstances[static::$connection_name])) {
+            dump(static::$connection_name);
+            return App::$DbInstances[static::$connection_name];
+        } else {
+            throw new DbException("This connection is not initialized correctly", 500);
+        }
+    }
+
     /**
      * @return string
      */
@@ -38,7 +61,7 @@ abstract class ActiveRecordDriver
      */
     public static function findAll()
     {
-        $sth = App::$db->exec("SELECT * FROM " . static::getTableName());
+        $sth = self::getDbConnection()->exec("SELECT * FROM " . static::getTableName());
         if ($sth) {
             return $sth->fetchAll(PDO::FETCH_CLASS, stdClass::class);
         }
@@ -71,7 +94,7 @@ abstract class ActiveRecordDriver
             $WHERE = "WHERE " . implode(" AND ", $el);
         }
 
-        $sth = App::$db->exec("SELECT * FROM " . static::getTableName() . " {$WHERE} LIMIT 1", $condition);
+        $sth = self::getDbConnection()->exec("SELECT * FROM " . static::getTableName() . " {$WHERE} LIMIT 1", $condition);
         if ($sth) {
             $sth->setFetchMode(PDO::FETCH_CLASS, stdClass::class);
             $res = $sth->fetch(PDO::FETCH_CLASS);
@@ -99,7 +122,7 @@ abstract class ActiveRecordDriver
             $WHERE = "WHERE " . implode(" AND ", $el);
         }
 
-        $sth = App::$db->exec("SELECT * FROM " . static::getTableName() . " {$WHERE} ", $condition);
+        $sth = self::getDbConnection()->exec("SELECT * FROM " . static::getTableName() . " {$WHERE} ", $condition);
         if ($sth) {
             return $sth->fetchAll(PDO::FETCH_CLASS, stdClass::class);
         }
@@ -137,8 +160,8 @@ abstract class ActiveRecordDriver
             $params[$column] = $value;
         }
         $sql = "UPDATE " . static::getTableName() . " SET " . implode(', ', $columns) . " " .
-               "WHERE `" . static::$_primary_key_field . "` = " . $this->{static::$_primary_key_field};
-        return App::$db->exec($sql, $params);
+            "WHERE `" . static::$_primary_key_field . "` = " . $this->{static::$_primary_key_field};
+        return self::getDbConnection()->exec($sql, $params);
     }
 
     /**
@@ -159,10 +182,10 @@ abstract class ActiveRecordDriver
             $params[$column] = $value;
         }
         $sql = "INSERT INTO " . static::getTableName() . " (" . implode(', ', $columns) . ") " .
-               "VALUES (" . implode(', ', $columnsParamName) . ")";
-        $sth = App::$db->exec($sql, $params);
+            "VALUES (" . implode(', ', $columnsParamName) . ")";
+        $sth = self::getDbConnection()->exec($sql, $params);
         if ($sth) {
-            $this->{static::$_primary_key_field} = App::$db->lastInsert();
+            $this->{static::$_primary_key_field} = self::getDbConnection()->lastInsert();
             $this->refresh();
         }
 
@@ -175,7 +198,7 @@ abstract class ActiveRecordDriver
     public function delete()
     {
         $sql = "DELETE FROM " . static::getTableName() . " WHERE `" . static::$_primary_key_field . "` = :id";
-        App::$db->exec(
+        self::getDbConnection()->exec(
             $sql,
             ['id' => $this->{static::$_primary_key_field}]
         );
