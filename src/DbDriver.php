@@ -21,22 +21,22 @@ class DbDriver
     /**
      * @return DbDriver
      */
-    public static function getInstance()
+    public static function getInstance($db_conf = 'db')
     {
-        if (self::$instance === null) {
-            self::$instance = new self();
+        if (!isset(self::$instance[$db_conf])) {
+            self::$instance[$db_conf] = new self($db_conf);
         }
 
-        return self::$instance;
+        return self::$instance[$db_conf];
     }
 
     /**
-     *
+     * @param string $db_conf
      */
-    private function __construct()
+    private function __construct($db_conf = 'db')
     {
         /* try to obtain table prefix */
-        $conn = App::$config->get('db');
+        $conn = App::$config->get($db_conf);
         $this->table_prefix = isset($conn['table_prefix']) ? $conn['table_prefix'] : "";
 
         /* connect to DB */
@@ -47,7 +47,9 @@ class DbDriver
                 $conn['password']
             );
             //$this->pdo->setAttribute(PDO::ATTR_AUTOCOMMIT,0);
-            $this->pdo->exec('SET NAMES UTF8');
+            try {
+                $this->pdo->exec('SET NAMES UTF8');
+            } catch (Exception $e) {}
         }
     }
 
