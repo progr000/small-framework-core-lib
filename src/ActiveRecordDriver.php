@@ -7,7 +7,7 @@ use ReflectionObject;
 use stdClass;
 use PDO;
 
-abstract class ActiveRecordDriver
+abstract class ActiveRecordDriver extends stdClass
 {
     /** @var string if field name is different from 'id' redeclare this param in Model::class */
     protected static $_primary_key_field = 'id';
@@ -31,7 +31,6 @@ abstract class ActiveRecordDriver
         }
 
         if (isset(App::$DbInstances[static::$connection_name])) {
-            dump(static::$connection_name);
             return App::$DbInstances[static::$connection_name];
         } else {
             throw new DbException("This connection is not initialized correctly", 500);
@@ -56,21 +55,21 @@ abstract class ActiveRecordDriver
     }
 
     /**
-     * @return array|null
+     * @return static[]|null
      * @throws DbException
      */
     public static function findAll()
     {
         $sth = self::getDbConnection()->exec("SELECT * FROM " . static::getTableName());
         if ($sth) {
-            return $sth->fetchAll(PDO::FETCH_CLASS, stdClass::class);
+            return $sth->fetchAll(PDO::FETCH_CLASS, static::class);
         }
         return null;
     }
 
     /**
      * @param int $id
-     * @return stdClass|null
+     * @return static|null
      * @throws DbException
      */
     public static function findById($id)
@@ -79,24 +78,34 @@ abstract class ActiveRecordDriver
     }
 
     /**
-     * @param array $condition
-     * @return stdClass|null
+     * @param array|string $condition
+     * @return static|null
      * @throws DbException
      */
-    public static function findOne(array $condition)
+    public static function findOne($condition = [])
     {
+        $sql_quote = self::getDbConnection()->sql_quote;
         $WHERE = "";
-        if (sizeof($condition)) {
-            $el = [];
-            foreach ($condition as $k => $v) {
-                $el[] = "(`{$k}` = :{$k})";
+        if (is_array($condition)) {
+            if (sizeof($condition)) {
+                $el = [];
+                foreach ($condition as $k => $v) {
+                    $el[] = "({$sql_quote}{$k}{$sql_quote} = :{$k})";
+                }
+                $WHERE = "WHERE " . implode(" AND ", $el);
             }
-            $WHERE = "WHERE " . implode(" AND ", $el);
+        } else {
+            $WHERE = "WHERE " . $condition;
+            $condition = [];
         }
 
-        $sth = self::getDbConnection()->exec("SELECT * FROM " . static::getTableName() . " {$WHERE} LIMIT 1", $condition);
+        if (self::getDbConnection()->driver === 'sqlsrv') {
+            $sth = self::getDbConnection()->exec("SELECT TOP 1 * FROM " . static::getTableName() . " {$WHERE}", $condition);
+        } else {
+            $sth = self::getDbConnection()->exec("SELECT * FROM " . static::getTableName() . " {$WHERE} LIMIT 1", $condition);
+        }
         if ($sth) {
-            $sth->setFetchMode(PDO::FETCH_CLASS, stdClass::class);
+            $sth->setFetchMode(PDO::FETCH_CLASS, static::class);
             $res = $sth->fetch(PDO::FETCH_CLASS);
             if ($res) {
                 return $res;
@@ -107,24 +116,64 @@ abstract class ActiveRecordDriver
     }
 
     /**
-     * @param array $condition
-     * @return array|false|null
+     * @param array|string $condition
+     * @param int $limit
+     * @param array $order
+     * @param int $offset
+     * @return static[]|false|null
      * @throws DbException
      */
-    public static function find(array $condition)
+    public static function find($condition = [], $limit = 0, $order = [], $offset = 0)
     {
+        $sql_quote = self::getDbConnection()->sql_quote;
         $WHERE = "";
-        if (sizeof($condition)) {
-            $el = [];
-            foreach ($condition as $k => $v) {
-                $el[] = "(`{$k}` = :{$k})";
+        if (is_array($condition)) {
+            if (sizeof($condition)) {
+                $el = [];
+                foreach ($condition as $k => $v) {
+                    $el[] = "({$sql_quote}{$k}{$sql_quote} = :{$k})";
+                }
+                $WHERE = "WHERE " . implode(" AND ", $el);
             }
-            $WHERE = "WHERE " . implode(" AND ", $el);
+        } else {
+            $WHERE = "WHERE " . $condition;
+            $condition = [];
         }
 
-        $sth = self::getDbConnection()->exec("SELECT * FROM " . static::getTableName() . " {$WHERE} ", $condition);
+        $array_order = [];
+        foreach ($order as $k => $v) {
+            if (in_array(mb_strtoupper($v), ['ASC', 'DESC'])) {
+                $array_order[] = "{$k} " . mb_strtoupper($v);
+            } else {
+                $array_order[] = "{$v} ASC";
+            }
+        }
+        if (sizeof($array_order)) {
+            $ORDER_SQL = "ORDER BY " . implode(', ', $array_order);
+        } else {
+            $ORDER_SQL = "";
+        }
+
+        if (self::getDbConnection()->driver === 'sqlsrv') {
+            $TOP = "";
+            if ($ORDER_SQL === "") {
+                if ($limit) {
+                    $TOP = " TOP {$limit} ";
+                }
+            } else {
+                if ($limit) {
+                    $ORDER_SQL .= " OFFSET {$offset} ROWS FETCH NEXT {$limit} ROWS ONLY";
+                }
+            }
+            $sth = self::getDbConnection()->exec("SELECT {$TOP} * FROM " . static::getTableName() . " {$WHERE} {$ORDER_SQL}", $condition);
+        } else {
+            if ($limit) {
+                $ORDER_SQL .= " LIMIT {$limit} OFFSET {$offset}";
+            }
+            $sth = self::getDbConnection()->exec("SELECT * FROM " . static::getTableName() . " {$WHERE} {$ORDER_SQL} ", $condition);
+        }
         if ($sth) {
-            return $sth->fetchAll(PDO::FETCH_CLASS, stdClass::class);
+            return $sth->fetchAll(PDO::FETCH_CLASS, static::class);
         }
 
         return null;
@@ -153,15 +202,22 @@ abstract class ActiveRecordDriver
      */
     private function update(array $mappedProperties)
     {
+        $sql_quote = self::getDbConnection()->sql_quote;
         $columns = [];
         $params = [];
         foreach ($mappedProperties as $column => $value) {
-            $columns[] = "`{$column}` = :{$column}";
+            // TODO *** CHECK this
+            if (self::getDbConnection()->driver === 'sqlsrv' && $column === static::$_primary_key_field) {
+                continue;
+            }
+            $columns[] = "{$sql_quote}{$column}{$sql_quote} = :{$column}";
             $params[$column] = $value;
         }
         $sql = "UPDATE " . static::getTableName() . " SET " . implode(', ', $columns) . " " .
-            "WHERE `" . static::$_primary_key_field . "` = " . $this->{static::$_primary_key_field};
-        return self::getDbConnection()->exec($sql, $params);
+            "WHERE {$sql_quote}" . static::$_primary_key_field . "{$sql_quote} = " . $this->{static::$_primary_key_field};
+        //return self::getDbConnection()->exec($sql, $params);
+        self::getDbConnection()->exec($sql, $params);
+        return (self::getDbConnection()->affectedRows() > 0);
     }
 
     /**
@@ -171,13 +227,14 @@ abstract class ActiveRecordDriver
      */
     private function insert(array $mappedProperties)
     {
+        $sql_quote = self::getDbConnection()->sql_quote;
         $filteredProperties = array_filter($mappedProperties);
 
         $columns = [];
         $params = [];
         $columnsParamName = [];
         foreach ($filteredProperties as $column => $value) {
-            $columns[] = "`{$column}`";
+            $columns[] = "{$sql_quote}{$column}{$sql_quote}";
             $columnsParamName[] = ":{$column}";
             $params[$column] = $value;
         }
@@ -189,7 +246,8 @@ abstract class ActiveRecordDriver
             $this->refresh();
         }
 
-        return $sth;
+        //return $sth;
+        return (self::getDbConnection()->affectedRows() > 0);
     }
 
     /**
@@ -197,7 +255,8 @@ abstract class ActiveRecordDriver
      */
     public function delete()
     {
-        $sql = "DELETE FROM " . static::getTableName() . " WHERE `" . static::$_primary_key_field . "` = :id";
+        $sql_quote = self::getDbConnection()->sql_quote;
+        $sql = "DELETE FROM " . static::getTableName() . " WHERE {$sql_quote}" . static::$_primary_key_field . "{$sql_quote} = :id";
         self::getDbConnection()->exec(
             $sql,
             ['id' => $this->{static::$_primary_key_field}]
@@ -220,6 +279,7 @@ abstract class ActiveRecordDriver
 
     /**
      * Refresh an ActiveRecord after insert
+     * @throws DbException
      */
     private function refresh()
     {

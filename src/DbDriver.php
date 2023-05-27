@@ -15,6 +15,12 @@ class DbDriver
     private $errors;
     /** @var string */
     private $table_prefix = "";
+    /** @var string */
+    public $driver;
+    /** @var string */
+    public $sql_quote = "";
+    /** @var int|null */
+    private $affectedRows;
 
     /**
      * @param string $db_conf_name
@@ -48,9 +54,19 @@ class DbDriver
                 $conn['password']
             );
             //$this->pdo->setAttribute(PDO::ATTR_AUTOCOMMIT,0);
-            try {
-                $this->pdo->exec('SET NAMES UTF8');
-            } catch (Exception $e) {}
+            $this->driver = mb_strtolower($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
+            if ($this->driver === 'sqlsrv') {
+                $this->sql_quote = '"';
+            } elseif ($this->driver === 'mysql') {
+                $this->sql_quote = '`';
+            } elseif ($this->driver === 'pgsql') {
+                $this->sql_quote = '"';
+            }
+            if (isset($conn['charset']) && $this->driver !== 'sqlsrv') {
+                try {
+                    $this->pdo->exec("SET NAMES '{$conn['charset']}'");
+                } catch (Exception $e) {}
+            }
         }
     }
 
@@ -123,8 +139,8 @@ class DbDriver
         $keys[] = "{{";
         $keys[] = "}}";
         $values = array_values($params);
-        $values[] = "`$this->table_prefix";
-        $values[] = "`";
+        $values[] = "{$this->sql_quote}{$this->table_prefix}";
+        $values[] = "{$this->sql_quote}";
 
         return str_replace($keys, $values, $sql);
     }
@@ -151,10 +167,11 @@ class DbDriver
                     unset($params[$key]);
                 }
             }
-            $sql = str_replace(['{{', '}}'], ["`{$this->table_prefix}", "`"], $sql);
+            $sql = str_replace(['{{', '}}'], ["{$this->sql_quote}{$this->table_prefix}", "{$this->sql_quote}"], $sql);
 
             $sth = $this->pdo->prepare($sql);
             $result = $sth->execute($params);
+            $this->affectedRows = $sth->rowCount();
             if ($result === false) {
                 //$this->errors[] = ['query' => $sql, 'data' => $params];
                 $this->errors[] = $this->prepareSql($sql, $params);
@@ -217,5 +234,13 @@ class DbDriver
             return intval($this->pdo->lastInsertId());
         }
         return null;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function affectedRows()
+    {
+        return $this->affectedRows;
     }
 }
