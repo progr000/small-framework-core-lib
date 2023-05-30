@@ -188,7 +188,7 @@ abstract class ActiveRecordDriver extends stdClass
     {
         $pkf = static::$_primary_key_field;
         $mappedProperties = $this->mapProperties();
-        if ($this->$pkf !== null) {
+        if (isset($this->$pkf)) {
             return $this->update($mappedProperties);
         } else {
             return $this->insert($mappedProperties);
