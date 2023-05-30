@@ -48,24 +48,26 @@ class DbDriver
 
         /* connect to DB */
         if (is_array($conn) && !empty($conn['dsn']) && !empty($conn['user']) && !empty($conn['password'])) {
-            $this->pdo = new PDO(
-                $conn['dsn'],
-                $conn['user'],
-                $conn['password']
-            );
-            //$this->pdo->setAttribute(PDO::ATTR_AUTOCOMMIT,0);
-            $this->driver = mb_strtolower($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
-            if ($this->driver === 'sqlsrv') {
-                $this->sql_quote = '"';
-            } elseif ($this->driver === 'mysql') {
-                $this->sql_quote = '`';
-            } elseif ($this->driver === 'pgsql') {
-                $this->sql_quote = '"';
-            }
-            if (isset($conn['charset']) && $this->driver !== 'sqlsrv') {
-                try {
+            try {
+                $this->pdo = new PDO(
+                    $conn['dsn'],
+                    $conn['user'],
+                    $conn['password']
+                );
+                //$this->pdo->setAttribute(PDO::ATTR_AUTOCOMMIT,0);
+                $this->driver = mb_strtolower($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
+                if ($this->driver === 'sqlsrv') {
+                    $this->sql_quote = '"';
+                } elseif ($this->driver === 'mysql') {
+                    $this->sql_quote = '`';
+                } elseif ($this->driver === 'pgsql') {
+                    $this->sql_quote = '"';
+                }
+                if (isset($conn['charset']) && $this->driver !== 'sqlsrv') {
                     $this->pdo->exec("SET NAMES '{$conn['charset']}'");
-                } catch (Exception $e) {}
+                }
+            } catch (Exception $e) {
+
             }
         }
     }

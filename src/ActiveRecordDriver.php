@@ -116,66 +116,26 @@ abstract class ActiveRecordDriver extends stdClass
     }
 
     /**
-     * @param array|string $condition
-     * @param int $limit
-     * @param array $order
-     * @param int $offset
-     * @return static[]|false|null
+     * @return QueryBuilderDriver
      * @throws DbException
      */
-    public static function find($condition = [], $limit = 0, $order = [], $offset = 0)
+    public static function find()
     {
-        $sql_quote = self::getDbConnection()->sql_quote;
-        $WHERE = "";
-        if (is_array($condition)) {
-            if (sizeof($condition)) {
-                $el = [];
-                foreach ($condition as $k => $v) {
-                    $el[] = "({$sql_quote}{$k}{$sql_quote} = :{$k})";
-                }
-                $WHERE = "WHERE " . implode(" AND ", $el);
-            }
-        } else {
-            $WHERE = "WHERE " . $condition;
-            $condition = [];
-        }
+        return new QueryBuilderDriver(self::getDbConnection(), static::class, static::$_table_name);
+    }
 
-        $array_order = [];
-        foreach ($order as $k => $v) {
-            if (in_array(mb_strtoupper($v), ['ASC', 'DESC'])) {
-                $array_order[] = "{$k} " . mb_strtoupper($v);
-            } else {
-                $array_order[] = "{$v} ASC";
-            }
-        }
-        if (sizeof($array_order)) {
-            $ORDER_SQL = "ORDER BY " . implode(', ', $array_order);
-        } else {
-            $ORDER_SQL = "";
-        }
-
-        if (self::getDbConnection()->driver === 'sqlsrv') {
-            $TOP = "";
-            if ($ORDER_SQL === "") {
-                if ($limit) {
-                    $TOP = " TOP {$limit} ";
-                }
-            } else {
-                if ($limit) {
-                    $ORDER_SQL .= " OFFSET {$offset} ROWS FETCH NEXT {$limit} ROWS ONLY";
-                }
-            }
-            $sth = self::getDbConnection()->exec("SELECT {$TOP} * FROM " . static::getTableName() . " {$WHERE} {$ORDER_SQL}", $condition);
-        } else {
-            if ($limit) {
-                $ORDER_SQL .= " LIMIT {$limit} OFFSET {$offset}";
-            }
-            $sth = self::getDbConnection()->exec("SELECT * FROM " . static::getTableName() . " {$WHERE} {$ORDER_SQL} ", $condition);
-        }
+    /**
+     * @param string $sql
+     * @param array $params
+     * @return array|false|null
+     * @throws DbException
+     */
+    public static function execRawSql($sql, $params=[])
+    {
+        $sth = self::getDbConnection()->exec($sql, $params);
         if ($sth) {
-            return $sth->fetchAll(PDO::FETCH_CLASS, static::class);
+            return $sth->fetchAll(PDO::FETCH_CLASS, stdClass::class);
         }
-
         return null;
     }
 
