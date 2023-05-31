@@ -4,6 +4,7 @@ namespace Core;
 
 use Exception;
 use PDO;
+use stdClass;
 use Core\Exceptions\DbException;
 use PDOStatement;
 
@@ -113,6 +114,16 @@ class DbDriver
         } else {
             return false;
         }
+    }
+
+    /**
+     * @param string $table
+     * @param string $class
+     * @return QueryBuilderDriver
+     */
+    public function table($table, $class = stdClass::class)
+    {
+        return new QueryBuilderDriver($this, $class, $table);
     }
 
     /**
