@@ -59,12 +59,18 @@ class QueryBuilderDriver
         if (gettype($columns) === 'string') {
             $this->select = " {$columns} ";
         } else {
-            $this->select = " {$this->sql_quote}" . implode("{$this->sql_quote}, {$this->sql_quote}", $columns) . "{$this->sql_quote} ";
-            $this->select = str_replace(
-                "{$this->sql_quote}{$this->sql_quote}",
-                "{$this->sql_quote}" ,
-                str_replace(".", "{$this->sql_quote}.{$this->sql_quote}", $this->select)
-            );
+            foreach ($columns as $k => $v) {
+                if (gettype($k) === 'integer') {
+                    $select_field = $v;
+                    $select_field = str_replace([$this->sql_quote, "'", '"', "`"], "", $select_field);
+                    $select_field = "{$this->sql_quote}" . str_replace(".", "{$this->sql_quote}.{$this->sql_quote}", $select_field) . "{$this->sql_quote}";
+                    $columns[$k] = $select_field;
+                } else {
+                    // raw content as is it
+                    $do_nothing = true;
+                }
+            }
+            $this->select = implode(", ", $columns);
         }
         return $this;
     }
@@ -92,13 +98,21 @@ class QueryBuilderDriver
             return $this->connection->prepareSql("({$condition})", $params);
         } else {
             $tmp = [];
-            foreach ($condition as $k => $v) {
-                $where_field = $k;
-                $where_field = str_replace($this->sql_quote, "", $where_field);
-                $where_field = "{$this->sql_quote}" . str_replace(".", "{$this->sql_quote}.{$this->sql_quote}", $where_field) . "{$this->sql_quote}";
-                $tmp[] = $this->connection->prepareSql("({$where_field} = :{$k})", [$k => $v]);
+            if (sizeof($condition)) {
+                foreach ($condition as $k => $v) {
+                    $where_field = $k;
+                    $where_field = str_replace([$this->sql_quote, "'", '"', "`"], "", $where_field);
+                    $where_field = "{$this->sql_quote}" . str_replace(".", "{$this->sql_quote}.{$this->sql_quote}", $where_field) . "{$this->sql_quote}";
+                    $tmp[] = $this->connection->prepareSql("({$where_field} = :{$k})", [$k => $v]);
+                }
+                if (sizeof($tmp) === 1) {
+                    return implode("", $tmp);
+                } else {
+                    return "(" . implode(" AND ", $tmp) . ")";
+                }
+            } else {
+                return "";
             }
-            return "(" . implode(" AND ", $tmp) . ")";
         }
     }
 
@@ -178,7 +192,10 @@ class QueryBuilderDriver
      */
     public function where($condition, $params = [])
     {
-        $this->andWhere = array_merge($this->andWhere, [$this->prepareCondition($condition, $params)]);
+        $tmp = $this->prepareCondition($condition, $params);
+        if (!empty($tmp)) {
+            $this->andWhere = array_merge($this->andWhere, [$tmp]);
+        }
         return $this;
     }
 
@@ -190,7 +207,10 @@ class QueryBuilderDriver
      */
     public function orWhere($condition, $params = [])
     {
-        $this->orWhere = array_merge($this->orWhere, [$this->prepareCondition($condition, $params)]);
+        $tmp = $this->prepareCondition($condition, $params);
+        if (!empty($tmp)) {
+            $this->orWhere = array_merge($this->orWhere, [$tmp]);
+        }
         return $this;
     }
 
@@ -212,7 +232,7 @@ class QueryBuilderDriver
                     $sort_direction = "ASC";
                     $sort_field = $v;
                 }
-                $sort_field = str_replace($this->sql_quote, "", $sort_field);
+                $sort_field = str_replace([$this->sql_quote, "'", '"', "`"], "", $sort_field);
                 $sort_field = "{$this->sql_quote}" . str_replace(".", "{$this->sql_quote}.{$this->sql_quote}", $sort_field) . "{$this->sql_quote}";
                 $array_order[] = "{$sort_field} " . $sort_direction;
             }
@@ -244,11 +264,28 @@ class QueryBuilderDriver
     }
 
     /**
-     * @return array|string|string[]|null
+     * @param string $type
+     * @return string
      * @throws DbException
      */
-    public function rawSql()
+    public function prepareRawSql($type = 'select')
     {
+        /**/
+        $type = mb_strtoupper($type);
+        if (in_array($type, ['DELETE', 'UPDATE'])) {
+
+            $this->select = "";
+            //$this->alias = "";
+            $this->join = [];
+            if ($this->connection->driver === 'sqlsrv') {
+                $this->orderBy = "";
+                $this->offset = 0;
+            }
+
+        } elseif ($type !== 'SELECT') {
+            throw new DbException('Wrong query type', 500);
+        }
+
         /**/
         $sql = $this->connection->prepareSql("{$this->select} FROM {$this->table} {$this->alias}", []);
         if ($this->select !== " * ") {
@@ -297,13 +334,17 @@ class QueryBuilderDriver
                     $LIMIT = " OFFSET {$this->offset} ROWS FETCH NEXT {$this->limit} ROWS ONLY";
                 }
             }
-            $sql = "SELECT {$TOP} {$sql} {$LIMIT}";
+            $sql = "{$type} {$TOP} {$sql} {$LIMIT}";
         } else {
             $LIMIT = "";
             if ($this->limit > 0) {
-                $LIMIT = " LIMIT {$this->limit} OFFSET {$this->offset}";
+                if ($type === 'SELECT') {
+                    $LIMIT = " LIMIT {$this->limit} OFFSET {$this->offset}";
+                } else {
+                    $LIMIT = " LIMIT {$this->limit}";
+                }
             }
-            $sql = "SELECT {$sql} {$LIMIT}";
+            $sql = "{$type} {$sql} {$LIMIT}";
         }
 
         /**/
@@ -312,8 +353,8 @@ class QueryBuilderDriver
         foreach ($this->all_aliases as $k => $v) {
             $search[] = "{$k}.";
             $search[] = "{$v}.";
-            $replace[] = "\"{$k}\".";
-            $replace[] = "\"{$v}\".";
+            $replace[] = "{$this->sql_quote}{$k}{$this->sql_quote}.";
+            $replace[] = "{$this->sql_quote}{$v}{$this->sql_quote}.";
         }
         $sql = str_replace($search, $replace, $sql);
 
@@ -326,11 +367,29 @@ class QueryBuilderDriver
      */
     public function get()
     {
-        $sth = $this->connection->exec($this->rawSql());
+        $sth = $this->connection->exec($this->prepareRawSql('select'));
         if ($sth) {
             return $sth->fetchAll(PDO::FETCH_CLASS, $this->class);
         }
-        return null;
+        return false;
+    }
+
+    /**
+     * @param array|string $condition
+     * @param array $params
+     * @return false|int|null
+     * @throws DbException
+     */
+    public function delete($condition = [], $params = [])
+    {
+        $this->where($condition, $params);
+        $sth = $this->connection->exec($this->prepareRawSql('delete'));
+        if ($sth) {
+            return $this->connection->affectedRows();
+        } else {
+            return false;
+        }
+
     }
 
 }

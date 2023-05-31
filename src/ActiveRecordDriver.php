@@ -121,7 +121,7 @@ abstract class ActiveRecordDriver extends stdClass
      */
     public static function find()
     {
-        return new QueryBuilderDriver(self::getDbConnection(), static::class, static::$_table_name);
+        return new QueryBuilderDriver(self::getDbConnection(), static::class, static::getTableName());
     }
 
     /**
