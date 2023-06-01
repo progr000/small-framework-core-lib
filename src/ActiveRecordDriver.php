@@ -55,16 +55,12 @@ abstract class ActiveRecordDriver extends stdClass
     }
 
     /**
-     * @return static[]|null
+     * @return static[]|null|false
      * @throws DbException
      */
     public static function findAll()
     {
-        $sth = self::getDbConnection()->exec("SELECT * FROM " . static::getTableName());
-        if ($sth) {
-            return $sth->fetchAll(PDO::FETCH_CLASS, static::class);
-        }
-        return null;
+        return self::find()->get();
     }
 
     /**
@@ -84,32 +80,9 @@ abstract class ActiveRecordDriver extends stdClass
      */
     public static function findOne($condition = [])
     {
-        $sql_quote = self::getDbConnection()->sql_quote;
-        $WHERE = "";
-        if (is_array($condition)) {
-            if (sizeof($condition)) {
-                $el = [];
-                foreach ($condition as $k => $v) {
-                    $el[] = "({$sql_quote}{$k}{$sql_quote} = :{$k})";
-                }
-                $WHERE = "WHERE " . implode(" AND ", $el);
-            }
-        } else {
-            $WHERE = "WHERE " . $condition;
-            $condition = [];
-        }
-
-        if (self::getDbConnection()->driver === 'sqlsrv') {
-            $sth = self::getDbConnection()->exec("SELECT TOP 1 * FROM " . static::getTableName() . " {$WHERE}", $condition);
-        } else {
-            $sth = self::getDbConnection()->exec("SELECT * FROM " . static::getTableName() . " {$WHERE} LIMIT 1", $condition);
-        }
-        if ($sth) {
-            $sth->setFetchMode(PDO::FETCH_CLASS, static::class);
-            $res = $sth->fetch(PDO::FETCH_CLASS);
-            if ($res) {
-                return $res;
-            }
+        $res = self::find()->where($condition)->limit(1)->get();
+        if (isset($res[0])) {
+            return $res[0];
         }
 
         return null;
@@ -148,6 +121,14 @@ abstract class ActiveRecordDriver extends stdClass
     public static function deleteRecords($condition = [], $params = [])
     {
         return self::find()->delete($condition, $params);
+    }
+
+    /**
+     * @throws DbException
+     */
+    public static function truncate()
+    {
+        return self::execRawSql("TRUNCATE TABLE " . static::getTableName());
     }
 
     /**
