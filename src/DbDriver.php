@@ -127,6 +127,26 @@ class DbDriver
     }
 
     /**
+     * @param $val
+     * @return false|int|string|void
+     * @throws DbException
+     */
+    public function prepareValType($val)
+    {
+        $type = gettype($val);
+        if (!in_array($type, ["boolean", "integer", "double", "string", "NULL"])) {
+            throw new DbException("Can't prepare Sql statement for this variable type {$type}", 500);
+        }
+        if (in_array($type, ["boolean", "integer"])) {
+            return intval($val);
+        } elseif ($type !== "NULL") {
+            return $this->pdo->quote($val);
+        } else {
+            return 'null'; // TODO check this on Postgres and MsSql (MySql is OK)
+        }
+    }
+
+    /**
      * Replace keys in query for its values
      * @param string $sql
      * @param array $params
@@ -136,15 +156,7 @@ class DbDriver
     public function prepareSql($sql, array $params)
     {
         foreach ($params as $key => $val) {
-            $type = gettype($val);
-            if (!in_array($type, ["boolean", "integer", "double", "string", "NULL"])) {
-                throw new DbException("Can't prepare Sql statement for this variable type {$type}", 500);
-            }
-            if (in_array($type, ["boolean", "integer"])) {
-                $params[$key] = intval($val);
-            } elseif ($type !== "NULL") {
-                $params[$key] = $this->pdo->quote($val);
-            }
+            $params[$key] = $this->prepareValType($val);
         }
         $keys = array_map(function ($val) {
             return ":{$val}";

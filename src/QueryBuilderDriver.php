@@ -35,6 +35,11 @@ class QueryBuilderDriver
     private $offset = 0;
     /** @var array */
     private $all_aliases = [];
+    /** @var array */
+    private $insert_update_upsert_data = [];
+
+    /** @var bool */
+    private $only_show_sql = false;
 
 
     /**
@@ -42,12 +47,13 @@ class QueryBuilderDriver
      * @param string $class
      * @param string $table
      */
-    public function __construct($connection, $class, $table)
+    public function __construct($connection, $class, $table, $only_show_sql=false)
     {
         $this->connection = $connection;
         $this->sql_quote = $this->connection->sql_quote;
         $this->class = $class;
         $this->table = $table;
+        $this->only_show_sql = $only_show_sql;
     }
 
     /**
@@ -264,45 +270,147 @@ class QueryBuilderDriver
     }
 
     /**
+     * @return array|false|null|string
+     * @throws DbException
+     */
+    public function get()
+    {
+        $sql = $this->prepareRawSql('select');
+        if ($this->only_show_sql) {
+            return $sql;
+        }
+        $sth = $this->connection->exec($sql);
+        if ($sth) {
+            return $sth->fetchAll(PDO::FETCH_CLASS, $this->class);
+        }
+        return false;
+    }
+
+    /**
+     * @param array|string $condition
+     * @param array $params
+     * @return false|int|null|string
+     * @throws DbException
+     */
+    public function delete($condition = [], $params = [])
+    {
+        $this->where($condition, $params);
+        $sql = $this->prepareRawSql('delete');
+        if ($this->only_show_sql) {
+            return $sql;
+        }
+        $sth = $this->connection->exec($sql);
+        if ($sth) {
+            return $this->connection->affectedRows();
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @param array $fields
+     * @return false|int|null|string
+     * @throws DbException
+     */
+    public function insert(array $fields)
+    {
+        $this->insert_update_upsert_data = $fields;
+        $sql = $this->prepareRawSql('insert');
+        if ($this->only_show_sql) {
+            return $sql;
+        }
+        $sth = $this->connection->exec($sql);
+        if ($sth) {
+            return $this->connection->affectedRows();
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @param array $fields
+     * @param array|string $condition
+     * @return false|int|null|string
+     * @throws DbException
+     */
+    public function update(array $fields, $condition)
+    {
+        $this->insert_update_upsert_data = $fields;
+        $this->where($condition, []);
+        $sql = $this->prepareRawSql('update');
+        if ($this->only_show_sql) {
+            return $sql;
+        }
+        $sth = $this->connection->exec($sql);
+        if ($sth) {
+            return $this->connection->affectedRows();
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @param array $fields
+     * @return false|int|null|string
+     * @throws DbException
+     */
+    public function upsert(array $fields)
+    {
+        $this->insert_update_upsert_data = $fields;
+        $sql = $this->prepareRawSql('upsert');
+        if ($this->only_show_sql) {
+            return $sql;
+        }
+        $sth = $this->connection->exec($sql);
+        if ($sth) {
+            return $this->connection->affectedRows();
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * @param string $type
      * @return string
      * @throws DbException
      */
-    public function prepareRawSql($type = 'select')
+    private function prepareRawSql($type = 'select')
     {
-        /**/
         $type = mb_strtoupper($type);
-        if (in_array($type, ['DELETE', 'UPDATE'])) {
+        if ($type === 'SELECT') {
+            $sql = $this->prepareRawSqlSelect();
+        } elseif ($type === 'DELETE') {
+            $sql = $this->prepareRawSqlDelete();
+        } elseif ($type === 'INSERT') {
+            $sql = $this->prepareRawSqlInsert();
+        } elseif ($type === 'UPDATE') {
 
-            $this->select = "";
-            //$this->alias = "";
-            $this->join = [];
-            if ($this->connection->driver === 'sqlsrv') {
-                $this->orderBy = "";
-                $this->offset = 0;
-            }
+        } elseif ($type === 'UPSERT') {
 
-        } elseif ($type !== 'SELECT') {
+        } else {
             throw new DbException('Wrong query type', 500);
         }
 
-        /**/
-        $sql = $this->connection->prepareSql("{$this->select} FROM {$this->table} {$this->alias}", []);
-        if ($this->select !== " * ") {
-            /* if field specified, can't return rear modelClass, return stdClass instead */
-            $this->class = stdClass::class;
+        /* some finally replacement */
+        $search = [];
+        $replace = [];
+        foreach ($this->all_aliases as $k => $v) {
+            $search[] = "{$k}.";
+            $search[] = "{$v}.";
+            $replace[] = "{$this->sql_quote}{$k}{$this->sql_quote}.";
+            $replace[] = "{$this->sql_quote}{$v}{$this->sql_quote}.";
         }
+        $sql = str_replace($search, $replace, $sql);
 
-        /**/
-        if (sizeof($this->join)) {
-            foreach ($this->join as $v) {
-                $sql .= " {$v['type']} {$v['table']} ON {$v['on']} ";
-            }
-            /* if join enabled can't return rear modelClass, return stdClass instead */
-            $this->class = stdClass::class;
-        }
+        /* return query */
+        return preg_replace("/[\s]+/", " ", trim($sql));
+    }
 
-        /**/
+    /**
+     * @return string
+     */
+    private function prepareRawWhere()
+    {
         $where = "";
         if (sizeof($this->andWhere) || sizeof($this->orWhere)) {
             if (sizeof($this->andWhere)) {
@@ -316,12 +424,17 @@ class QueryBuilderDriver
                 }
             }
         }
-        $sql .= $where;
 
-        /**/
-        $sql .= $this->orderBy;
+        return $where;
+    }
 
-        /**/
+    /**
+     * @param string $type
+     * @param string $sql
+     * @return string
+     */
+    private function addRawLimit($type, $sql)
+    {
         if ($this->connection->driver === 'sqlsrv') {
             $TOP = "";
             $LIMIT = "";
@@ -347,49 +460,115 @@ class QueryBuilderDriver
             $sql = "{$type} {$sql} {$LIMIT}";
         }
 
-        /**/
-        $search = [];
-        $replace = [];
-        foreach ($this->all_aliases as $k => $v) {
-            $search[] = "{$k}.";
-            $search[] = "{$v}.";
-            $replace[] = "{$this->sql_quote}{$k}{$this->sql_quote}.";
-            $replace[] = "{$this->sql_quote}{$v}{$this->sql_quote}.";
-        }
-        $sql = str_replace($search, $replace, $sql);
-
-        return preg_replace("/[\s]+/", " ", trim($sql));
+        return $sql;
     }
 
     /**
-     * @return array|false|null
+     * @return string
      * @throws DbException
      */
-    public function get()
+    private function prepareRawSqlSelect()
     {
-        $sth = $this->connection->exec($this->prepareRawSql('select'));
-        if ($sth) {
-            return $sth->fetchAll(PDO::FETCH_CLASS, $this->class);
+        /* begin query */
+        $sql = $this->connection->prepareSql("{$this->select} FROM {$this->table} {$this->alias}", []);
+        if ($this->select !== " * ") {
+            /* if field specified, can't return rear modelClass, return stdClass instead */
+            $this->class = stdClass::class;
         }
-        return false;
+
+        /* all joins for query */
+        if (sizeof($this->join)) {
+            foreach ($this->join as $v) {
+                $sql .= " {$v['type']} {$v['table']} ON {$v['on']} ";
+            }
+            /* if join enabled can't return rear modelClass, return stdClass instead */
+            $this->class = stdClass::class;
+        }
+
+        /* where for query */
+        $sql .= $this->prepareRawWhere();
+
+        /* order for query */
+        $sql .= $this->orderBy;
+
+        /* limit for query and return*/
+        return $this->addRawLimit('SELECT', $sql);
     }
 
     /**
-     * @param array|string $condition
-     * @param array $params
-     * @return false|int|null
+     * @return string
      * @throws DbException
      */
-    public function delete($condition = [], $params = [])
+    private function prepareRawSqlDelete()
     {
-        $this->where($condition, $params);
-        $sth = $this->connection->exec($this->prepareRawSql('delete'));
-        if ($sth) {
-            return $this->connection->affectedRows();
+        /* unset some stuf for delete */
+        $this->select = "";
+        if ($this->connection->driver === 'sqlsrv') {
+            $this->orderBy = "";
+            $this->offset = 0;
+        }
+
+        /* begin query */
+        $sql = $this->connection->prepareSql("FROM {$this->table} {$this->alias}", []);
+
+        /* where for query */
+        $sql .= $this->prepareRawWhere();
+
+        /* order for query */
+        $sql .= $this->orderBy;
+
+        /* limit for query and return*/
+        return $this->addRawLimit('DELETE', $sql);
+    }
+
+    /**
+     * @return string
+     * @throws DbException
+     */
+    private function prepareRawSqlInsert()
+    {
+        /* check is multiple array for insert */
+        if (isset($this->insert_update_upsert_data[0]) && is_array($this->insert_update_upsert_data[0])) {
+            $fields_names_get_from = $this->insert_update_upsert_data[0];
+            $values_array = $this->insert_update_upsert_data;
         } else {
-            return false;
+            $fields_names_get_from = $this->insert_update_upsert_data;
+            $values_array[] = $this->insert_update_upsert_data;
         }
 
-    }
+        /* check is associative array with data */
+        $is_assoc = true;
+        foreach ($fields_names_get_from as $k => $v) {
+            if (gettype($k) === 'integer') {
+                $is_assoc = false;
+                break;
+            }
+        }
 
+        /* assoc or not */
+        if ($is_assoc) {
+            $fields_names = array_keys($fields_names_get_from);
+            foreach ($fields_names as $k => $insert_field) {
+                $insert_field = str_replace([$this->sql_quote, "'", '"', "`"], "", $insert_field);
+                $insert_field = "{$this->sql_quote}" . str_replace(".", "{$this->sql_quote}.{$this->sql_quote}", $insert_field) . "{$this->sql_quote}";
+                $fields_names[$k] = $insert_field;
+            }
+            $fields = "(" . implode(', ', $fields_names) . ")";
+        } else {
+            $fields = "";
+        }
+
+        /* values */
+        $values_string_array = [];
+        foreach ($values_array as $values) {
+            $keys = array_keys($values);
+            $values_string = "(:" . implode(', :', $keys) . ")";
+            $values_string = $this->connection->prepareSql($values_string, $values);
+            $values_string_array[] = $values_string;
+        }
+        $values_sql = implode(', ', $values_string_array);
+
+        /* return */
+        return $this->connection->prepareSql("INSERT INTO {$this->table} {$fields} VALUES {$values_sql}", []);
+    }
 }

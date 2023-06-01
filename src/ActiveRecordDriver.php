@@ -92,14 +92,28 @@ abstract class ActiveRecordDriver extends stdClass
      * @return QueryBuilderDriver
      * @throws DbException
      */
-    public static function find()
+    public static function find($only_show_sql = false)
     {
-        return new QueryBuilderDriver(self::getDbConnection(), static::class, static::getTableName());
+        return new QueryBuilderDriver(self::getDbConnection(), static::class, static::getTableName(), $only_show_sql);
     }
 
+    /**
+     * @return QueryBuilderDriver
+     * @throws DbException
+     */
+    public static function table($only_show_sql = false)
+    {
+        return new QueryBuilderDriver(self::getDbConnection(), static::class, static::getTableName(), $only_show_sql);
+    }
+
+    /**
+     * @param array $fields
+     * @return false|int|string|null
+     * @throws DbException
+     */
     public static function insert($fields)
     {
-
+        return self::table()->insert($fields);
     }
 
     public static function update($fields, $condition)
@@ -155,7 +169,7 @@ abstract class ActiveRecordDriver extends stdClass
     {
         $pkf = static::$_primary_key_field;
         $mappedProperties = $this->mapProperties();
-        if (isset($this->$pkf)) {
+        if (isset($this->$pkf)) { // TODO repair case when I want to change primary key and this key already exists - than give not error but update another record,
             return $this->_update($mappedProperties);
         } else {
             return $this->_insert($mappedProperties);
@@ -184,7 +198,7 @@ abstract class ActiveRecordDriver extends stdClass
             "WHERE {$sql_quote}" . static::$_primary_key_field . "{$sql_quote} = " . $this->{static::$_primary_key_field};
         //return self::getDbConnection()->exec($sql, $params);
         self::getDbConnection()->exec($sql, $params);
-        return (self::getDbConnection()->affectedRows() > 0);
+        return (sizeof(self::getDbConnection()->getErrors()) == 0);
     }
 
     /**
