@@ -114,9 +114,14 @@ class MigrationDriver
      */
     private function execute($file, $method)
     {
-        $class = self::PATH_CLASS . mb_substr($file, 0, strpos($file, '.'));
-        $migration = new $class();
-        return $migration->{$method}();
+        try {
+            $class = self::PATH_CLASS . mb_substr($file, 0, strpos($file, '.'));
+            $migration = new $class();
+            return $migration->{$method}();
+        } catch (Exception $e) {
+            @unlink(self::$lock_file);
+            return false;
+        }
     }
 
     /**
@@ -223,6 +228,7 @@ class MigrationDriver
         $content = str_replace("__NEW_CLASS_NAME__", $name, $content);
         $file_name = self::$FOLDER . "/{$name}.php";
         file_put_contents($file_name, $content);
+        chmod($file_name, 0777);
         LogDriver::success("Successfully created. You can edit '" . realpath($file_name) . "' now, and then run migrate.", 0);
         return true;
     }
