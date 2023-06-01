@@ -124,6 +124,32 @@ abstract class ActiveRecordDriver extends stdClass
         return new QueryBuilderDriver(self::getDbConnection(), static::class, static::getTableName());
     }
 
+    public static function insert($fields)
+    {
+
+    }
+
+    public static function update($fields, $condition)
+    {
+
+    }
+
+    public static function upsert($fields)
+    {
+
+    }
+
+    /**
+     * @param array|string $condition
+     * @param array $params
+     * @return false|int|null
+     * @throws DbException
+     */
+    public static function deleteRecords($condition = [], $params = [])
+    {
+        return self::find()->delete($condition, $params);
+    }
+
     /**
      * @param string $sql
      * @param array $params
@@ -149,9 +175,9 @@ abstract class ActiveRecordDriver extends stdClass
         $pkf = static::$_primary_key_field;
         $mappedProperties = $this->mapProperties();
         if (isset($this->$pkf)) {
-            return $this->update($mappedProperties);
+            return $this->_update($mappedProperties);
         } else {
-            return $this->insert($mappedProperties);
+            return $this->_insert($mappedProperties);
         }
     }
 
@@ -160,7 +186,7 @@ abstract class ActiveRecordDriver extends stdClass
      * @return bool
      * @throws DbException
      */
-    private function update(array $mappedProperties)
+    private function _update(array $mappedProperties)
     {
         $sql_quote = self::getDbConnection()->sql_quote;
         $columns = [];
@@ -185,7 +211,7 @@ abstract class ActiveRecordDriver extends stdClass
      * @return bool
      * @throws DbException
      */
-    private function insert(array $mappedProperties)
+    private function _insert(array $mappedProperties)
     {
         $sql_quote = self::getDbConnection()->sql_quote;
         $filteredProperties = array_filter($mappedProperties);
