@@ -92,7 +92,7 @@ class MigrationDriver
         }
 
         try {
-            $list_in_db = App::$db->getAll("SELECT " . self::COLUMN_NAME . " as m FROM " . self::TABLE_LIST_MIGRATIONS . " ORDER BY migration_name");
+            $list_in_db = App::$db->getAll("SELECT " . self::COLUMN_NAME . " as m FROM {{" . self::TABLE_LIST_MIGRATIONS . "}} ORDER BY migration_name");
             if ($list_in_db) {
                 foreach ($list_in_db as $v) {
                     $this->done_list[] = $v['m'];
@@ -141,7 +141,7 @@ class MigrationDriver
                 if ($steps === null || $cnt < $steps) {
                     $executeMigration = LogDriver::executingMessage("Installing migration '{$v}'", 0);
                     if ($this->execute($v, 'up') !== false) {
-                        App::$db->exec("INSERT INTO " . self::TABLE_LIST_MIGRATIONS . " (" . self::COLUMN_NAME . ") VALUES (:name)", ['name' => $v]);
+                        App::$db->exec("INSERT INTO {{" . self::TABLE_LIST_MIGRATIONS . "}} (" . self::COLUMN_NAME . ") VALUES (:name)", ['name' => $v]);
                         $executeMigration->showSuccess();
                     } else {
                         App::$db->rollBack();
@@ -177,7 +177,7 @@ class MigrationDriver
                 if ($cnt < $steps) {
                     $executeMigration = LogDriver::executingMessage("Uninstalling migration '{$v}'", 0);
                     if ($this->execute($v, 'down') !== false) {
-                        App::$db->exec("DELETE FROM " . self::TABLE_LIST_MIGRATIONS . " WHERE " . self::COLUMN_NAME . " =  :name", ['name' => $v]);
+                        App::$db->exec("DELETE FROM {{" . self::TABLE_LIST_MIGRATIONS . "}} WHERE " . self::COLUMN_NAME . " =  :name", ['name' => $v]);
                         $executeMigration->showSuccess();
                     } else {
                         App::$db->rollBack();
