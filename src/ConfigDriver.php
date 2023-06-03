@@ -36,15 +36,6 @@ class ConfigDriver
         }
 
         $config = require $config_dir . '/main.php';
-        if (file_exists($config_dir . '/main-local.php')) {
-            $config = array_merge(
-                $config,
-                require $config_dir . '/main-local.php'
-            );
-        } elseif (defined('IS_DEBUG') && IS_DEBUG) {
-            LogDriver::warning("You can create local config file '". $config_dir . '/main-local.php' ."', with some params, which can override params from config/main.php", 0);
-        }
-
         $this->container = new stdClass();
         foreach ($config as $k=>$v) {
             $this->container->$k = $v;
