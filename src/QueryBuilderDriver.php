@@ -37,6 +37,8 @@ class QueryBuilderDriver
     private $all_aliases = [];
     /** @var array */
     private $insert_update_upsert_data = [];
+    /** @var array */
+    private $upsert_unique_by = [];
 
     /** @var bool */
     private $only_show_sql = false;
@@ -100,7 +102,7 @@ class QueryBuilderDriver
      */
     private function prepareCondition($condition, $params = [])
     {
-        if (gettype($condition) === 'string') {
+        if (gettype($condition) === 'string' && (trim($condition) !== "")) {
             return $this->connection->prepareSql("({$condition})", $params);
         } else {
             $tmp = [];
@@ -116,10 +118,10 @@ class QueryBuilderDriver
                 } else {
                     return "(" . implode(" AND ", $tmp) . ")";
                 }
-            } else {
-                return "";
             }
         }
+
+        return "";
     }
 
     /**
@@ -329,11 +331,11 @@ class QueryBuilderDriver
 
     /**
      * @param array $fields
-     * @param array|string $condition
+     * @param array $condition
      * @return false|int|null|string
      * @throws DbException
      */
-    public function update(array $fields, $condition)
+    public function update(array $fields, $condition = [])
     {
         $this->insert_update_upsert_data = $fields;
         $this->where($condition, []);
@@ -351,16 +353,20 @@ class QueryBuilderDriver
 
     /**
      * @param array $fields
+     * @param array $uniqueBy
      * @return false|int|null|string
      * @throws DbException
      */
-    public function upsert(array $fields)
+    public function upsert(array $fields, $uniqueBy = [])
     {
         $this->insert_update_upsert_data = $fields;
+        $this->upsert_unique_by = $uniqueBy;
         $sql = $this->prepareRawSql('upsert');
         if ($this->only_show_sql) {
             return $sql;
         }
+
+        /**/
         $sth = $this->connection->exec($sql);
         if ($sth) {
             return $this->connection->affectedRows();
@@ -384,9 +390,9 @@ class QueryBuilderDriver
         } elseif ($type === 'INSERT') {
             $sql = $this->prepareRawSqlInsert();
         } elseif ($type === 'UPDATE') {
-
+            $sql = $this->prepareRawSqlUpdate();
         } elseif ($type === 'UPSERT') {
-
+            $sql = $this->prepareRawSqlUpsert();
         } else {
             throw new DbException('Wrong query type', 500);
         }
@@ -570,5 +576,70 @@ class QueryBuilderDriver
 
         /* return */
         return $this->connection->prepareSql("INSERT INTO {$this->table} {$fields} VALUES {$values_sql}", []);
+    }
+
+    /**
+     * @return string
+     * @throws DbException
+     */
+    private function prepareRawSqlUpdate()
+    {
+        $f = [];
+        foreach ($this->insert_update_upsert_data as $field => $value) {
+            $f[] = "{$field} = :$field";
+        }
+        $sql = "UPDATE {$this->table} SET " . implode(', ', $f);
+        $sql .= $this->prepareRawWhere();
+
+        return $this->connection->prepareSql($sql, $this->insert_update_upsert_data);
+    }
+
+    /**
+     * @return string|string[]
+     * @throws DbException
+     */
+    private function prepareRawSqlUpsert()
+    {
+        /**/
+        $sql = $this->prepareRawSqlInsert();
+
+        /**/
+        $f = [];
+        foreach ($this->insert_update_upsert_data as $field => $value) {
+            $f[$field] = "{$field} = :$field";
+        }
+
+        /**/
+        if ($this->connection->driver === 'mysql') {
+
+            $sql .= " ON DUPLICATE KEY UPDATE " . implode(', ', $f);
+
+        } elseif ($this->connection->driver === 'pgsql') {
+
+            if (empty($this->upsert_unique_by)) {
+                throw new DbException("You must specify 'uniqueBy'");
+            }
+            $sql .= " ON CONFLICT (" . implode($this->upsert_unique_by) . ") DO UPDATE SET " . implode(', ', $f);
+
+        } else {
+
+            if (empty($this->upsert_unique_by)) {
+                throw new DbException("You must specify 'uniqueBy'");
+            }
+            $where = [];
+            foreach ($this->upsert_unique_by as $k => $v) {
+                if (!isset($this->insert_update_upsert_data[$v])) {
+                    throw new DbException("You must specify correct 'uniqueBy'");
+                }
+                unset($f[$v]);
+                $where[] = "({$v} = :{$v})";
+            }
+
+            $sql = "SET IDENTITY_INSERT {$this->table} ON UPDATE {$this->table} SET " . implode(', ', $f) . " WHERE " . implode($where) ." if @@ROWCOUNT = 0 " . $sql . " SET IDENTITY_INSERT {$this->table} OFF";
+            //throw new DbException("This DB-driver doesn't support UPSERT method");
+
+        }
+
+        return $this->connection->prepareSql($sql, $this->insert_update_upsert_data);
     }
 }

@@ -55,6 +55,15 @@ abstract class ActiveRecordDriver extends stdClass
     }
 
     /**
+     * @return array|mixed
+     * @throws DbException
+     */
+    public static function getErrors()
+    {
+        return self::getDbConnection()->getErrors();
+    }
+
+    /**
      * @return static[]|null|false
      * @throws DbException
      */
@@ -71,6 +80,52 @@ abstract class ActiveRecordDriver extends stdClass
     public static function findById($id)
     {
         return self::findOne([static::$_primary_key_field => $id]);
+    }
+
+    /**
+     * @param int $id
+     * @return ActiveRecordDriver
+     * @throws DbException
+     */
+    public static function findOrFail($id)
+    {
+        $ret = self::findById($id);
+        if ($ret) {
+            return $ret;
+        } else {
+            throw new DbException("Model with id = {$id} doesn't exist.");
+        }
+    }
+
+    /**
+     * @param int $id
+     * @return ActiveRecordDriver|static
+     * @throws DbException
+     */
+    public static function findOrNew($id)
+    {
+        $ret = self::findById($id);
+        if ($ret) {
+            return $ret;
+        } else {
+            return new static();
+        }
+    }
+
+    /**
+     * @param int $id
+     * @param mixed $or
+     * @return ActiveRecordDriver
+     * @throws DbException
+     */
+    public static function findOr($id, $or)
+    {
+        $ret = self::findById($id);
+        if ($ret) {
+            return $ret;
+        } else {
+            return $or;
+        }
     }
 
     /**
@@ -111,19 +166,31 @@ abstract class ActiveRecordDriver extends stdClass
      * @return false|int|string|null
      * @throws DbException
      */
-    public static function insert($fields)
+    public static function insert(array $fields)
     {
         return self::table()->insert($fields);
     }
 
-    public static function update($fields, $condition)
+    /**
+     * @param array $fields
+     * @param array $condition
+     * @return false|int|string|null
+     * @throws DbException
+     */
+    public static function update(array $fields, $condition = [])
     {
-
+        return self::table()->update($fields, $condition);
     }
 
-    public static function upsert($fields)
+    /**
+     * @param array $fields
+     * @param array $uniqueBy
+     * @return false|int|string|null
+     * @throws DbException
+     */
+    public static function upsert(array $fields, $uniqueBy = [])
     {
-
+        return self::table()->upsert($fields, $uniqueBy);
     }
 
     /**
@@ -243,6 +310,14 @@ abstract class ActiveRecordDriver extends stdClass
             ['id' => $this->{static::$_primary_key_field}]
         );
         $this->{static::$_primary_key_field} = null;
+    }
+
+    /**
+     * @throws DbException
+     */
+    public function getError()
+    {
+        return self::getErrors();
     }
 
     /**
