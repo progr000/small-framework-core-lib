@@ -193,6 +193,9 @@ class RouteDriver
             $m->handle(App::$request);
         }
 
+        /* Localization */
+        App::$localization->init();
+
         /**/
         if (gettype($controllerAndAction['action']) === 'object') {
 

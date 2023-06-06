@@ -22,10 +22,15 @@ class App
     public static $request;
     /** @var ResponseDriver */
     public static $response;
+    /** @var LocalizationDriver */
+    public static $localization;
     /** @var DbDriver */
     public static $db;
     /** @var DbDriver[] */
     public static $DbInstances;
+
+    /** @var string */
+    public static $locale;
 
     /**
      * @param string $config_dir
@@ -33,12 +38,18 @@ class App
      */
     private function __construct($config_dir)
     {
+        session_start();
+
         require_once __DIR__ . "/DumperDriver.php";
 
         self::$config = ConfigDriver::getInstance($config_dir);
         self::$route = RouteDriver::getInstance();
         self::$request = new RequestDriver();
         self::$response = new ResponseDriver();
+        self::$localization = LocalizationDriver::getInstance();
+
+        /**/
+        self::$locale = self::$config->get('localization', ['default-locale' => "en"])['default-locale'];
 
         /**/
         foreach (self::$config->get('databases', []) as $conn_name => $conn_params) {
