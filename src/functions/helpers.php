@@ -11,11 +11,12 @@ if (! function_exists('config')) {
 
 if (! function_exists('__')) {
     /**
-     * @param string $string
+     * @param string $key
+     * @param array $replace
      * @return string
      */
-    function __($string)
+    function __($key, $replace = [])
     {
-        return $string;
+        return $key;
     }
 }
