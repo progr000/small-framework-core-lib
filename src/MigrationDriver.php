@@ -10,6 +10,8 @@ class MigrationDriver
 {
     /** @var MigrationDriver */
     private static $instance;
+    /** @var array */
+    private $errors = [];
 
     /** @var string */
     private static $lock_file;
@@ -117,7 +119,12 @@ class MigrationDriver
         try {
             $class = self::PATH_CLASS . mb_substr($file, 0, strpos($file, '.'));
             $migration = new $class();
-            return $migration->{$method}();
+            if ($migration->{$method}()) {
+                return true;
+            } else {
+                $this->errors = array_merge($this->errors, $migration->getErrors());
+                return false;
+            }
         } catch (Exception $e) {
             @unlink(self::$lock_file);
             return false;
@@ -146,7 +153,8 @@ class MigrationDriver
                     } else {
                         App::$db->rollBack();
                         $executeMigration->showError();
-                        LogDriver::warning(App::$db->getErrors(), 0);
+                        //LogDriver::warning(App::$db->getErrors(), 0);
+                        LogDriver::warning($this->errors, 0);
                         return false;
                     }
                     $cnt++;
@@ -182,7 +190,8 @@ class MigrationDriver
                     } else {
                         App::$db->rollBack();
                         $executeMigration->showError();
-                        LogDriver::warning(App::$db->getErrors(), 0);
+                        //LogDriver::warning(App::$db->getErrors(), 0);
+                        LogDriver::warning($this->errors, 0);
                         return false;
                     }
                     $cnt++;

@@ -7,11 +7,11 @@ use Core\Exceptions\ValidatorException;
 class ValidatorDriver
 {
     /** @var array */
-    private $failed = [];
+    protected $failed = [];
     /** @var array */
-    private $success = [];
+    protected $success = [];
     /** @var array */
-    private $data;
+    protected $data;
 
     /** @var RequestDriver  */
     private $request;
@@ -49,28 +49,35 @@ class ValidatorDriver
 
             $methods = [];
             $params = [];
-            $arr = explode('|', $rule);
-            foreach ($arr as $value) {
+            if (!is_array($rule)) {
+                $rule = explode('|', $rule);
+            }
+            foreach ($rule as $value) {
                 $tmp = explode(':', $value);
                 if (isset($tmp[1])) {
 
                     if (method_exists($this, $tmp[0])) {
-                        $methods[] = $tmp[0];
+                        $methods[] = ['type' => 'function', 'exec' => $tmp[0]];
                         for ($i=1; $i<count($tmp); $i++) {
-                            $params[$tmp[$i]] = $tmp[$i];
+                            //$params[$tmp[$i]] = $tmp[$i];
+                            $params[$tmp[0]] = $tmp[$i];
                         }
                     } else {
                         if (in_array($tmp[0], ['min', 'max']))
                             $params[$tmp[0]] = doubleval($tmp[1]);
                         elseif ($tmp[0] === 'length')
                             $params[$tmp[0]] = intval($tmp[1]);
+                        elseif ($tmp[0] === 'regex')
+                            $params[$tmp[0]] = intval($tmp[1]);
                         else
-                            $params[$tmp[0]] = $tmp[1];
+                            $params[] = $tmp[1];
                     }
 
                 } else {
                     if (method_exists($this, $tmp[0])) {
-                        $methods[] = $tmp[0];
+                        $methods[] = ['type' => 'function', 'exec' => $tmp[0]];
+                    } elseif (class_exists($tmp[0])) {
+                        $methods[] = ['type' => 'class', 'exec' => $tmp[0]];
                     } else {
                         throw new ValidatorException("Wrong rule in RequestClass " . get_class($this->request) . ". Validator-method {$tmp[0]}() doesn't exist.", 500);
                     }
@@ -83,11 +90,20 @@ class ValidatorDriver
 
             $test_var = true;
             foreach ($methods as $method) {
-                if (isset($this->data[$key]) || $method === 'required') {
+                if (isset($this->data[$key]) || $method['exec'] === 'required') {
                     //dump($this->data[$key], $method, $this->$method($key, $params));
-                    if (!$this->$method($key, $params)) {
-                        $ret = false;
-                        $test_var = false;
+                    if ($method['type'] === 'function') {
+                        if (!$this->{$method['exec']}($key, $params)) {
+                            $ret = false;
+                            $test_var = false;
+                        }
+                    } else {
+                        $f = new $method['exec']($this);
+                        if (!$f($this->data[$key], $params, $this->data)) {
+                            $this->failed[$key][] = isset($f->errorMessage) ? $f->errorMessage : 'Wrong value';
+                            $ret = false;
+                            $test_var = false;
+                        }
                     }
                 }
             }
@@ -226,4 +242,24 @@ class ValidatorDriver
         return $ret;
     }
 
+    /**
+     * @param string $key
+     * @param array $params
+     * @return bool
+     */
+    private function regex($key, array $params = [])
+    {
+        $val = $this->data[$key];
+        if (empty($params['regex'])) {
+            $this->failed[$key][] = 'Wrong regex for validation';
+            return false;
+        }
+
+        if (preg_match($params['regex'], $val)) {
+            return true;
+        }
+
+        $this->failed[$key][] = "value not match with regex /{$params['regex']}/";
+        return false;
+    }
 }
