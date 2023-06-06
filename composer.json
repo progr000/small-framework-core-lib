@@ -21,6 +21,9 @@
         "ext-curl": "*"
     },
     "autoload": {
+        "files": [
+            "src/functions/helpers.php"
+        ],
         "psr-4": {
             "Core\\": "src/"
         }
