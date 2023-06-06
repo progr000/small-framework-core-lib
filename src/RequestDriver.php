@@ -160,6 +160,17 @@ class RequestDriver implements RequestInterface
     }
 
     /**
+     * This method must return messages for rules
+     * Strongly recommended leave empty rules in this class
+     * and override this method in child class with needed rules
+     * @return array
+     */
+    public function messages()
+    {
+        return [];
+    }
+
+    /**
      * Start validation
      * @return bool
      * @throws ValidatorException
