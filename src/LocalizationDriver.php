@@ -33,7 +33,7 @@ class LocalizationDriver
     public function init()
     {
         $file = config('localization', []);
-        if (isset($file['json-path']) && file_exists($file['json-path'] . "/" .  App::$locale . ".json")) {
+        if (!empty($file['json-path']) && file_exists($file['json-path'] . "/" .  App::$locale . ".json")) {
             $this->container = json_decode(file_get_contents($file['json-path'] . "/" .  App::$locale . ".json"), true);
         }
     }

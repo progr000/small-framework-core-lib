@@ -42,9 +42,7 @@ class DbDriver
     private function __construct($db_conf_name = 'db-main')
     {
         /* try to obtain table prefix */
-        $conn = isset(config('databases', [])[$db_conf_name])
-            ? config('databases', [])[$db_conf_name]
-            : [];
+        $conn = config("databases->{$db_conf_name}", []);
         $this->table_prefix = isset($conn['table_prefix']) ? $conn['table_prefix'] : "";
 
         /* connect to DB */
