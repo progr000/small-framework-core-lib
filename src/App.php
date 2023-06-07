@@ -100,6 +100,9 @@ class App
                 $m->handle(App::$request);
             }
 
+            /* localization init */
+            App::$localization->init();
+
             /**/
             ob_start();
             $res = self::$route->processRoute();
