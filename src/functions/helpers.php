@@ -54,6 +54,22 @@ if (!function_exists('session')) {
     }
 }
 
+if (!function_exists('cookie')) {
+    /**
+     * @param string|array|null $key
+     * @param mixed $default
+     * @return \Core\CookieDriver|mixed|void
+     */
+    function cookie($key = null, $default = null)
+    {
+        if (is_null($key)) {
+            return App::$cookie;
+        }
+
+        return App::$cookie->get($key, $default);
+    }
+}
+
 if (!function_exists('__')) {
     /**
      * @param string $key

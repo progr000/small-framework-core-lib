@@ -27,6 +27,8 @@ class App
     public static $localization;
     /** @var $session */
     public static $session;
+    /** @var $cookie */
+    public static $cookie;
     /** @var DbDriver */
     public static $db;
     /** @var DbDriver[] */
@@ -45,6 +47,7 @@ class App
 
         self::$config = ConfigDriver::getInstance($config_dir);
         self::$session = SessionDriver::getInstance(self::$config->get('session-container-name', 'app-small-framework'));
+        self::$cookie = CookieDriver::getInstance();
         self::$route = RouteDriver::getInstance();
         self::$request = new RequestDriver();
         self::$response = new ResponseDriver();
