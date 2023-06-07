@@ -41,7 +41,7 @@ class RouteDriver
     private function __construct()
     {
         /* get list of available routes from config */
-        $routes = App::$config->get('routes');
+        $routes = config('routes');
         if (!$routes) {
             throw new IntegrityException('routes is required parameter in config (must be an special array)', 500);
         }
@@ -233,7 +233,7 @@ class RouteDriver
                         $tmpObj = new $execClassName();
                         if ($tmpObj instanceof RequestInterface) {
                             /* middleware apply to Request */
-                            $allMiddleware = App::$config->get('global-middleware', []);
+                            $allMiddleware = config('global-middleware', []);
                             foreach ($allMiddleware as $middleware) {
                                 $m = new $middleware();
                                 $m->handle($tmpObj);

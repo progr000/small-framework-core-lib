@@ -25,6 +25,8 @@ class App
     public static $response;
     /** @var LocalizationDriver */
     public static $localization;
+    /** @var $session */
+    public static $session;
     /** @var DbDriver */
     public static $db;
     /** @var DbDriver[] */
@@ -42,6 +44,7 @@ class App
         require_once __DIR__ . "/DumperDriver.php";
 
         self::$config = ConfigDriver::getInstance($config_dir);
+        self::$session = SessionDriver::getInstance(self::$config->get('session-container-name', 'app-small-framework'));
         self::$route = RouteDriver::getInstance();
         self::$request = new RequestDriver();
         self::$response = new ResponseDriver();
@@ -88,10 +91,10 @@ class App
     {
         try {
             /* session start */
-            session_start();
+            App::$session->init();
 
             /* global middleware check and apply */
-            $allMiddleware = App::$config->get('global-middleware', []);
+            $allMiddleware = config('global-middleware', []);
             if (isset($controllerAndAction['middleware']) && is_array($controllerAndAction['middleware'])) {
                 $allMiddleware = array_merge($allMiddleware, $controllerAndAction['middleware']);
             }

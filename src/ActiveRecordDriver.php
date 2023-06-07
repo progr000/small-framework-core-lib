@@ -25,8 +25,8 @@ abstract class ActiveRecordDriver extends stdClass
     protected static function getDbConnection()
     {
         if (!static::$connection_name) {
-            static::$connection_name = isset(App::$config->get('databases', [])['default-db-connection-name'])
-                ? App::$config->get('databases', [])['default-db-connection-name']
+            static::$connection_name = isset(config('databases', [])['default-db-connection-name'])
+                ? config('databases', [])['default-db-connection-name']
                 : 'db-main';
         }
 

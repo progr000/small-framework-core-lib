@@ -2,16 +2,6 @@
 
 use Core\App;
 
-if (!function_exists('config')) {
-    /**
-     * @return void
-     */
-    function config()
-    {
-
-    }
-}
-
 if (!function_exists('replace_vars')) {
     /**
      * @param string $str
@@ -28,6 +18,39 @@ if (!function_exists('replace_vars')) {
             }
         }
         return str_replace($s, $r, $str);
+    }
+}
+
+if (!function_exists('config')) {
+    /**
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    function config($key, $default = null)
+    {
+        return App::$config->get($key, $default);
+    }
+}
+
+if (!function_exists('session')) {
+    /**
+     * @param string|array|null $key
+     * @param mixed $default
+     * @return \Core\SessionDriver|mixed|void
+     */
+    function session($key = null, $default = null)
+    {
+        if (is_null($key)) {
+            return App::$session;
+        }
+
+        if (is_array($key)) {
+            App::$session->put($key);
+            return;
+        }
+
+        return App::$session->get($key, $default);
     }
 }
 

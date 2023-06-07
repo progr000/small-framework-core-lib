@@ -2,10 +2,6 @@
 
 namespace Core;
 
-use stdClass;
-use Core\Exceptions\IntegrityException;
-
-
 class LocalizationDriver
 {
     /** @var self */
@@ -36,7 +32,7 @@ class LocalizationDriver
      */
     public function init()
     {
-        $file = App::$config->get('localization', []);
+        $file = config('localization', []);
         if (isset($file['json-path']) && file_exists($file['json-path'] . "/" .  App::$locale . ".json")) {
             $this->container = json_decode(file_get_contents($file['json-path'] . "/" .  App::$locale . ".json"), true);
         }

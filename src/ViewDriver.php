@@ -39,7 +39,7 @@ class ViewDriver
      */
     public static function renderPart($templateName, array &$vars = [])
     {
-        $tpl_path = App::$config->get('template-path');
+        $tpl_path = config('template-path');
         if (!$tpl_path) {
             throw new IntegrityException('template-path is required parameter in config (must be a string, real path to dir with templates)', 400);
         }
@@ -74,7 +74,7 @@ class ViewDriver
      */
     public static function render($templateName, array $vars = [], $layout = null)
     {
-        $tpl_path = App::$config->get('template-path');
+        $tpl_path = config('template-path');
         if (!$tpl_path) {
             throw new IntegrityException('template-path is required parameter in config (must be a string, real path to dir with templates)', 400);
         }
