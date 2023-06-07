@@ -288,7 +288,9 @@ class RouteDriver
      */
     public function getRoot()
     {
-        return $this->script_root;
+        return ($this->script_root === "")
+            ? "/"
+            : $this->script_root;
     }
 
     /**

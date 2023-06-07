@@ -47,19 +47,9 @@ class ValidatorDriver
      */
     private function getMessage($key, $rule_item, $default_message, $replace = [])
     {
-        $m = $this->request->messages();
-        $s = [];
-        $r = [];
-        if (sizeof($replace)) {
-            foreach ($replace as $k => $v) {
-                $s[] = "{%{$k}}";
-                $r[] = $v;
-            }
-        }
-        return str_replace(
-            $s,
-            $r,
-            (isset($m["{$key}_$rule_item"]) ? $m["{$key}_$rule_item"] : $default_message)
+        return replace_vars(
+            (isset($m["{$key}_$rule_item"]) ? $m["{$key}_$rule_item"] : $default_message),
+            $replace
         );
     }
 

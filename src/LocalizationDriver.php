@@ -49,8 +49,9 @@ class LocalizationDriver
      */
     public function get($key, array $replace = [])
     {
-        return isset($this->container[$key])
-            ? $this->container[$key]
-            : '';
+        return replace_vars(
+            (isset($this->container[$key]) ? $this->container[$key] : $key),
+            $replace
+        );
     }
 }
