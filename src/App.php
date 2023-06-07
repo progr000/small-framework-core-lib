@@ -7,6 +7,7 @@ use Core\Exceptions\HttpForbiddenException;
 use Core\Exceptions\HttpNotFoundException;
 use Core\Exceptions\IntegrityException;
 use Core\Exceptions\NotImplementedException;
+use Core\Middleware\Maintenance;
 use ReflectionException;
 
 
@@ -86,6 +87,10 @@ class App
     public function run()
     {
         try {
+            /* maintenance global */
+            $m = new Maintenance();
+            $m->handle(App::$request);
+
             /**/
             ob_start();
             $res = self::$route->processRoute();

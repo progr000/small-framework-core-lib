@@ -2,7 +2,6 @@
 
 namespace Core;
 
-use Core\Exceptions\ConfigException;
 use Core\Exceptions\HttpNotFoundException;
 use Core\Exceptions\IntegrityException;
 use Core\Interfaces\RequestInterface;
