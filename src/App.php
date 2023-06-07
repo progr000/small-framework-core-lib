@@ -6,6 +6,7 @@ use Core\Exceptions\DbException;
 use Core\Exceptions\HttpForbiddenException;
 use Core\Exceptions\HttpNotFoundException;
 use Core\Exceptions\IntegrityException;
+use Core\Exceptions\MaintenanceException;
 use Core\Exceptions\NotImplementedException;
 use Core\Middleware\Maintenance;
 use ReflectionException;
@@ -82,12 +83,14 @@ class App
     /**
      * @return void
      * @throws HttpNotFoundException
-     * @throws ReflectionException|IntegrityException
+     * @throws ReflectionException
+     * @throws MaintenanceException
+     * @throws IntegrityException
      */
     public function run()
     {
         try {
-            /* maintenance global */
+            /* maintenance global check before app run */
             $m = new Maintenance();
             $m->handle(App::$request);
 
