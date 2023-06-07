@@ -182,16 +182,6 @@ class RouteDriver
         if (isset($matches)) unset($matches[0]);
         if (!isset($matches)) $matches = [];
 
-        /* middleware check and apply */
-        $allMiddleware = App::$config->get('global-middleware', []);
-        if (isset($controllerAndAction['middleware']) && is_array($controllerAndAction['middleware'])) {
-            $allMiddleware = array_merge($allMiddleware, $controllerAndAction['middleware']);
-        }
-        foreach ($allMiddleware as $middleware) {
-            $m = new $middleware();
-            $m->handle(App::$request);
-        }
-
         /* Localization */
         App::$localization->init();
 
@@ -243,6 +233,7 @@ class RouteDriver
                         $tmpObj = new $execClassName();
                         if ($tmpObj instanceof RequestInterface) {
                             /* middleware apply to Request */
+                            $allMiddleware = App::$config->get('global-middleware', []);
                             foreach ($allMiddleware as $middleware) {
                                 $m = new $middleware();
                                 $m->handle($tmpObj);

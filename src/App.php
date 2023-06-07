@@ -8,7 +8,6 @@ use Core\Exceptions\HttpNotFoundException;
 use Core\Exceptions\IntegrityException;
 use Core\Exceptions\MaintenanceException;
 use Core\Exceptions\NotImplementedException;
-use Core\Middleware\Maintenance;
 use ReflectionException;
 
 
@@ -40,8 +39,6 @@ class App
      */
     private function __construct($config_dir)
     {
-        session_start();
-
         require_once __DIR__ . "/DumperDriver.php";
 
         self::$config = ConfigDriver::getInstance($config_dir);
@@ -90,9 +87,18 @@ class App
     public function run()
     {
         try {
-            /* maintenance global check before app run */
-            $m = new Maintenance();
-            $m->handle(App::$request);
+            /* session start */
+            session_start();
+
+            /* global middleware check and apply */
+            $allMiddleware = App::$config->get('global-middleware', []);
+            if (isset($controllerAndAction['middleware']) && is_array($controllerAndAction['middleware'])) {
+                $allMiddleware = array_merge($allMiddleware, $controllerAndAction['middleware']);
+            }
+            foreach ($allMiddleware as $middleware) {
+                $m = new $middleware();
+                $m->handle(App::$request);
+            }
 
             /**/
             ob_start();
