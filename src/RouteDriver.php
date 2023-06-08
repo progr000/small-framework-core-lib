@@ -182,8 +182,16 @@ class RouteDriver
         if (isset($matches)) unset($matches[0]);
         if (!isset($matches)) $matches = [];
 
-        /* Localization */
-        App::$localization->init();
+        /* request middleware check and apply */
+        if (isset($controllerAndAction['middleware'])) {
+            if (!is_array($controllerAndAction['middleware'])) {
+                $controllerAndAction['middleware'] = [$controllerAndAction['middleware']];
+            }
+            foreach ($controllerAndAction['middleware'] as $middleware) {
+                $m = new $middleware();
+                $m->handle(App::$request);
+            }
+        }
 
         /**/
         if (gettype($controllerAndAction['action']) === 'object') {

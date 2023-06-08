@@ -97,11 +97,11 @@ class App
             App::$session->init();
 
             /* global middleware check and apply */
-            $allMiddleware = config('global-middleware', []);
-            if (isset($controllerAndAction['middleware']) && is_array($controllerAndAction['middleware'])) {
-                $allMiddleware = array_merge($allMiddleware, $controllerAndAction['middleware']);
+            $globalMiddleware = config('global-middleware', []);
+            if (!is_array($globalMiddleware)) {
+                throw new IntegrityException('"global-middleware" must be an array with middleware class names');
             }
-            foreach ($allMiddleware as $middleware) {
+            foreach ($globalMiddleware as $middleware) {
                 $m = new $middleware();
                 $m->handle(App::$request);
             }
