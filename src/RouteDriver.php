@@ -175,6 +175,7 @@ class RouteDriver
 
         /**/
         if (!$isRouteFound || !isset($controllerAndAction)) {
+            session(['csrf' => session('previous_csrf', null)]);
             throw new HttpNotFoundException('Not found', 404);
         }
 
