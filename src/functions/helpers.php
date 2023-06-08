@@ -33,6 +33,16 @@ if (!function_exists('config')) {
     }
 }
 
+if (!function_exists('csrf')) {
+    /**
+     * @return string
+     */
+    function csrf()
+    {
+        return App::$session->get('csrf', '');
+    }
+}
+
 if (!function_exists('session')) {
     /**
      * @param string|array|null $key

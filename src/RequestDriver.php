@@ -254,6 +254,46 @@ class RequestDriver implements RequestInterface
     }
 
     /**
+     * @return bool
+     */
+    public function isGet()
+    {
+        return (mb_strtolower($this->method) === 'get');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPost()
+    {
+        return (mb_strtolower($this->method) === 'post');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDelete()
+    {
+        return (mb_strtolower($this->method) === 'delete');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPut()
+    {
+        return (in_array(mb_strtolower($this->method), ['put', 'path']));
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAjax()
+    {
+        return 'XMLHttpRequest' == $this->header('X-Requested-With');
+    }
+
+    /**
      * @return string
      */
     public function protocol()
