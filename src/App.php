@@ -43,8 +43,6 @@ class App
      */
     private function __construct($config_dir)
     {
-        require_once __DIR__ . "/DumperDriver.php";
-
         self::$config = ConfigDriver::getInstance($config_dir);
         self::$session = SessionDriver::getInstance(self::$config->get('session-container-name', 'app-small-framework'));
         self::$cookie = CookieDriver::getInstance();
