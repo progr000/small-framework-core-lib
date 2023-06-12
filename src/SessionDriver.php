@@ -5,7 +5,7 @@ namespace Core;
 class SessionDriver
 {
     /** @var self */
-    private static $instance;
+    private static $instance = [];
     /** @var array */
     private $container;
 
@@ -14,10 +14,10 @@ class SessionDriver
      */
     public static function getInstance($container)
     {
-        if (self::$instance === null) {
-            self::$instance = new self($container);
+        if (!isset(self::$instance[$container])) {
+            self::$instance[$container] = new self($container);
         }
-        return self::$instance;
+        return self::$instance[$container];
     }
 
     /**
@@ -69,6 +69,24 @@ class SessionDriver
         foreach ($data as $k => $v) {
             $_SESSION[$this->container][$k] = $v;
         }
+    }
+
+    /**
+     * @param string $key
+     * @return void
+     */
+    public function delete($key)
+    {
+        unset($_SESSION[$this->container][$key]);
+    }
+
+    /**
+     * Clear whole session-container
+     * @return void
+     */
+    public function clear()
+    {
+        unset($_SESSION[$this->container]);
     }
 
     /**

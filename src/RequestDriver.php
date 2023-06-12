@@ -148,6 +148,23 @@ class RequestDriver implements RequestInterface
     
     
     /** ========== Validation methods ============== */
+
+    /**
+     * @return false
+     */
+    public function onFailedValidation()
+    {
+        $old = SessionDriver::getInstance('old-request');
+        $old->clear();
+        $old->put($this->all());
+
+        $error = SessionDriver::getInstance('error-request');
+        $error->clear();
+        $error->put($this->getErrors());
+
+        return false;
+    }
+
     /**
      * This method must return rules for validation
      * Strongly recommended leave empty rules in this class

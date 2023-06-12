@@ -1,6 +1,7 @@
 <?php
 
 use Core\App;
+use Core\SessionDriver;
 
 if (!function_exists('replace_vars')) {
     /**
@@ -61,6 +62,20 @@ if (!function_exists('session')) {
         }
 
         return App::$session->get($key, $default);
+    }
+}
+
+
+if (!function_exists('old')) {
+    /**
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    function old($key, $default = null)
+    {
+        $old = SessionDriver::getInstance('old-request');
+        return $old->get($key, $default);
     }
 }
 
