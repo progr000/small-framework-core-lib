@@ -141,7 +141,7 @@ class ValidatorDriver
     private function required($key)
     {
         //dump("required($key)");
-        if (!key_exists($key, $this->data)) {
+        if (!key_exists($key, $this->data) || empty($this->data[$key])) {
             $this->failed[$key][] = $this->getMessage($key, 'required', 'value is required');
             return false;
         }
@@ -233,15 +233,15 @@ class ValidatorDriver
                 throw new ValidatorException('Wrong rule in RequestClass ' . get_class($this->request) . "Param length can't correspond with params min or max", 500);
             }
 
-            if (isset($params['min']) && mb_strlen($val) < intval($params['min'])) {
+            if (!empty($val) && isset($params['min']) && mb_strlen($val) < intval($params['min'])) {
                 $this->failed[$key][] = $this->getMessage($key,'min',"value too short, min length {%min}", $params);
                 $ret = false;
             }
-            if (isset($params['max']) && mb_strlen($val) > intval($params['max'])) {
+            if (!empty($val) && isset($params['max']) && mb_strlen($val) > intval($params['max'])) {
                 $this->failed[$key][] = $this->getMessage($key,'max', "value too long, max length {%max}", $params);
                 $ret = false;
             }
-            if (isset($params['length']) && mb_strlen($val) !== intval($params['length'])) {
+            if (isset($val, $params['length']) && mb_strlen($val) !== intval($params['length'])) {
                 $this->failed[$key][] = $this->getMessage($key,'length',"value length must be {%length}", $params);
                 $ret = false;
             }

@@ -154,13 +154,8 @@ class RequestDriver implements RequestInterface
      */
     public function onFailedValidation()
     {
-        $old = SessionDriver::getInstance('old-request');
-        $old->clear();
-        $old->put($this->all());
-
-        $error = SessionDriver::getInstance('error-request');
-        $error->clear();
-        $error->put($this->getErrors());
+        SessionDriver::getInstance('old-request')->put($this->all());
+        SessionDriver::getInstance('error-request')->put($this->getErrors());
 
         return false;
     }
@@ -198,6 +193,10 @@ class RequestDriver implements RequestInterface
         if (empty($this->rules())) {
             return null;
         }
+
+        /* clear some old data */
+        SessionDriver::getInstance('old-request')->clear();
+        SessionDriver::getInstance('error-request')->clear();
 
         $validator = new ValidatorDriver($this);
         return $validator->validate();
