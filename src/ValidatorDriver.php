@@ -16,6 +16,9 @@ class ValidatorDriver
     /** @var RequestDriver  */
     private $request;
 
+    /**
+     * @param RequestDriver $request
+     */
     public function __construct(RequestDriver $request)
     {
         $this->request = $request;
@@ -47,6 +50,7 @@ class ValidatorDriver
      */
     private function getMessage($key, $rule_item, $default_message, $replace = [])
     {
+        $m = $this->request->messages();
         return replace_vars(
             (isset($m["{$key}_$rule_item"]) ? $m["{$key}_$rule_item"] : $default_message),
             $replace
@@ -68,34 +72,45 @@ class ValidatorDriver
                 $rule = explode('|', $rule);
             }
             foreach ($rule as $value) {
-                $tmp = explode(':', $value);
-                if (isset($tmp[1])) {
 
-                    if (method_exists($this, $tmp[0])) {
-                        $methods[] = ['type' => 'function', 'exec' => $tmp[0]];
-                        for ($i=1; $i<count($tmp); $i++) {
-                            //$params[$tmp[$i]] = $tmp[$i];
-                            $params[$tmp[0]] = $tmp[$i];
-                        }
-                    } else {
-                        if (in_array($tmp[0], ['min', 'max']))
-                            $params[$tmp[0]] = doubleval($tmp[1]);
-                        elseif ($tmp[0] === 'length')
-                            $params[$tmp[0]] = intval($tmp[1]);
-                        elseif ($tmp[0] === 'regex')
-                            $params[$tmp[0]] = intval($tmp[1]);
-                        else
-                            $params[] = $tmp[1];
-                    }
+                if (gettype($value) === 'object' && is_callable($value)) {
+
+                    $methods[] = ['type' => 'closure', 'exec' => $value];
 
                 } else {
-                    if (method_exists($this, $tmp[0])) {
-                        $methods[] = ['type' => 'function', 'exec' => $tmp[0]];
-                    } elseif (class_exists($tmp[0])) {
-                        $methods[] = ['type' => 'class', 'exec' => $tmp[0]];
+                    $tmp = explode(':', $value);
+
+                    if (isset($tmp[1])) {
+
+                        if (method_exists($this, $tmp[0])) {
+                            $methods[] = ['type' => 'function', 'exec' => $tmp[0]];
+                            for ($i = 1; $i < count($tmp); $i++) {
+                                //$params[$tmp[$i]] = $tmp[$i];
+                                $params[$tmp[0]] = $tmp[$i];
+                            }
+                        } else {
+                            if (in_array($tmp[0], ['min', 'max']))
+                                $params[$tmp[0]] = doubleval($tmp[1]);
+                            elseif ($tmp[0] === 'length')
+                                $params[$tmp[0]] = intval($tmp[1]);
+                            elseif ($tmp[0] === 'regex')
+                                $params[$tmp[0]] = intval($tmp[1]);
+                            else
+                                $params[] = $tmp[1];
+                        }
+
                     } else {
-                        throw new ValidatorException("Wrong rule in RequestClass " . get_class($this->request) . ". Validator-method {$tmp[0]}() doesn't exist.", 500);
+
+                        if (method_exists($this, $tmp[0])) {
+                            $methods[] = ['type' => 'function', 'exec' => $tmp[0]];
+                        } elseif (class_exists($tmp[0])) {
+                            $methods[] = ['type' => 'class', 'exec' => $tmp[0]];
+                        } else {
+                            throw new ValidatorException("Wrong rule in RequestClass " . get_class($this->request) . ". Validator-method {$tmp[0]}() doesn't exist.", 500);
+                        }
+
                     }
+
                 }
             }
 
@@ -109,6 +124,12 @@ class ValidatorDriver
                     //dump($this->data[$key], $method, $this->$method($key, $params));
                     if ($method['type'] === 'function') {
                         if (!$this->{$method['exec']}($key, $params)) {
+                            $ret = false;
+                            $test_var = false;
+                        }
+                    } elseif ($method['type'] === 'closure') {
+                        if (!$method['exec']($key, $params, $this->data)) {
+                            $this->failed[$key][] = $this->getMessage($key, 'closure', 'Wrong value');
                             $ret = false;
                             $test_var = false;
                         }
@@ -275,6 +296,30 @@ class ValidatorDriver
         }
 
         $this->failed[$key][] = $this->getMessage($key,'regex',"value not match with regex {%regex}", $params);
+        return false;
+    }
+
+    /**
+     * @param $key
+     * @param array $params
+     * @return bool
+     * @throws ValidatorException
+     */
+    private function compareEquals($key, array $params)
+    {
+        if (empty($params)) {
+            throw new ValidatorException('Wrong rule in RequestClass ' . get_class($this->request), 500);
+        }
+        $key_compare = array_shift($params);
+        if (!isset($this->data[$key_compare])) {
+            throw new ValidatorException('Wrong compare field in rule in RequestClass ' . get_class($this->request), 500);
+        }
+
+        if ($this->data[$key] === $this->data[$key_compare]) {
+            return true;
+        }
+
+        $this->failed[$key][] = $this->getMessage($key,'compareEquals',"Value {$key} doesn't equals value {$key_compare}", $params);
         return false;
     }
 }
