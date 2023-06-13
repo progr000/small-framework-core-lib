@@ -99,12 +99,12 @@ class SessionDriver
     }
 
     /**
-     * @return array|null
+     * @return array
      */
     public function all()
     {
         return isset($_SESSION[$this->container])
             ? $_SESSION[$this->container]
-            : null;
+            : [];
     }
 }
