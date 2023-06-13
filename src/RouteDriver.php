@@ -175,7 +175,8 @@ class RouteDriver
 
         /**/
         if (!$isRouteFound || !isset($controllerAndAction)) {
-            session(['csrf' => session('previous_csrf', null)]);
+            $sess_csrf = SessionDriver::getInstance('csrf');
+            $sess_csrf->put(['csrf' => $sess_csrf->get('previous_csrf', null)]);
             throw new HttpNotFoundException('Not found', 404);
         }
 

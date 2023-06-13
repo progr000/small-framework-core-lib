@@ -41,7 +41,8 @@ if (!function_exists('csrf')) {
      */
     function csrf()
     {
-        return App::$session->get('csrf', '');
+        $sess_csrf = SessionDriver::getInstance('csrf');
+        return $sess_csrf->get('csrf', '');
     }
 }
 

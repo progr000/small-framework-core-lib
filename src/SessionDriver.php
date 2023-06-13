@@ -41,7 +41,7 @@ class SessionDriver
      * @param mixed $default
      * @return mixed
      */
-    public function get($key, $default)
+    public function get($key, $default = null)
     {
         if (isset($_SESSION[$this->container][$key])) {
             return $_SESSION[$this->container][$key];
