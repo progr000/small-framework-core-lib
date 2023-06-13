@@ -146,12 +146,12 @@ if (!function_exists('css_stack')) {
         $str = "";
         foreach ($css as $item) {
             if (strrpos($item, '<style') !== false) {
-                $str .= $item;
+                $str .= $item . "\n";
             } else {
                 $filemtime = file_exists($item)
                     ? filemtime($item)
                     : time();
-                $str .= '<link href="' . $item . (App::$config->get('IS_DEBUG', false) ? '?v=' . $filemtime : '') . '" rel="stylesheet">';
+                $str .= '<link href="' . $item . (App::$config->get('IS_DEBUG', false) ? '?v=' . $filemtime : '') . '" rel="stylesheet">' . "\n";
             }
         }
         return $str;
@@ -168,12 +168,12 @@ if (!function_exists('js_stack')) {
         $str = "";
         foreach ($js as $item) {
             if (strrpos($item, '<script') !== false) {
-                $str .= $item;
+                $str .= $item . "\n";
             } else {
                 $filemtime = file_exists($item)
                     ? filemtime($item)
                     : time();
-                $str .= '<script src="' . $item . (App::$config->get('IS_DEBUG', false) ? '?v=' . $filemtime : '') . '"></script>';
+                $str .= '<script src="' . $item . (App::$config->get('IS_DEBUG', false) ? '?v=' . $filemtime : '') . '"></script>' . "\n";
             }
         }
         return $str;
