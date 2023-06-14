@@ -33,6 +33,8 @@ class RouteDriver
     private $action;
     /** @var string */
     private $route_pattern;
+    /** @var string */
+    public $route_name;
 
     /**
      * Route constructor.
@@ -50,14 +52,16 @@ class RouteDriver
         foreach ($routes as $k => $v) {
             if (gettype($k) === 'integer') {
                 /* for the rest type of route will be created additional routes */
-                if (isset($v[1])) {
-                    $route_path = '~^' . $v[1];
+                if (isset($v['prefix'])) {
+                    $r_name = str_replace('/', '-', trim($v['prefix'], '/'));
+                    $route_path = '~^/' . trim($v['prefix'], '/') . '/';
                 } else {
-                    $route_path = '~^/' . str_replace(
-                            'controller',
-                            '',
-                            mb_strtolower(substr($v[0], strrpos($v[0], '\\') + 1))
-                        ). '/';
+                    $r_name = str_replace(
+                        'controller',
+                        '',
+                        mb_strtolower(substr($v[0], strrpos($v[0], '\\') + 1))
+                    );
+                    $route_path = '~^/' . $r_name . '/';
                 }
 
                 if (isset($v['middleware']))
@@ -65,15 +69,19 @@ class RouteDriver
                 else
                     $middleware = null;
 
-                $this->available_routes[] = ['controller' => $v[0], 'action' => 'index',     'middleware' => $middleware, 'method' => 'GET',    'pattern' => $route_path . '?$~'];
-                $this->available_routes[] = ['controller' => $v[0], 'action' => 'view',      'middleware' => $middleware, 'method' => 'GET',    'pattern' => $route_path . '(\d+)/?$~'];
-                $this->available_routes[] = ['controller' => $v[0], 'action' => 'view',      'middleware' => $middleware, 'method' => 'GET',    'pattern' => $route_path . '(\d+)/view/?$~'];
-                $this->available_routes[] = ['controller' => $v[0], 'action' => 'edit',      'middleware' => $middleware, 'method' => 'GET',    'pattern' => $route_path . '(\d+)/edit/?$~'];
-                $this->available_routes[] = ['controller' => $v[0], 'action' => 'update',    'middleware' => $middleware, 'method' => 'PUT',    'pattern' => $route_path . '(\d+)/?$~'];
-                $this->available_routes[] = ['controller' => $v[0], 'action' => 'create',    'middleware' => $middleware, 'method' => 'GET',    'pattern' => $route_path . 'create/?$~'];
-                $this->available_routes[] = ['controller' => $v[0], 'action' => 'store',     'middleware' => $middleware, 'method' => 'POST',   'pattern' => $route_path . '?$~'];
-                $this->available_routes[] = ['controller' => $v[0], 'action' => 'delete',    'middleware' => $middleware, 'method' => 'DELETE', 'pattern' => $route_path . '(\d+)/?$~'];
-                $this->available_routes[] = ['controller' => $v[0], 'action' => '{{%ANY%}}', 'middleware' => $middleware, 'method' => null,  'pattern' => $route_path . '(\d+)/([a-z\-]{3,15})/?$~'];
+                if (isset($v['name'])) {
+                    $r_name = $v['name'];
+                }
+
+                $this->available_routes[] = ['controller' => $v[0], 'action' => 'index',     'name' => "{$r_name}.index",  'middleware' => $middleware, 'method' => 'GET',    'pattern' => $route_path . '?$~'];
+                $this->available_routes[] = ['controller' => $v[0], 'action' => 'view',      'name' => "{$r_name}.view",   'middleware' => $middleware, 'method' => 'GET',    'pattern' => $route_path . '(\d+)/?$~'];
+                $this->available_routes[] = ['controller' => $v[0], 'action' => 'view',      'name' => "{$r_name}.view",   'middleware' => $middleware, 'method' => 'GET',    'pattern' => $route_path . '(\d+)/view/?$~'];
+                $this->available_routes[] = ['controller' => $v[0], 'action' => 'edit',      'name' => "{$r_name}.edit",   'middleware' => $middleware, 'method' => 'GET',    'pattern' => $route_path . '(\d+)/edit/?$~'];
+                $this->available_routes[] = ['controller' => $v[0], 'action' => 'update',    'name' => "{$r_name}.update", 'middleware' => $middleware, 'method' => 'PUT',    'pattern' => $route_path . '(\d+)/?$~'];
+                $this->available_routes[] = ['controller' => $v[0], 'action' => 'create',    'name' => "{$r_name}.create", 'middleware' => $middleware, 'method' => 'GET',    'pattern' => $route_path . 'create/?$~'];
+                $this->available_routes[] = ['controller' => $v[0], 'action' => 'store',     'name' => "{$r_name}.store",  'middleware' => $middleware, 'method' => 'POST',   'pattern' => $route_path . '?$~'];
+                $this->available_routes[] = ['controller' => $v[0], 'action' => 'delete',    'name' => "{$r_name}.delete", 'middleware' => $middleware, 'method' => 'DELETE', 'pattern' => $route_path . '(\d+)/?$~'];
+                $this->available_routes[] = ['controller' => $v[0], 'action' => '{{%ANY%}}', 'name' => "{$r_name}.other",  'middleware' => $middleware, 'method' => null,     'pattern' => $route_path . '(\d+)/([a-z\-]{3,15})/?$~'];
             } elseif (gettype($v) === 'array') {
                 /* for ordinal route */
 
@@ -96,11 +104,16 @@ class RouteDriver
                 if (isset($v['method'])) {
                     $tmp['method'] = $v['method'];
                 }
+                if (isset($v['name'])) {
+                    $tmp['name'] = $v['name'];
+                } else {
+                    $tmp['name'] = null;
+                }
                 $this->available_routes[] = $tmp;
 
             } elseif (gettype($v) === 'object') {
                 $pattern = '~^' . $k . '$~';
-                $this->available_routes[] = ['controller' => null, 'action' => $v, 'pattern' => $pattern];
+                $this->available_routes[] = ['controller' => null, 'action' => $v, 'pattern' => $pattern, 'name' => null];
             }
         }
         //dd($this->available_routes);
@@ -163,10 +176,16 @@ class RouteDriver
             if (!empty($matches)) {
                 if (!isset($controllerAndAction['method'])) {
                     $this->route_pattern = $pattern;
+                    $this->route_name = isset($controllerAndAction['name'])
+                        ? $controllerAndAction['name']
+                        : '';
                     $isRouteFound = true;
                     break;
                 } elseif (mb_strtoupper($controllerAndAction['method']) === App::$request->method()) {
                     $this->route_pattern = $pattern;
+                    $this->route_name = isset($controllerAndAction['name'])
+                        ? $controllerAndAction['name']
+                        : '';
                     $isRouteFound = true;
                     break;
                 }
