@@ -23,6 +23,7 @@ class ViewDriver
      * @param string $template
      * @param array $vars
      * @return string
+     * @throws HttpNotFoundException|IntegrityException
      */
     public function renderView($template, array &$vars = [])
     {
@@ -86,8 +87,9 @@ class ViewDriver
         if (is_null($layout))
             $layout = self::$layout;
         
-        if (!file_exists( "{$tpl_path}/{$layout}.php")) 
+        if (!file_exists( "{$tpl_path}/{$layout}.php")) {
             throw new HttpNotFoundException("Layout <b>{$tpl_path}/{$layout}.php</b> not found.", 404);
+        }
         
         $content = self::renderPart($templateName, $vars);
 
