@@ -26,11 +26,11 @@ class ViewDriver
      */
     public function renderView($template, array &$vars = [])
     {
-        try {
+        //try {
             return self::renderPart($template, $vars);
-        } catch (Exception $exception) {
-            return "";
-        }
+        //} catch (Exception $exception) {
+        //    return "";
+        //}
     }
 
     /**
@@ -47,8 +47,9 @@ class ViewDriver
             throw new IntegrityException('template-path is required parameter in config (must be a string, real path to dir with templates)', 400);
         }
         
-        if (!file_exists( "{$tpl_path}/{$templateName}.php")) 
+        if (!file_exists( "{$tpl_path}/{$templateName}.php")) {
             throw new HttpNotFoundException("Template <b>{$tpl_path}/{$templateName}.php</b> not exist.", 404);
+        }
         
         ob_start();
         ob_implicit_flush(false);
