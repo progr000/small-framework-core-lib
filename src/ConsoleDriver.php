@@ -4,7 +4,6 @@ namespace Core;
 
 use Exception;
 
-
 abstract class ConsoleDriver
 {
     /** @var array */

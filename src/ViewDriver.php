@@ -3,9 +3,7 @@
 namespace Core;
 
 use Core\Exceptions\IntegrityException;
-use Exception;
 use Core\Exceptions\HttpNotFoundException;
-
 
 /**
  * Class View

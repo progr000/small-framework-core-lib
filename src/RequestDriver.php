@@ -6,7 +6,6 @@ use Core\Interfaces\RequestInterface;
 use Exception;
 use Core\Exceptions\ValidatorException;
 
-
 class RequestDriver implements RequestInterface
 {
     /** all possible request vars are stored in this vars */

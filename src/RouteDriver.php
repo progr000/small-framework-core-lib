@@ -7,7 +7,6 @@ use Core\Exceptions\IntegrityException;
 use Core\Interfaces\RequestInterface;
 use ReflectionException;
 
-
 /**
  * Class Route
  * @package core\Services

@@ -10,7 +10,6 @@ use Core\Exceptions\MaintenanceException;
 use Core\Exceptions\NotImplementedException;
 use ReflectionException;
 
-
 class App
 {
     /** @var self */

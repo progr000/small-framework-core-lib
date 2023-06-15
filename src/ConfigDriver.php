@@ -5,7 +5,6 @@ namespace Core;
 use stdClass;
 use Core\Exceptions\IntegrityException;
 
-
 class ConfigDriver
 {
     /** @var self */

@@ -5,7 +5,6 @@ namespace Core;
 use finfo;
 use Exception;
 
-
 class SendmailDriver
 {
     /** @var int */

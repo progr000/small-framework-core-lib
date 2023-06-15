@@ -5,7 +5,6 @@ namespace Core;
 use Core\Exceptions\DbException;
 use Exception;
 
-
 class MigrationDriver
 {
     /** @var MigrationDriver */
