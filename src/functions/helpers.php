@@ -8,7 +8,8 @@ if (!function_exists('replace_vars')) {
      * @param array $replace
      * @return array|string|string[]
      */
-    function replace_vars($str, $replace = []) {
+    function replace_vars($str, $replace = [])
+    {
         $s = [];
         $r = [];
         if (sizeof($replace)) {
@@ -30,16 +31,6 @@ if (!function_exists('config')) {
     function config($key, $default = null)
     {
         return App::$config->get($key, $default);
-    }
-}
-
-if (!function_exists('csrf')) {
-    /**
-     * @return string
-     */
-    function csrf()
-    {
-        return App::$session->get('csrf', '');
     }
 }
 

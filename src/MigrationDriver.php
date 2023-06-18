@@ -5,7 +5,6 @@ namespace Core;
 use Core\Exceptions\DbException;
 use Exception;
 
-
 class MigrationDriver
 {
     /** @var MigrationDriver */
@@ -146,7 +145,7 @@ class MigrationDriver
             $cnt = 0;
             foreach ($this->undone_list as $v) {
                 if ($steps === null || $cnt < $steps) {
-                    $executeMigration = LogDriver::executingMessage("Installing migration '{$v}'", 0);
+                    $executeMigration = LogDriver::executingMessage("Installing migration {$v}", 0);
                     if ($this->execute($v, 'up') !== false) {
                         App::$db->exec("INSERT INTO {{" . self::TABLE_LIST_MIGRATIONS . "}} (" . self::COLUMN_NAME . ") VALUES (:name)", ['name' => $v]);
                         $executeMigration->showSuccess();
@@ -183,7 +182,7 @@ class MigrationDriver
             $cnt = 0;
             while (null !== ($v = array_pop($this->done_list))) {
                 if ($cnt < $steps) {
-                    $executeMigration = LogDriver::executingMessage("Uninstalling migration '{$v}'", 0);
+                    $executeMigration = LogDriver::executingMessage("Uninstalling migration {$v}", 0);
                     if ($this->execute($v, 'down') !== false) {
                         App::$db->exec("DELETE FROM {{" . self::TABLE_LIST_MIGRATIONS . "}} WHERE " . self::COLUMN_NAME . " =  :name", ['name' => $v]);
                         $executeMigration->showSuccess();

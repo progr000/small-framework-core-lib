@@ -4,7 +4,6 @@ namespace Core;
 
 use finfo;
 
-
 class ResponseDriver
 {
     /** @var bool */

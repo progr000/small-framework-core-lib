@@ -65,23 +65,23 @@ if (!function_exists('dd')) {
     }
 }
 
-if (!function_exists('ll')) {
-    $GLOBALS['ll_calls'] = 0;
-    /**
-     * @param ...$vars
-     * @return void
-     */
-    function ll(...$vars)
-    {
-        $GLOBALS['ll_calls']++;
-        ob_start();
-        var_dump(...$vars);
-        $out = ob_get_contents();
-        $out .= "\n\n ================= {$GLOBALS['ll_calls']}\n";
-        ob_end_clean();
-        $f = fopen(__DIR__ . '/../../../logs/my_ll.log', 'a');
-        fwrite($f, $out);
-        fflush($f);
-        fclose($f);
-    }
-}
+//if (!function_exists('ll')) {
+//    $GLOBALS['ll_calls'] = 0;
+//    /**
+//     * @param ...$vars
+//     * @return void
+//     */
+//    function ll(...$vars)
+//    {
+//        $GLOBALS['ll_calls']++;
+//        ob_start();
+//        var_dump(...$vars);
+//        $out = ob_get_contents();
+//        $out .= "\n\n ================= {$GLOBALS['ll_calls']}\n";
+//        ob_end_clean();
+//        $f = fopen(__DIR__ . '/../../../logs/my_ll.log', 'a');
+//        fwrite($f, $out);
+//        fflush($f);
+//        fclose($f);
+//    }
+//}

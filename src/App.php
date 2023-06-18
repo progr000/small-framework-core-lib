@@ -10,7 +10,6 @@ use Core\Exceptions\MaintenanceException;
 use Core\Exceptions\NotImplementedException;
 use ReflectionException;
 
-
 class App
 {
     /** @var self */
@@ -118,7 +117,12 @@ class App
                 $res->send();
             } else {
                 self::$response->setDebugData($debug_data);
-                self::$response->setBody($res)->send();
+                if ($res instanceof \Exception) {
+                    $exception = get_class($res);
+                    throw new $exception($res->getMessage(), $res->getCode());
+                } else {
+                    self::$response->setBody($res)->send();
+                }
             }
             die();
 

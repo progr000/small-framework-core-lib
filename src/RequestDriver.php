@@ -6,7 +6,6 @@ use Core\Interfaces\RequestInterface;
 use Exception;
 use Core\Exceptions\ValidatorException;
 
-
 class RequestDriver implements RequestInterface
 {
     /** all possible request vars are stored in this vars */
@@ -148,6 +147,18 @@ class RequestDriver implements RequestInterface
     
     
     /** ========== Validation methods ============== */
+
+    /**
+     * @return false
+     */
+    public function onFailedValidation()
+    {
+        SessionDriver::getInstance('old-request')->put($this->all());
+        SessionDriver::getInstance('error-request')->put($this->getErrors());
+
+        return false;
+    }
+
     /**
      * This method must return rules for validation
      * Strongly recommended leave empty rules in this class
@@ -181,6 +192,10 @@ class RequestDriver implements RequestInterface
         if (empty($this->rules())) {
             return null;
         }
+
+        /* clear some old data */
+        SessionDriver::getInstance('old-request')->clear();
+        SessionDriver::getInstance('error-request')->clear();
 
         $validator = new ValidatorDriver($this);
         return $validator->validate();
