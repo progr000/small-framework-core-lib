@@ -82,7 +82,7 @@ abstract class ActiveRecordDriver extends stdClass
 
     /**
      * @param int $id
-     * @return ActiveRecordDriver
+     * @return static
      * @throws DbException
      */
     public static function findOrFail($id)
@@ -97,7 +97,7 @@ abstract class ActiveRecordDriver extends stdClass
 
     /**
      * @param int $id
-     * @return ActiveRecordDriver|static
+     * @return static
      * @throws DbException
      */
     public static function findOrNew($id)
@@ -113,7 +113,7 @@ abstract class ActiveRecordDriver extends stdClass
     /**
      * @param int $id
      * @param mixed $or
-     * @return ActiveRecordDriver
+     * @return static
      * @throws DbException
      */
     public static function findOr($id, $or)
