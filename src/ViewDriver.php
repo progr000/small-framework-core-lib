@@ -121,9 +121,9 @@ class ViewDriver
             if (strrpos($item, '<style') !== false) {
                 $str .= $item . "\n";
             } else {
-                if (defined('__WWW_DIR__')) {
-                    $filemtime = file_exists(__WWW_DIR__ . "/" . $item)
-                        ? filemtime(__WWW_DIR__ . "/" . $item)
+                if (App::$site_root) {
+                    $filemtime = file_exists(App::$site_root . "/" . $item)
+                        ? filemtime(App::$site_root . "/" . $item)
                         : time();
                 } else {
                     $filemtime = time();
@@ -168,9 +168,9 @@ class ViewDriver
             if (strrpos($item, '<script') !== false) {
                 $str .= $item . "\n";
             } else {
-                if (defined('__WWW_DIR__')) {
-                    $filemtime = file_exists(__WWW_DIR__ . "/" . $item)
-                        ? filemtime(__WWW_DIR__ . "/" . $item)
+                if (App::$site_root) {
+                    $filemtime = file_exists(App::$site_root . "/" . $item)
+                        ? filemtime(App::$site_root . "/" . $item)
                         : time();
                 } else {
                     $filemtime = time();

@@ -24,14 +24,18 @@ class App
     public static $response;
     /** @var LocalizationDriver */
     public static $localization;
-    /** @var $session */
+    /** @var SessionDriver */
     public static $session;
-    /** @var $cookie */
+    /** @var CookieDriver */
     public static $cookie;
     /** @var DbDriver */
     public static $db;
     /** @var DbDriver[] */
     public static $DbInstances;
+    /** @var string */
+    public static $site_root;
+    /** @var string */
+    public static $site_url = "";
 
     /** @var string */
     public static $locale;
@@ -42,6 +46,7 @@ class App
      */
     private function __construct($config_dir)
     {
+        /**/
         self::$config = ConfigDriver::getInstance($config_dir);
         self::$session = SessionDriver::getInstance(self::$config->get('session-container-name', 'app-small-framework'));
         self::$cookie = CookieDriver::getInstance();
@@ -50,6 +55,16 @@ class App
         self::$response = new ResponseDriver();
         self::$localization = LocalizationDriver::getInstance();
 
+        /**/
+        self::$site_root = self::$config->get('SITE_ROOT', (defined('__WWW_DIR__') ? __WWW_DIR__ : null));
+        self::$site_url = self::$config->get('SITE_URL', null);
+        if (!self::$site_url && self::$request->protocol() && self::$request->host() && self::$request->port()) {
+            self::$site_url = self::$request->protocol() . "://" . self::$request->host();
+            if (!in_array(self::$request->port(), [80, 443, "80", "443"])) {
+                self::$site_url .= ":" . self::$request->port();
+            }
+        }
+        
         /**/
         self::$locale = self::$config->get('localization', ['default-locale' => "en"])['default-locale'];
 
