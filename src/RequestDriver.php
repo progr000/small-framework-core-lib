@@ -65,6 +65,9 @@ class RequestDriver implements RequestInterface
     public function __construct()
     {
         $this->method = mb_strtoupper(isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET');
+        if (isset($_REQUEST['_method']) && in_array(mb_strtoupper($_REQUEST['_method']), ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])) {
+            $this->method = mb_strtoupper($_REQUEST['_method']);
+        }
         $this->protocol = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : null;
         $this->host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
         $this->port = isset($_SERVER['SERVER_PORT']) ? intval($_SERVER['SERVER_PORT']) : null;

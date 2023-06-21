@@ -79,7 +79,8 @@ class RouteDriver
                 $this->available_routes[] = ['controller' => $v[0], 'action' => 'update',    'name' => "{$r_name}.update", 'middleware' => $middleware, 'method' => 'PUT',    'pattern' => $route_path . '(\d+)/?$~'];
                 $this->available_routes[] = ['controller' => $v[0], 'action' => 'create',    'name' => "{$r_name}.create", 'middleware' => $middleware, 'method' => 'GET',    'pattern' => $route_path . 'create/?$~'];
                 $this->available_routes[] = ['controller' => $v[0], 'action' => 'store',     'name' => "{$r_name}.store",  'middleware' => $middleware, 'method' => 'POST',   'pattern' => $route_path . '?$~'];
-                $this->available_routes[] = ['controller' => $v[0], 'action' => 'delete',    'name' => "{$r_name}.delete", 'middleware' => $middleware, 'method' => 'DELETE', 'pattern' => $route_path . '(\d+)/?$~'];
+                $this->available_routes[] = ['controller' => $v[0], 'action' => 'delete',    'name' => "{$r_name}.delete", 'middleware' => $middleware, 'method' => 'GET',    'pattern' => $route_path . '(\d+)/delete/?$~'];
+                $this->available_routes[] = ['controller' => $v[0], 'action' => 'destroy',   'name' => "{$r_name}.delete", 'middleware' => $middleware, 'method' => 'DELETE', 'pattern' => $route_path . '(\d+)/?$~'];
                 $this->available_routes[] = ['controller' => $v[0], 'action' => '{{%ANY%}}', 'name' => "{$r_name}.other",  'middleware' => $middleware, 'method' => null,     'pattern' => $route_path . '(\d+)/([a-z\-]{3,15})/?$~'];
             } elseif (gettype($v) === 'array') {
                 /* for ordinal route */
