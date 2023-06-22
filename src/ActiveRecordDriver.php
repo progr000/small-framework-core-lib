@@ -226,6 +226,24 @@ abstract class ActiveRecordDriver extends stdClass
     }
 
     /**
+     * @param array $data
+     * @param array $only
+     * @return void
+     */
+    public function load(array $data, array $only = [])
+    {
+        if (sizeof($only)) {
+            foreach ($only as $v) {
+                unset($data[$v]);
+            }
+        }
+
+        foreach ($data as $k => $v) {
+            $this->{$k} = $v;
+        }
+    }
+
+    /**
      * Save ActiveRecord
      * @return bool
      * @throws DbException
