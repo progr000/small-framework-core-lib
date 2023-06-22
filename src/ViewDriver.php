@@ -128,7 +128,7 @@ class ViewDriver
                 } else {
                     $filemtime = time();
                 }
-                $str .= '<link href="' . $item . (App::$config->get('IS_DEBUG', false) ? '?v=' . $filemtime : '') . '" rel="stylesheet">' . "\n";
+                $str .= '<link href="' . asset($item) . (App::$config->get('IS_DEBUG', false) ? '?v=' . $filemtime : '') . '" rel="stylesheet">' . "\n";
             }
         }
         return $str;
@@ -175,7 +175,7 @@ class ViewDriver
                 } else {
                     $filemtime = time();
                 }
-                $str .= '<script src="' . $item . (App::$config->get('IS_DEBUG', false) ? '?v=' . $filemtime : '') . '"></script>' . "\n";
+                $str .= '<script src="' . asset($item) . (App::$config->get('IS_DEBUG', false) ? '?v=' . $filemtime : '') . '"></script>' . "\n";
             }
         }
         return $str;

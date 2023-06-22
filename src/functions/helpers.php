@@ -82,3 +82,25 @@ if (!function_exists('__')) {
         return App::$localization->get($key, $replace);
     }
 }
+
+if (!function_exists('asset')) {
+    /**
+     * @param string $file
+     * @return string
+     */
+    function asset($file)
+    {
+        return App::$site_url . "/" . ltrim($file, '/');
+    }
+}
+
+if (!function_exists('url')) {
+    /**
+     * @param string $file
+     * @return string
+     */
+    function url($path)
+    {
+        return App::$site_url . "/" . ltrim($path, '/');
+    }
+}

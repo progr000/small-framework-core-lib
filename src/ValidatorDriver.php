@@ -209,6 +209,16 @@ class ValidatorDriver
      * @param array $params
      * @return bool
      */
+    private function integer($key, array $params = [])
+    {
+        return $this->int($key, $params);
+    }
+
+    /**
+     * @param string $key
+     * @param array $params
+     * @return bool
+     */
     private function double($key, array $params = [])
     {
         //dump("double($key, " . json_encode($params) .")");
@@ -237,6 +247,16 @@ class ValidatorDriver
         }
 
         return $ret;
+    }
+
+    /**
+     * @param string $key
+     * @param array $params
+     * @return bool
+     */
+    private function number($key, array $params = [])
+    {
+        return $this->double($key, $params);
     }
 
     /**
@@ -286,6 +306,9 @@ class ValidatorDriver
     private function regex($key, array $params = [])
     {
         $val = $this->data[$key];
+        if (empty($val)) {
+            return true;
+        }
         if (empty($params['regex'])) {
             $this->failed[$key][] = $this->getMessage($key,'regex_bad','Wrong regex for validation');
             return false;
@@ -321,5 +344,49 @@ class ValidatorDriver
 
         $this->failed[$key][] = $this->getMessage($key,'compareEquals',"Value {$key} doesn't equals value {$key_compare}", $params);
         return false;
+    }
+
+    /**
+     * @param string $key
+     * @param array $params
+     * @return bool
+     */
+    private function email($key, array $params = [])
+    {
+        // TODO
+        return true;
+    }
+
+    /**
+     * @param string $key
+     * @param array $params
+     * @return bool
+     */
+    private function phone($key, array $params = [])
+    {
+        // TODO
+        return true;
+    }
+
+    /**
+     * @param string $key
+     * @param array $params
+     * @return bool
+     */
+    private function url($key, array $params = [])
+    {
+        // TODO
+        return true;
+    }
+
+    /**
+     * @param string $key
+     * @param array $params
+     * @return bool
+     */
+    private function domain($key, array $params = [])
+    {
+        // TODO
+        return true;
     }
 }
