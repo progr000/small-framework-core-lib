@@ -226,7 +226,6 @@ abstract class ActiveRecordDriver extends stdClass
     }
 
     /**
-     * @param array $data
      * @param array $only
      * @return void
      */
@@ -292,7 +291,8 @@ abstract class ActiveRecordDriver extends stdClass
     private function _insert(array $mappedProperties)
     {
         $sql_quote = self::getDbConnection()->sql_quote;
-        $filteredProperties = array_filter($mappedProperties);
+        //$filteredProperties = array_filter($mappedProperties);
+        $filteredProperties = $mappedProperties;
 
         $columns = [];
         $params = [];

@@ -96,11 +96,21 @@ if (!function_exists('asset')) {
 
 if (!function_exists('url')) {
     /**
-     * @param string $file
+     * @param string $path
+     * @param array|string $params
      * @return string
      */
-    function url($path)
+    function url($path, $params = '')
     {
-        return App::$site_url . "/" . ltrim($path, '/');
+        $tmp = [];
+        if (is_array($params) && sizeof($params)) {
+            foreach ($params as $k => $v) {
+                $tmp[] = "{$k}=" . urlencode($v);
+            }
+            $params = implode('&', $tmp);
+        }
+        $params = ltrim(trim($params), '?');
+
+        return App::$site_url . "/" . ltrim($path, '/') . ($params ? "?" . $params : "");
     }
 }
