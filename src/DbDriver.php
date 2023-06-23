@@ -131,6 +131,9 @@ class DbDriver
      */
     public function prepareValType($val)
     {
+        if (!$this->pdo) {
+            throw new DbException("PDO not initialized. Probably not set params for db-connections in config", 500);
+        }
         $type = gettype($val);
         if (!in_array($type, ["boolean", "integer", "double", "string", "NULL"])) {
             throw new DbException("Can't prepare Sql statement for this variable type {$type}", 500);
