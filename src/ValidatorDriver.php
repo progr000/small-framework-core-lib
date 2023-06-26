@@ -129,14 +129,14 @@ class ValidatorDriver
                         }
                     } elseif ($method['type'] === 'closure') {
                         if (!$method['exec']($key, $params, $this->data)) {
-                            $this->failed[$key][] = $this->getMessage($key, 'closure', 'Wrong value');
+                            $this->failed[$key][] = $this->getMessage($key, 'closure', __('Wrong value'));
                             $ret = false;
                             $test_var = false;
                         }
                     } else {
                         $f = new $method['exec']($this);
                         if (!$f($this->data[$key], $params, $this->data)) {
-                            $this->failed[$key][] = $this->getMessage($key, $method['exec'], (isset($f->errorMessage) ? $f->errorMessage : 'Wrong value'));
+                            $this->failed[$key][] = $this->getMessage($key, $method['exec'], (isset($f->errorMessage) ? $f->errorMessage : __('Wrong value')));
                             $ret = false;
                             $test_var = false;
                         }
@@ -163,7 +163,7 @@ class ValidatorDriver
     {
         //dump("required($key)");
         if (!key_exists($key, $this->data) || empty($this->data[$key])) {
-            $this->failed[$key][] = $this->getMessage($key, 'required', 'value is required');
+            $this->failed[$key][] = $this->getMessage($key, 'required', __('Value is required'));
             return false;
         }
         return true;
@@ -181,11 +181,11 @@ class ValidatorDriver
             $val = intval($this->data[$key]);
             if (isset($params['min']) || isset($params['max'])) {
                 if (isset($params['min']) && $val < $params['min']) {
-                    $this->failed[$key][] = $this->getMessage($key, 'min',"value too small, min value {%min}", $params);
+                    $this->failed[$key][] = $this->getMessage($key, 'min',__("Value too small, min value {%min}"), $params);
                     $ret = false;
                 }
                 if (isset($params['max']) && $val > $params['max']) {
-                    $this->failed[$key][] = $this->getMessage($key,'max', "value too big, max value {%max}", $params);
+                    $this->failed[$key][] = $this->getMessage($key,'max', __("Value too big, max value {%max}"), $params);
                     $ret = false;
                 }
                 if (!isset($ret)) {
@@ -197,7 +197,7 @@ class ValidatorDriver
                 $ret = true;
             }
         } else {
-            $this->failed[$key][] = $this->getMessage($key,'int', 'value must be an int');
+            $this->failed[$key][] = $this->getMessage($key,'int', __('Value must be an integer'));
             $ret = false;
         }
 
@@ -226,11 +226,11 @@ class ValidatorDriver
             $val = doubleval($this->data[$key]);
             if (isset($params['min']) || isset($params['max'])) {
                 if (isset($params['min']) && $val < $params['min']) {
-                    $this->failed[$key][] = $this->getMessage($key,'min', "value too small, min value {%min}", $params);
+                    $this->failed[$key][] = $this->getMessage($key,'min', __("Value too small, min value {%min}"), $params);
                     $ret = false;
                 }
                 if (isset($params['max']) && $val > $params['max']) {
-                    $this->failed[$key][] = $this->getMessage($key,'max',"value too big, max value {%max}", $params);
+                    $this->failed[$key][] = $this->getMessage($key,'max',__("Value too big, max value {%max}"), $params);
                     $ret = false;
                 }
                 if (!isset($ret)) {
@@ -242,7 +242,7 @@ class ValidatorDriver
                 $ret = true;
             }
         } else {
-            $this->failed[$key][] = $this->getMessage($key,'double', 'value must be a double');
+            $this->failed[$key][] = $this->getMessage($key,'double', __('Value must be a double'));
             $ret = false;
         }
 
@@ -275,15 +275,15 @@ class ValidatorDriver
             }
 
             if (!empty($val) && isset($params['min']) && mb_strlen($val) < intval($params['min'])) {
-                $this->failed[$key][] = $this->getMessage($key,'min',"value too short, min length {%min}", $params);
+                $this->failed[$key][] = $this->getMessage($key,'min', __("Value too short, min length {%min}"), $params);
                 $ret = false;
             }
             if (!empty($val) && isset($params['max']) && mb_strlen($val) > intval($params['max'])) {
-                $this->failed[$key][] = $this->getMessage($key,'max', "value too long, max length {%max}", $params);
+                $this->failed[$key][] = $this->getMessage($key,'max', __("Value too long, max length {%max}"), $params);
                 $ret = false;
             }
             if (isset($val, $params['length']) && mb_strlen($val) !== intval($params['length'])) {
-                $this->failed[$key][] = $this->getMessage($key,'length',"value length must be {%length}", $params);
+                $this->failed[$key][] = $this->getMessage($key,'length', __("Value length must be {%length}"), $params);
                 $ret = false;
             }
             if (!isset($ret)) {
@@ -310,7 +310,7 @@ class ValidatorDriver
             return true;
         }
         if (empty($params['regex'])) {
-            $this->failed[$key][] = $this->getMessage($key,'regex_bad','Wrong regex for validation');
+            $this->failed[$key][] = $this->getMessage($key,'regex_bad', __('Wrong regex for validation'));
             return false;
         }
 
@@ -318,7 +318,7 @@ class ValidatorDriver
             return true;
         }
 
-        $this->failed[$key][] = $this->getMessage($key,'regex',"value not match with regex {%regex}", $params);
+        $this->failed[$key][] = $this->getMessage($key,'regex', __("Value not match with regex {%regex}"), $params);
         return false;
     }
 
@@ -342,7 +342,7 @@ class ValidatorDriver
             return true;
         }
 
-        $this->failed[$key][] = $this->getMessage($key,'compareEquals',"Value {$key} doesn't equals value {$key_compare}", $params);
+        $this->failed[$key][] = $this->getMessage($key,'compareEquals', __("Value doesn't equals value {%compareEquals}"), $params);
         return false;
     }
 
@@ -353,7 +353,28 @@ class ValidatorDriver
      */
     private function email($key, array $params = [])
     {
-        // TODO
+        if (!(bool)preg_match('/^[a-z0-9_\-\.]+(\+[a-z0-9_\-\.]+)*@[a-z0-9_\-\.]+\.[a-z]{2,6}$/i', $this->data[$key])) {
+            $this->failed[$key][] = $this->getMessage($key,'email', __("Wrong email format"), $params);
+            return false;
+        }
+
+        if (!filter_var($this->data[$key], FILTER_VALIDATE_EMAIL)) {
+            $this->failed[$key][] = $this->getMessage($key,'email', __("Email validation failed"), $params);
+            return false;
+        }
+
+        if (!empty($params['email']) && $params['email'] === 'dns') {
+            $host = mb_substr($this->data[$key], strpos($this->data[$key],'@') + 1);
+            if (!isset($host)) {
+                $this->failed[$key][] = $this->getMessage($key,'email', __("Email host not found"), $params);
+                return false;
+            }
+            if (!filter_var(gethostbyname($host), FILTER_VALIDATE_IP)) {
+                $this->failed[$key][] = $this->getMessage($key,'email', __("Email dns check failed"), $params);
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -364,7 +385,11 @@ class ValidatorDriver
      */
     private function phone($key, array $params = [])
     {
-        // TODO
+        if (!(bool)preg_match('/^\+?[0-9\s\-\(\)]{5,20}$/', $this->data[$key])) {
+            $this->failed[$key][] = $this->getMessage($key,'phone', __("Wrong phone format"), $params);
+            return false;
+        }
+
         return true;
     }
 
@@ -375,7 +400,22 @@ class ValidatorDriver
      */
     private function url($key, array $params = [])
     {
-        // TODO
+        if (!filter_var($this->data[$key], FILTER_VALIDATE_URL)) {
+            $this->failed[$key][] = $this->getMessage($key,'url', __("Url validation failed"), $params);
+            return false;
+        };
+        if (!empty($params['url']) && $params['url'] === 'dns') {
+            $tmp = parse_url($this->data[$key]);
+            if (!isset($tmp['host'])) {
+                $this->failed[$key][] = $this->getMessage($key,'url', __("Url host not found"), $params);
+                return false;
+            }
+            if (!filter_var(gethostbyname($tmp['host']), FILTER_VALIDATE_IP)) {
+                $this->failed[$key][] = $this->getMessage($key,'url', __("Url dns check failed"), $params);
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -386,7 +426,17 @@ class ValidatorDriver
      */
     private function domain($key, array $params = [])
     {
-        // TODO
+        if (!filter_var($this->data[$key],  FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)) {
+            $this->failed[$key][] = $this->getMessage($key,'domain', __("Domain validation failed"), $params);
+            return false;
+        };
+        if (!empty($params['domain']) && $params['domain'] === 'dns') {
+            if (!filter_var(gethostbyname($this->data[$key]), FILTER_VALIDATE_IP)) {
+                $this->failed[$key][] = $this->getMessage($key,'domain', __("Domain dns check failed"), $params);
+                return false;
+            }
+        }
+
         return true;
     }
 }
