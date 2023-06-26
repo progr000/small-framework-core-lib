@@ -71,13 +71,17 @@ class ValidatorDriver
             if (!is_array($rule)) {
                 $rule = explode('|', $rule);
             }
-            foreach ($rule as $value) {
+            foreach ($rule as $key2 => $value) {
 
                 if (gettype($value) === 'object' && is_callable($value)) {
 
                     $methods[] = ['type' => 'closure', 'exec' => $value];
 
                 } else {
+                    if (in_array($key2, ['min', 'max', 'length'])) {
+                        $value = $key2 . ":" . $value;
+                    }
+
                     $tmp = explode(':', $value);
 
                     if (isset($tmp[1])) {
