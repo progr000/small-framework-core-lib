@@ -69,7 +69,6 @@ class RequestDriver implements RequestInterface
                 $rules = explode('|', $rules);
             }
             foreach ($rules as $k => $v) {
-                $rules['data-real-type'] = 'text';
                 if (gettype($v) === 'string') {
                     $tmp = explode(':', $v);
                     if (isset($tmp[1]) && in_array($tmp[0], ['min', 'max', 'length'])) {
@@ -87,6 +86,7 @@ class RequestDriver implements RequestInterface
                     unset($rules[$k]);
                 }
             }
+            if (!isset($rules['data-real-type'])) { $rules['data-real-type'] = 'text'; }
             if ($rules['data-real-type'] === 'text') {
                 if (isset($rules['min'])) {
                     $rules['minlength'] = $rules['min'];
