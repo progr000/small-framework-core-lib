@@ -305,16 +305,18 @@ class ValidatorDriver
      */
     private function regex($key, array $params = [])
     {
-        $val = $this->data[$key];
-        if (empty($val)) {
+        /* do not check if empty */
+        if (empty($this->data[$key])) {
             return true;
         }
+
+        /**/
         if (empty($params['regex'])) {
             $this->failed[$key][] = $this->getMessage($key,'regex_bad', __('Wrong regex for validation'));
             return false;
         }
 
-        if (preg_match($params['regex'], $val)) {
+        if (preg_match($params['regex'], $this->data[$key])) {
             return true;
         }
 
@@ -353,16 +355,22 @@ class ValidatorDriver
      */
     private function email($key, array $params = [])
     {
+        /* do not check if empty */
+        if (empty($this->data[$key])) {
+            return true;
+        }
+
+        /**/
         if (!(bool)preg_match('/^[a-z0-9_\-\.]+(\+[a-z0-9_\-\.]+)*@[a-z0-9_\-\.]+\.[a-z]{2,6}$/i', $this->data[$key])) {
             $this->failed[$key][] = $this->getMessage($key,'email', __("Wrong email format"), $params);
             return false;
         }
-
         if (!filter_var($this->data[$key], FILTER_VALIDATE_EMAIL)) {
             $this->failed[$key][] = $this->getMessage($key,'email', __("Email validation failed"), $params);
             return false;
         }
 
+        /**/
         if (!empty($params['email']) && $params['email'] === 'dns') {
             $host = mb_substr($this->data[$key], strpos($this->data[$key],'@') + 1);
             if (!isset($host)) {
@@ -385,6 +393,12 @@ class ValidatorDriver
      */
     private function phone($key, array $params = [])
     {
+        /* do not check if empty */
+        if (empty($this->data[$key])) {
+            return true;
+        }
+
+        /**/
         if (!(bool)preg_match('/^\+?[0-9\s\-\(\)]{5,20}$/', $this->data[$key])) {
             $this->failed[$key][] = $this->getMessage($key,'phone', __("Wrong phone format"), $params);
             return false;
@@ -400,6 +414,12 @@ class ValidatorDriver
      */
     private function url($key, array $params = [])
     {
+        /* do not check if empty */
+        if (empty($this->data[$key])) {
+            return true;
+        }
+
+        /**/
         if (!filter_var($this->data[$key], FILTER_VALIDATE_URL)) {
             $this->failed[$key][] = $this->getMessage($key,'url', __("Url validation failed"), $params);
             return false;
@@ -426,6 +446,12 @@ class ValidatorDriver
      */
     private function domain($key, array $params = [])
     {
+        /* do not check if empty */
+        if (empty($this->data[$key])) {
+            return true;
+        }
+
+        /**/
         if (!filter_var($this->data[$key],  FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)) {
             $this->failed[$key][] = $this->getMessage($key,'domain', __("Domain validation failed"), $params);
             return false;
