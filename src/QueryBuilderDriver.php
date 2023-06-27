@@ -289,6 +289,28 @@ class QueryBuilderDriver
     }
 
     /**
+     * @return false|int|string
+     * @throws DbException
+     */
+    public function count()
+    {
+        $this->select = " count(*) as cnt ";
+        $this->orderBy = "";
+        $sql = $this->prepareRawSql('select');
+        if ($this->only_show_sql) {
+            return $sql;
+        }
+        $sth = $this->connection->exec($sql);
+        if ($sth) {
+            $res = $sth->fetch(PDO::FETCH_ASSOC);
+            if (isset($res['cnt'])) {
+                return intval($res['cnt']);
+            }
+        }
+        return false;
+    }
+
+    /**
      * @param array|string $condition
      * @param array $params
      * @return false|int|null|string

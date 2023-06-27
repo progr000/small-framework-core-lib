@@ -48,9 +48,16 @@ interface RestInterface
     public function store();
 
     /**
+     * Show item for deletion or delete an item
+     * method GET
+     * @param int $id
+     */
+    public function delete($id);
+
+    /**
      * Delete an item
      * method DELETE
      * @param int $id
      */
-    public function delete($id);
+    public function destroy($id);
 }

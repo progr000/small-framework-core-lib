@@ -121,14 +121,14 @@ class ViewDriver
             if (strrpos($item, '<style') !== false) {
                 $str .= $item . "\n";
             } else {
-                if (defined('__WWW_DIR__')) {
-                    $filemtime = file_exists(__WWW_DIR__ . "/" . $item)
-                        ? filemtime(__WWW_DIR__ . "/" . $item)
+                if (App::$site_root) {
+                    $filemtime = file_exists(App::$site_root . "/" . $item)
+                        ? filemtime(App::$site_root . "/" . $item)
                         : time();
                 } else {
                     $filemtime = time();
                 }
-                $str .= '<link href="' . $item . (App::$config->get('IS_DEBUG', false) ? '?v=' . $filemtime : '') . '" rel="stylesheet">' . "\n";
+                $str .= '<link href="' . asset($item) . (App::$config->get('IS_DEBUG', false) ? '?v=' . $filemtime : '') . '" rel="stylesheet">' . "\n";
             }
         }
         return $str;
@@ -168,14 +168,14 @@ class ViewDriver
             if (strrpos($item, '<script') !== false) {
                 $str .= $item . "\n";
             } else {
-                if (defined('__WWW_DIR__')) {
-                    $filemtime = file_exists(__WWW_DIR__ . "/" . $item)
-                        ? filemtime(__WWW_DIR__ . "/" . $item)
+                if (App::$site_root) {
+                    $filemtime = file_exists(App::$site_root . "/" . $item)
+                        ? filemtime(App::$site_root . "/" . $item)
                         : time();
                 } else {
                     $filemtime = time();
                 }
-                $str .= '<script src="' . $item . (App::$config->get('IS_DEBUG', false) ? '?v=' . $filemtime : '') . '"></script>' . "\n";
+                $str .= '<script src="' . asset($item) . (App::$config->get('IS_DEBUG', false) ? '?v=' . $filemtime : '') . '"></script>' . "\n";
             }
         }
         return $str;

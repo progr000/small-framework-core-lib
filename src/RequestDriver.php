@@ -56,15 +56,79 @@ class RequestDriver implements RequestInterface
     /** @var array */
     protected $errors = [];
 
+    /**
+     * @param string $field
+     * @return string
+     */
+    public static function getRulesForHtmlInput($field)
+    {
+        $all_rules = (new static(true))->rules();
+        if (isset($all_rules[$field])) {
+            $rules = $all_rules[$field];
+            if (!is_array($rules)) {
+                $rules = explode('|', $rules);
+            }
+            foreach ($rules as $k => $v) {
+                if (gettype($v) === 'string') {
+                    $tmp = explode(':', $v);
+                    if (isset($tmp[1]) && in_array($tmp[0], ['min', 'max', 'length'])) {
+                        $rules[$tmp[0]] = $tmp[1];
+                    } elseif (in_array($v, ['email', 'url'])) {
+                        $rules['data-type'] = $v;
+                    } elseif (in_array($v, ['string', 'domain'])) {
+                        $rules['data-type'] = 'text';
+                    } elseif (in_array($v, ['int', 'integer', 'number', 'double'])) {
+                        $rules['data-type'] = 'text';
+                        $rules['data-real-type'] = 'number';
+                    } elseif ($v === 'required') {
+                        $rules['required'] = 'required';
+                    }
+                    unset($rules[$k]);
+                }
+            }
+            if (!isset($rules['data-real-type'])) { $rules['data-real-type'] = 'text'; }
+            if ($rules['data-real-type'] === 'text') {
+                if (isset($rules['min'])) {
+                    $rules['minlength'] = $rules['min'];
+                    unset($rules['min']);
+                }
+                if (isset($rules['max'])) {
+                    $rules['maxlength'] = $rules['max'];
+                    unset($rules['max']);
+                }
+                if (isset($rules['length'])) {
+                    $rules['minlength'] = $rules['length'];
+                    $rules['maxlength'] = $rules['length'];
+                    unset($rules['length']);
+                }
+            }
+            unset($rules['data-real-type']);
+            $ret = '';
+            foreach ($rules as $k => $v) {
+                $ret .= " {$k}=\"{$v}\"";
+            }
+            return trim($ret);
+        }
+        return '';
+    }
 
     /**
      * Constructor
      * @return void|mixed
      * @throws ValidatorException
      */
-    public function __construct()
+    public function __construct($only_get_rules = false)
     {
+        /**/
+        if ($only_get_rules) {
+            return;
+        }
+
+        /**/
         $this->method = mb_strtoupper(isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET');
+        if (isset($_REQUEST['_method']) && in_array(mb_strtoupper($_REQUEST['_method']), ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])) {
+            $this->method = mb_strtoupper($_REQUEST['_method']);
+        }
         $this->protocol = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : null;
         $this->host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
         $this->port = isset($_SERVER['SERVER_PORT']) ? intval($_SERVER['SERVER_PORT']) : null;

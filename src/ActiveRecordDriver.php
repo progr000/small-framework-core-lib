@@ -82,7 +82,7 @@ abstract class ActiveRecordDriver extends stdClass
 
     /**
      * @param int $id
-     * @return ActiveRecordDriver
+     * @return static
      * @throws DbException
      */
     public static function findOrFail($id)
@@ -97,7 +97,7 @@ abstract class ActiveRecordDriver extends stdClass
 
     /**
      * @param int $id
-     * @return ActiveRecordDriver|static
+     * @return static
      * @throws DbException
      */
     public static function findOrNew($id)
@@ -113,7 +113,7 @@ abstract class ActiveRecordDriver extends stdClass
     /**
      * @param int $id
      * @param mixed $or
-     * @return ActiveRecordDriver
+     * @return static
      * @throws DbException
      */
     public static function findOr($id, $or)
@@ -226,6 +226,23 @@ abstract class ActiveRecordDriver extends stdClass
     }
 
     /**
+     * @param array $only
+     * @return void
+     */
+    public function load(array $data, array $only = [])
+    {
+        if (sizeof($only)) {
+            foreach ($only as $v) {
+                unset($data[$v]);
+            }
+        }
+
+        foreach ($data as $k => $v) {
+            $this->{$k} = $v;
+        }
+    }
+
+    /**
      * Save ActiveRecord
      * @return bool
      * @throws DbException
@@ -274,7 +291,8 @@ abstract class ActiveRecordDriver extends stdClass
     private function _insert(array $mappedProperties)
     {
         $sql_quote = self::getDbConnection()->sql_quote;
-        $filteredProperties = array_filter($mappedProperties);
+        //$filteredProperties = array_filter($mappedProperties);
+        $filteredProperties = $mappedProperties;
 
         $columns = [];
         $params = [];
