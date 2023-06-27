@@ -14,6 +14,8 @@ class RequestDriver implements RequestInterface
     /** @var array */
     protected $get = [];
     /** @var array */
+    protected $files = [];
+    /** @var array */
     protected $cookie = [];
     /** @var array */
     protected $session;
@@ -150,6 +152,9 @@ class RequestDriver implements RequestInterface
         }
         if (!empty($_GET)) {
             $this->get = $_GET;
+        }
+        if (!empty($_FILES)) {
+            $this->files = $_FILES;
         }
         if (!empty($_COOKIE)) {
             $this->cookie = $_COOKIE;
@@ -527,5 +532,37 @@ class RequestDriver implements RequestInterface
     {
         if (is_null($key)) return $this->all_request;
         return isset($this->all_request[$key]) ? $this->all_request[$key] : $default;
+    }
+
+    /**
+     * @param string|null $key
+     * @return array|null
+     */
+    public function file($key = null)
+    {
+        if (is_null($key)) return $this->files;
+        return isset($this->files[$key]) ? $this->files[$key] : null;
+    }
+
+    /**
+     * @param string $key
+     * @param string $to
+     * @return bool
+     * @throws Exception
+     */
+    function moveUploaded($key, $to)
+    {
+        $file = $this->file($key);
+
+        $destination = dirname($to);
+        if (!file_exists($destination) || !is_dir($destination) || !is_writable($destination)) {
+            throw new Exception("Folder for upload doesn't exists or not writeable.", 500);
+        }
+
+        if (!empty($file['name']) && !empty($file['tmp_name'])) {
+            return move_uploaded_file($file['tmp_name'], $to);
+        }
+
+        return false;
     }
 }
