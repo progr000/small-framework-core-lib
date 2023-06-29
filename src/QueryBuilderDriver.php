@@ -272,7 +272,7 @@ class QueryBuilderDriver
     }
 
     /**
-     * @return array|false|null|string
+     * @return false|array
      * @throws DbException
      */
     public function get()
@@ -285,6 +285,29 @@ class QueryBuilderDriver
         if ($sth) {
             return $sth->fetchAll(PDO::FETCH_CLASS, $this->class);
         }
+        return false;
+    }
+
+    /**
+     * @return false|array
+     * @throws DbException
+     */
+    public function all()
+    {
+        return $this->get();
+    }
+
+    /**
+     * @return false|mixed
+     * @throws DbException
+     */
+    public function one()
+    {
+        $res = $this->get();
+        if (isset($res[0])) {
+            return $res[0];
+        }
+
         return false;
     }
 

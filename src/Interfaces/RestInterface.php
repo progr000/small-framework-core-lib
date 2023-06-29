@@ -7,7 +7,7 @@ interface RestInterface
     /**
      * Get list of items
      * method GET
-     * @return false|string
+     * @return mixed
      */
     public function index();
 
@@ -15,7 +15,7 @@ interface RestInterface
      * Get an item
      * method GET
      * @param int $id
-     * @return false|string
+     * @return mixed
      */
     public function view($id);
 
@@ -23,7 +23,7 @@ interface RestInterface
      * Get form for edit an item
      * method GET
      * @param int $id
-     * @return false|string
+     * @return mixed
      */
     public function edit($id);
 
@@ -31,19 +31,21 @@ interface RestInterface
      * Update item
      * method PUT
      * @param int $id
+     * @return mixed
      */
     public function update($id);
 
     /**
      * Get form for create an item
      * method PUT
-     * @return false|string
+     * @return mixed
      */
     public function create();
 
     /**
      * Create an item
      * method POST
+     * @return mixed
      */
     public function store();
 
@@ -51,6 +53,7 @@ interface RestInterface
      * Show item for deletion or delete an item
      * method GET
      * @param int $id
+     * @return mixed
      */
     public function delete($id);
 
@@ -58,6 +61,7 @@ interface RestInterface
      * Delete an item
      * method DELETE
      * @param int $id
+     * @return mixed
      */
     public function destroy($id);
 }

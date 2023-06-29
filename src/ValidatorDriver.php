@@ -73,11 +73,16 @@ class ValidatorDriver
             }
             foreach ($rule as $key2 => $value) {
 
+                if ($value === 'file') {
+                    $params['file'] = 'file';
+                }
+
                 if (gettype($value) === 'object' && is_callable($value)) {
 
                     $methods[] = ['type' => 'closure', 'exec' => $value];
 
                 } else {
+
                     if (in_array($key2, ['min', 'max', 'length'])) {
                         $value = $key2 . ":" . $value;
                     }
@@ -100,7 +105,8 @@ class ValidatorDriver
                             elseif ($tmp[0] === 'regex')
                                 $params[$tmp[0]] = intval($tmp[1]);
                             else
-                                $params[] = $tmp[1];
+                                $params[$tmp[0]] = $tmp[1];
+                                //$params[] = $tmp[1];
                         }
 
                     } else {
@@ -163,9 +169,14 @@ class ValidatorDriver
      * @param string $key
      * @return bool
      */
-    private function required($key)
+    private function required($key, $params = [])
     {
-        //dump("required($key)");
+        if (isset($params['file'])) {
+            if (!key_exists($key, $this->data) || empty($this->data[$key]) || empty($this->data[$key]['tmp_name'])) {
+                $this->failed[$key][] = $this->getMessage($key, 'required', __('Value is required'));
+                return false;
+            }
+        }
         if (!key_exists($key, $this->data) || empty($this->data[$key])) {
             $this->failed[$key][] = $this->getMessage($key, 'required', __('Value is required'));
             return false;
@@ -463,6 +474,50 @@ class ValidatorDriver
         if (!empty($params['domain']) && $params['domain'] === 'dns') {
             if (!filter_var(gethostbyname($this->data[$key]), FILTER_VALIDATE_IP)) {
                 $this->failed[$key][] = $this->getMessage($key,'domain', __("Domain dns check failed"), $params);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $key
+     * @param array $params
+     * @return bool
+     */
+    private function file($key, array $params = [])
+    {
+        /* do not check if empty */
+        if (empty($this->data[$key]) || empty($this->data[$key]['tmp_name'])) {
+            return true;
+        }
+
+        /**/
+        if (isset($params['type'])) {
+            if (empty($this->data[$key]['type'])) {
+                $this->failed[$key][] = $this->getMessage($key,'file', __("Type of file is undefined"), $params);
+                return false;
+            }
+            $expected_types = explode(',', $params['type']);
+            $found_expected_type = false;
+            foreach ($expected_types as $v) {
+                $v = trim($v);
+                if (strrpos($this->data[$key]['type'], $v)) {
+                    $found_expected_type = true;
+                    break;
+                }
+            }
+            if (!$found_expected_type) {
+                $this->failed[$key][] = $this->getMessage($key,'file', __("Wrong file type. Expected {%type}"), $params);
+                return false;
+            }
+        }
+        if (isset($params['max'])) {
+            $max_size = $params['max'];
+            $cur_size = intval($this->data[$key]['size']);
+            if ($cur_size > $max_size) {
+                $this->failed[$key][] = $this->getMessage($key,'file', __("File to lage, max size {$max_size} bytes"), $params);
                 return false;
             }
         }

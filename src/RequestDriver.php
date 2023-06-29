@@ -185,9 +185,9 @@ class RequestDriver implements RequestInterface
         }
 
         if (is_array($this->json)) {
-            $this->all_request = array_merge($this->get, $this->post, $this->cookie, $this->json);
+            $this->all_request = array_merge($this->get, $this->post, $this->files, $this->cookie, $this->json);
         } else {
-            $this->all_request = array_merge($this->get, $this->post, $this->cookie);
+            $this->all_request = array_merge($this->get, $this->post, $this->files, $this->cookie);
         }
 
         if (($this->validate() === false) && method_exists($this, 'onFailedValidation')) {

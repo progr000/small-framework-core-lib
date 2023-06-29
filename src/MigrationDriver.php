@@ -145,7 +145,7 @@ class MigrationDriver
             $cnt = 0;
             foreach ($this->undone_list as $v) {
                 if ($steps === null || $cnt < $steps) {
-                    $executeMigration = LogDriver::executingMessage("Installing migration {$v}", 0);
+                    $executeMigration = LogDriver::executingMessage("Installing migration [warn]{$v}[/warn]", 0);
                     if ($this->execute($v, 'up') !== false) {
                         App::$db->exec("INSERT INTO {{" . self::TABLE_LIST_MIGRATIONS . "}} (" . self::COLUMN_NAME . ") VALUES (:name)", ['name' => $v]);
                         $executeMigration->showSuccess();
@@ -182,7 +182,7 @@ class MigrationDriver
             $cnt = 0;
             while (null !== ($v = array_pop($this->done_list))) {
                 if ($cnt < $steps) {
-                    $executeMigration = LogDriver::executingMessage("Uninstalling migration {$v}", 0);
+                    $executeMigration = LogDriver::executingMessage("Uninstalling migration [warn]{$v}[/warn]", 0);
                     if ($this->execute($v, 'down') !== false) {
                         App::$db->exec("DELETE FROM {{" . self::TABLE_LIST_MIGRATIONS . "}} WHERE " . self::COLUMN_NAME . " =  :name", ['name' => $v]);
                         $executeMigration->showSuccess();
@@ -237,7 +237,7 @@ class MigrationDriver
         $file_name = self::$FOLDER . "/{$name}.php";
         file_put_contents($file_name, $content);
         chmod($file_name, 0777);
-        LogDriver::success("Successfully created. You can edit '" . realpath($file_name) . "' now, and then run migrate.", 0);
+        LogDriver::success("Successfully created. You can edit [warn]" . realpath($file_name) . "[/warn] now, and then run migrate.", 0);
         return true;
     }
 

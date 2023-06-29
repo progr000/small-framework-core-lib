@@ -308,6 +308,8 @@ abstract class ActiveRecordDriver extends stdClass
         if ($sth) {
             $this->{static::$_primary_key_field} = self::getDbConnection()->lastInsert();
             $this->refresh();
+        } else {
+            return false;
         }
 
         //return $sth;
