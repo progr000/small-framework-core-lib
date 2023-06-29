@@ -210,8 +210,8 @@ class SendmailDriver
             $this->bodyText = str_replace($replace_arr, "$val", $this->bodyText);
             $this->bodyHtml = str_replace($replace_arr, "$val", $this->bodyHtml);
         }
-        $this->bodyText = utf8_decode($this->bodyText);
-        $this->bodyHtml = utf8_decode($this->bodyHtml);
+        //$this->bodyText = utf8_decode($this->bodyText);
+        //$this->bodyHtml = utf8_decode($this->bodyHtml);
     }
 
     /**
@@ -400,8 +400,15 @@ class SendmailDriver
 
         /* do send throw sendmail program */
         $sendmail = ini_get("sendmail_path");
-        //$cmd = "{$sendmail} -vv -f {$this->from['email']} < {$letter_file}  2>&1 ; rm -f {$letter_file}";
-        $cmd = "{$sendmail} -vv -f {$this->from['email']} < {$letter_file}  2>&1";
+        $verbose = "";
+        if (strrpos("---" . basename($sendmail), "---sendmail") !== false) {
+            $verbose = "-v";
+        }
+        if (strrpos("---" . basename($sendmail), "---mhsendmail") !== false) {
+            $verbose = "";
+        }
+        $cmd = "{$sendmail} {$verbose} -f {$this->from['email']} < {$letter_file}  2>&1 ; rm -f {$letter_file}";
+        //$cmd = "{$sendmail} -vv -f {$this->from['email']} < {$letter_file}  2>&1";
         exec($cmd, $output, $code);
 
         /* processing answer from sendmail-program */
@@ -428,6 +435,16 @@ class SendmailDriver
                                 'status' => 'QUEUED',
                             ];
                         }
+                    }
+                }
+                if (strrpos($v, 'id=') !== false) {
+                    $tmp = explode("id=", $v);
+                    if (isset($tmp[1])) {
+                        return [
+                            'full_answer' => $full_answer,
+                            'queue_id' => trim($tmp[1]),
+                            'status' => 'QUEUED',
+                        ];
                     }
                 }
             }
