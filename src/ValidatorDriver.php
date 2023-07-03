@@ -160,7 +160,7 @@ class ValidatorDriver
         }
 
         $this->request->setValidated($this->success);
-        $this->request->setErrors($this->failed);
+        $this->request->setErrors($this->getErrors());
 
         return $ret;
     }
