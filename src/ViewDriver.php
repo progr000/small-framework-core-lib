@@ -117,18 +117,26 @@ class ViewDriver
     private static function prepareCssStack()
     {
         $str = "";
-        foreach (self::$CSS_STACK as $item) {
+        foreach (self::$CSS_STACK as $params => $item) {
             if (strrpos($item, '<style') !== false) {
                 $str .= $item . "\n";
             } else {
-                if (App::$site_root) {
-                    $filemtime = file_exists(App::$site_root . "/" . $item)
-                        ? filemtime(App::$site_root . "/" . $item)
-                        : time();
-                } else {
-                    $filemtime = time();
+                $css_params = "";
+                if (gettype($params) === 'string') {
+                    $css_params = " {$params} ";
                 }
-                $str .= '<link href="' . asset($item) . (App::$config->get('IS_DEBUG', false) ? '?v=' . $filemtime : '') . '" rel="stylesheet">' . "\n";
+                if (strrpos($item, 'http://') === false && strrpos($item, 'https://') === false) {
+                    if (App::$site_root) {
+                        $filemtime = file_exists(App::$site_root . "/" . $item)
+                            ? filemtime(App::$site_root . "/" . $item)
+                            : time();
+                    } else {
+                        $filemtime = time();
+                    }
+                    $str .= '<link href="' . asset($item) . (App::$config->get('IS_DEBUG', false) ? '?v=' . $filemtime : '') . '" rel="stylesheet">' . "\n";
+                } else {
+                    $str .= '<link href="' . $item . '" rel="stylesheet"' . $css_params . '>' . "\n";
+                }
             }
         }
         return $str;
@@ -164,18 +172,26 @@ class ViewDriver
     private static function prepareJsStack()
     {
         $str = "";
-        foreach (self::$JS_STACK as $item) {
+        foreach (self::$JS_STACK as $params => $item) {
             if (strrpos($item, '<script') !== false) {
                 $str .= $item . "\n";
             } else {
-                if (App::$site_root) {
-                    $filemtime = file_exists(App::$site_root . "/" . $item)
-                        ? filemtime(App::$site_root . "/" . $item)
-                        : time();
-                } else {
-                    $filemtime = time();
+                $js_params = "";
+                if (gettype($params) === 'string') {
+                    $js_params = " {$params} ";
                 }
-                $str .= '<script src="' . asset($item) . (App::$config->get('IS_DEBUG', false) ? '?v=' . $filemtime : '') . '"></script>' . "\n";
+                if (strrpos($item, 'http://') === false && strrpos($item, 'https://') === false) {
+                    if (App::$site_root) {
+                        $filemtime = file_exists(App::$site_root . "/" . $item)
+                            ? filemtime(App::$site_root . "/" . $item)
+                            : time();
+                    } else {
+                        $filemtime = time();
+                    }
+                    $str .= '<script src="' . asset($item) . (App::$config->get('IS_DEBUG', false) ? '?v=' . $filemtime : '') . '"></script>' . "\n";
+                } else {
+                    $str .= '<script src="' . $item . '"'.$js_params.'></script>' . "\n";
+                }
             }
         }
         return $str;
