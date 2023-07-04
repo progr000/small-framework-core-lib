@@ -110,6 +110,9 @@ class App
             /* session start */
             App::$session->init();
 
+            /* user initialization */
+            App::$user = session('Auth');
+
             /* global middleware check and apply */
             $globalMiddleware = config('global-middleware', []);
             if (!is_array($globalMiddleware)) {
@@ -122,9 +125,6 @@ class App
 
             /* localization init */
             App::$localization->init();
-
-            /* user initialization */
-            App::$user = session('Auth');
 
             /**/
             ob_start();
