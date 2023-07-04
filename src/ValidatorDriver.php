@@ -116,7 +116,7 @@ class ValidatorDriver
                         } elseif (class_exists($tmp[0])) {
                             $methods[] = ['type' => 'class', 'exec' => $tmp[0]];
                         } else {
-                            throw new ValidatorException("Wrong rule in RequestClass 1" . get_class($this->request) . ". Validator-method {$tmp[0]}() doesn't exist.", 500);
+                            throw new ValidatorException("Wrong rule in RequestClass " . get_class($this->request) . ". Validator-method {$tmp[0]}() doesn't exist.", 500);
                         }
 
                     }
@@ -125,7 +125,7 @@ class ValidatorDriver
             }
 
             if (empty($methods)) {
-                throw new ValidatorException('Wrong rule in RequestClass 2' . get_class($this->request), 500);
+                throw new ValidatorException('Wrong rule in RequestClass ' . get_class($this->request), 500);
             }
 
             $test_var = true;
@@ -286,7 +286,7 @@ class ValidatorDriver
         if (isset($params['min']) || isset($params['max']) || isset($params['length'])) {
 
             if (isset($params['length']) && (isset($params['min']) || isset($params['max']))) {
-                throw new ValidatorException('Wrong rule in RequestClass 3' . get_class($this->request) . "Param length can't correspond with params min or max", 500);
+                throw new ValidatorException('Wrong rule in RequestClass ' . get_class($this->request) . "Param length can't correspond with params min or max", 500);
             }
 
             if (!empty($val) && isset($params['min']) && mb_strlen($val) < intval($params['min'])) {
@@ -348,7 +348,7 @@ class ValidatorDriver
     private function compareEquals($key, array $params)
     {
         if (empty($params)) {
-            throw new ValidatorException('Wrong rule in RequestClass 4' . get_class($this->request), 500);
+            throw new ValidatorException('Wrong rule in RequestClass ' . get_class($this->request), 500);
         }
         $key_compare = array_shift($params);
         if (!isset($this->data[$key_compare])) {
@@ -517,7 +517,7 @@ class ValidatorDriver
             $max_size = $params['max'];
             $cur_size = intval($this->data[$key]['size']);
             if ($cur_size > $max_size) {
-                $this->failed[$key][] = $this->getMessage($key,'file', __("File to lage, max size {$max_size} bytes"), $params);
+                $this->failed[$key][] = $this->getMessage($key,'file', __("File to lage, max size {%max} bytes"), $params);
                 return false;
             }
         }
