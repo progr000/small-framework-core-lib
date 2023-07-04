@@ -32,6 +32,8 @@ class App
     public static $db;
     /** @var DbDriver[] */
     public static $DbInstances;
+    /** @var \Models\User */
+    public static $user;
     /** @var string */
     public static $site_root;
     /** @var string */
@@ -120,6 +122,9 @@ class App
 
             /* localization init */
             App::$localization->init();
+
+            /* user initialization */
+            App::$user = session('Auth');
 
             /**/
             ob_start();
