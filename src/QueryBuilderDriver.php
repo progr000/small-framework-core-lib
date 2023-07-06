@@ -130,6 +130,7 @@ class QueryBuilderDriver
      */
     private function prepareJoinTableName($table)
     {
+        $table = str_replace(['{{', '}}'], [$this->connection->table_prefix, ''], $table);
         $table = preg_replace("/[\s]+/", " ", trim($table));
         $table = str_replace([$this->sql_quote, ' as '], ['', ' AS '], $table);
         $tmp = explode(' AS ', $table);

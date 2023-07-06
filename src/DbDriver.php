@@ -15,7 +15,7 @@ class DbDriver
     /** @var array */
     private $errors;
     /** @var string */
-    private $table_prefix = "";
+    public $table_prefix = "";
     /** @var string */
     public $driver;
     /** @var string */
@@ -119,9 +119,9 @@ class DbDriver
      * @param string $class
      * @return QueryBuilderDriver
      */
-    public function table($table, $class = stdClass::class)
+    public function table($table, $only_show_sql = false, $class = stdClass::class)
     {
-        return new QueryBuilderDriver($this, $class, $table);
+        return new QueryBuilderDriver($this, $class, $table, $only_show_sql);
     }
 
     /**
