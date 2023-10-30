@@ -305,6 +305,9 @@ class QueryBuilderDriver
     public function one()
     {
         $res = $this->get();
+        if ($this->only_show_sql) {
+            return $res . " LIMIT 1";
+        }
         if (isset($res[0])) {
             return $res[0];
         }
