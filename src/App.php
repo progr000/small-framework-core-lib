@@ -151,22 +151,27 @@ class App
             if (self::$request->isAjax()) { self::$response->asJson(); }
             !self::$response->isJson() && $throw_body = ViewDriver::render('http-exceptions/403', $throw_body);
             self::$response->setBody($throw_body)->setStatus($e->getCode())->send();
+            die();
         } catch (HttpNotFoundException $e) {
-            $throw_body = ['status' => false, 'code' => $e->getCode(), 'message' => $e->getMessage(), 'error' => $e->getMessage()];
-            if (self::$request->isAjax()) { self::$response->asJson(); }
-            !self::$response->isJson() && $throw_body = ViewDriver::render('http-exceptions/404', $throw_body);
-            self::$response->setBody($throw_body)->setStatus($e->getCode())->send();
+            if (self::$config->get('OWN_404_HANDLER', true)) {
+                $throw_body = ['status' => false, 'code' => $e->getCode(), 'message' => $e->getMessage(), 'error' => $e->getMessage()];
+                if (self::$request->isAjax()) { self::$response->asJson(); }
+                !self::$response->isJson() && $throw_body = ViewDriver::render('http-exceptions/404', $throw_body);
+                self::$response->setBody($throw_body)->setStatus($e->getCode())->send();
+                die();
+            }
         } catch (NotImplementedException $e) {
             $throw_body = ['status' => false, 'code' => $e->getCode(), 'message' => $e->getMessage(), 'error' => $e->getMessage()];
             if (self::$request->isAjax()) { self::$response->asJson(); }
             !self::$response->isJson() && $throw_body = ViewDriver::render('http-exceptions/405', $throw_body);
             self::$response->setBody($throw_body)->setStatus($e->getCode())->send();
+            die();
         } catch (DbException $e) {
             $throw_body = ['status' => false, 'code' => $e->getCode(), 'message' => $e->getMessage(), 'error' => $e->getMessage()];
             if (self::$request->isAjax()) { self::$response->asJson(); }
             !self::$response->isJson() && $throw_body = ViewDriver::render('http-exceptions/500', $throw_body);
             self::$response->setBody($throw_body)->setStatus($e->getCode())->send();
+            die();
         }
-        die();
     }
 }
