@@ -50,15 +50,18 @@ class MigrationDriver
 
     /**
      * @param string $migration_dir
+     * @param bool $delete_lock
      * @return MigrationDriver
      * @throws Exception
      */
-    public static function getInstance($migration_dir)
+    public static function getInstance($migration_dir, $delete_lock = false)
     {
         self::$FOLDER = $migration_dir;
         self::$TPL = self::$FOLDER . "/tpl/mTPL.php";
         self::$lock_file = sys_get_temp_dir() . "/migration-app.lock";
-        //@unlink(self::$lock_file);
+        if ($delete_lock) {
+            @unlink(self::$lock_file);
+        }
         if (file_exists(self::$lock_file)) {
             LogDriver::error("Now another migration process has been started. It is not possible to start a new process until the previous one is finished.");
             throw new Exception('', 500);
@@ -87,9 +90,16 @@ class MigrationDriver
 
         $list_in_folder = scandir(self::$FOLDER, SCANDIR_SORT_ASCENDING);
         foreach ($list_in_folder as $v) {
-            if (strpos($v, 'm') !== false) {
-                $fs_list[] = $v;
+            if (is_dir(self::$FOLDER . DIRECTORY_SEPARATOR . $v)) {
+                continue;
             }
+            if (strrpos($v, '.php') === false) {
+                continue;
+            }
+            if (strpos($v, 'm') !== 0) {
+                continue;
+            }
+            $fs_list[] = $v;
         }
 
         try {
