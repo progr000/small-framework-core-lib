@@ -384,7 +384,7 @@ class LogDriver
         /* display */
         if ($this->msg->level <= self::$verbose_level) {
             if (PHP_SAPI === 'cli') {
-                $this->msg->text = str_replace('&amp;', '&', htmlentities($this->msg->text));
+                $this->msg->text = str_replace(['&amp;', '&lt;', '&gt;', '&#039;', '&quot;'], ['&', '<', '>', "'", '"'], htmlentities($this->msg->text));
             }
             echo (isset($this->replace[$this->msg->type][$this->cli_or_html]) ? $this->replace[$this->msg->type][$this->cli_or_html] : '') . str_replace($a_s, $a_r, $this->msg->text) . $close_tag;
             if (PHP_SAPI !== 'cli') {
