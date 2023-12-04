@@ -16,6 +16,8 @@ if (!function_exists('replace_vars')) {
             foreach ($replace as $k => $v) {
                 $s[] = "{%{$k}}";
                 $r[] = $v;
+                $s[] = ":{$k}";
+                $r[] = $v;
             }
         }
         return str_replace($s, $r, $str);
