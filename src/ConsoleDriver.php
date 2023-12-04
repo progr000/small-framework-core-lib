@@ -154,6 +154,9 @@ abstract class ConsoleDriver
                 }
             }
 
+            /* set verbose level for log driver */
+            LogDriver::setVerboseLevel($this->verbose_level);
+
             /* set other parameters values and start processMethod */
             foreach ($actions as $prop_key => $prop_val) {
 
