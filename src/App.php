@@ -2,12 +2,15 @@
 
 namespace Core;
 
+use Core\Exceptions\ConfigException;
 use Core\Exceptions\DbException;
 use Core\Exceptions\HttpForbiddenException;
 use Core\Exceptions\HttpNotFoundException;
 use Core\Exceptions\IntegrityException;
 use Core\Exceptions\MaintenanceException;
 use Core\Exceptions\NotImplementedException;
+use Core\Interfaces\CacheInterface;
+use Core\Providers\CacheProvider;
 use ReflectionException;
 
 class App
@@ -28,6 +31,8 @@ class App
     public static $session;
     /** @var CookieDriver */
     public static $cookie;
+    /** @var CacheInterface */
+    public static $cache;
     /** @var DbDriver */
     public static $db;
     /** @var DbDriver[] */
@@ -45,6 +50,7 @@ class App
     /**
      * @param string $config_dir
      * @throws IntegrityException
+     * @throws ConfigException
      */
     private function __construct($config_dir)
     {
@@ -52,6 +58,7 @@ class App
         self::$config = ConfigDriver::getInstance($config_dir);
         self::$session = SessionDriver::getInstance(self::$config->get('session-container-name', 'app-small-framework'));
         self::$cookie = CookieDriver::getInstance();
+        self::$cache = (new CacheProvider())->register();
         self::$route = RouteDriver::getInstance();
         self::$request = new RequestDriver();
         self::$response = new ResponseDriver();

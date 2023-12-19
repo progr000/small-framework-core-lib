@@ -18,7 +18,8 @@
         "ext-pdo": "*",
         "ext-iconv": "*",
         "ext-openssl": "*",
-        "ext-curl": "*"
+        "ext-curl": "*",
+        "ext-memcached": "*"
     },
     "autoload": {
         "files": [
