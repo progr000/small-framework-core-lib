@@ -116,3 +116,14 @@ if (!function_exists('url')) {
         return App::$site_url . "/" . ltrim($path, '/') . ($params ? "?" . $params : "");
     }
 }
+
+if (!function_exists('replaceMultiSpacesAndNewLine')) {
+    /**
+     * @param string $str
+     * @return string
+     */
+    function replaceMultiSpacesAndNewLine($str, $to = " ")
+    {
+        return preg_replace("/[\s]+/", $to, $str);
+    }
+}

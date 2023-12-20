@@ -111,6 +111,21 @@ abstract class ActiveRecordDriver extends stdClass
     }
 
     /**
+     * @param array $condition
+     * @return $this|ActiveRecordDriver
+     * @throws DbException
+     */
+    public static function firstOrNew($condition = [])
+    {
+        $ret = self::findOne($condition);
+        if ($ret) {
+            return $ret;
+        } else {
+            return new static();
+        }
+    }
+
+    /**
      * @param int $id
      * @param mixed $or
      * @return static

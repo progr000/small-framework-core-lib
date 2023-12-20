@@ -131,7 +131,7 @@ class QueryBuilderDriver
     private function prepareJoinTableName($table)
     {
         $table = str_replace(['{{', '}}'], [$this->connection->table_prefix, ''], $table);
-        $table = preg_replace("/[\s]+/", " ", trim($table));
+        $table = replaceMultiSpacesAndNewLine(trim($table));
         $table = str_replace([$this->sql_quote, ' as '], ['', ' AS '], $table);
         $tmp = explode(' AS ', $table);
         if (isset($tmp[1])) {
@@ -458,7 +458,7 @@ class QueryBuilderDriver
         $sql = str_replace($search, $replace, $sql);
 
         /* return query */
-        return preg_replace("/[\s]+/", " ", trim($sql));
+        return replaceMultiSpacesAndNewLine(trim($sql));
     }
 
     /**
