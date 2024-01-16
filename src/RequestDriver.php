@@ -26,6 +26,8 @@ class RequestDriver implements RequestInterface
     /** @var false|string */
     protected $rawContent;
     /** @var array */
+    protected $custom_data = [];
+    /** @var array */
     protected $all_request = [];
     /** @var array|false */
     protected $headers = [];
@@ -185,14 +187,23 @@ class RequestDriver implements RequestInterface
         }
 
         if (is_array($this->json)) {
-            $this->all_request = array_merge($this->get, $this->post, $this->files, $this->cookie, $this->json);
+            $this->all_request = array_merge($this->get, $this->post, $this->files, $this->cookie, $this->json, $this->custom_data);
         } else {
-            $this->all_request = array_merge($this->get, $this->post, $this->files, $this->cookie);
+            $this->all_request = array_merge($this->get, $this->post, $this->files, $this->cookie, $this->custom_data);
         }
 
         if (($this->validate() === false) && method_exists($this, 'onFailedValidation')) {
             return $this->onFailedValidation();
         }
+    }
+
+    /**
+     * @param array $data
+     * @return void
+     */
+    public function setCustomData(array $data)
+    {
+        $this->custom_data = $data;
     }
 
     /**
