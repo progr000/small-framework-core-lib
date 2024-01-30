@@ -146,7 +146,7 @@ class ValidatorDriver
                     } else {
                         $f = new $method['exec']($this);
                         if (!$f($this->data[$key], $params, $this->data)) {
-                            $this->failed[$key][] = $this->getMessage($key, $method['exec'], (isset($f->errorMessage) ? $f->errorMessage : __('Wrong value')));
+                            $this->failed[$key][] = $this->getMessage($key, $method['exec'], (isset($f->errorMessage) ? __($f->errorMessage, $params) : __('Wrong value')));
                             $ret = false;
                             $test_var = false;
                         }
@@ -237,7 +237,7 @@ class ValidatorDriver
     private function double($key, array $params = [])
     {
         //dump("double($key, " . json_encode($params) .")");
-        if (preg_match("/^[0-9\.]+$/", $this->data[$key])) {
+        if (preg_match("/^[0-9]{1,10}(?:\.[0-9]{1,5})?$/", $this->data[$key])) {
             $val = doubleval($this->data[$key]);
             if (isset($params['min']) || isset($params['max'])) {
                 if (isset($params['min']) && $val < $params['min']) {
