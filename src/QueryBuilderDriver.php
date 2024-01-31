@@ -2,6 +2,7 @@
 
 namespace Core;
 
+use Core\Providers\RelationshipContainer;
 use PDO;
 use stdClass;
 use Core\Exceptions\DbException;
@@ -43,6 +44,8 @@ class QueryBuilderDriver
     /** @var bool */
     private $only_show_sql = false;
 
+    /** @var array */
+    private $relations = [];
 
     /**
      * @param DbDriver $connection
@@ -273,6 +276,16 @@ class QueryBuilderDriver
     }
 
     /**
+     * @param array $relations
+     * @return $this
+     */
+    public function with(array $relations)
+    {
+        $this->relations = array_merge($this->relations, $relations);
+        return $this;
+    }
+
+    /**
      * @return false|array
      * @throws DbException
      */
@@ -284,7 +297,20 @@ class QueryBuilderDriver
         }
         $sth = $this->connection->exec($sql);
         if ($sth) {
-            return $sth->fetchAll(PDO::FETCH_CLASS, $this->class);
+            //dump($sql);
+            if ($this->class !== 'stdClass' && !empty($this->relations)) {
+                $res = $sth->fetchAll(PDO::FETCH_CLASS, $this->class);
+                $_unique_result_key = md5($sql . $this->class);
+                RelationshipContainer::$_mainResultContainer[$_unique_result_key] = &$res;
+                RelationshipContainer::$_withRelations[$_unique_result_key] = &$this->relations;
+                foreach ($res as $obj) {
+                    $obj->___unique_result_key___ = $_unique_result_key;
+                }
+                return $res;
+            } else {
+                return $sth->fetchAll(PDO::FETCH_CLASS, $this->class);
+            }
+
         }
         return false;
     }

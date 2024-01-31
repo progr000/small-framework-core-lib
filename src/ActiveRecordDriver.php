@@ -157,6 +157,20 @@ abstract class ActiveRecordDriver extends stdClass
     }
 
     /**
+     * @param array $relations
+     * @param bool $only_show_sql
+     * @return QueryBuilderDriver
+     * @throws DbException
+     */
+    public static function with(array $relations, $only_show_sql = false)
+    {
+        $builder = self::find($only_show_sql);
+        $builder->with($relations);
+        return $builder;
+    }
+
+    /**
+     * @param bool $only_show_sql
      * @return QueryBuilderDriver
      * @throws DbException
      */
@@ -166,12 +180,23 @@ abstract class ActiveRecordDriver extends stdClass
     }
 
     /**
+     * @param bool $only_show_sql
      * @return QueryBuilderDriver
      * @throws DbException
      */
     public static function table($only_show_sql = false)
     {
-        return new QueryBuilderDriver(self::getDbConnection(), static::class, static::getTableName(), $only_show_sql);
+        return self::find($only_show_sql);
+    }
+
+    /**
+     * @param bool $only_show_sql
+     * @return QueryBuilderDriver
+     * @throws DbException
+     */
+    public static function query($only_show_sql = false)
+    {
+        return self::find($only_show_sql);
     }
 
     /**
