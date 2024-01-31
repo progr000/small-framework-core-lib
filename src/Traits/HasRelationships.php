@@ -48,13 +48,14 @@ trait HasRelationships
 
     /**
      * @param ActiveRecordDriver|mixed $related
-     * @param string $foreignKey
-     * @param string|null $ownerKey
-     * @return void
+     * @param string $localKey
+     * @param string|null $foreignKey
+     * @return ActiveRecordDriver|null
+     * @throws DbException
      */
-    public function belongsTo($related, $foreignKey, $ownerKey = null)
+    public function belongsTo($related, $localKey, $foreignKey = null)
     {
-        $ownerKey = $this->prepareKey($ownerKey);
-        return $related::findOne([$foreignKey => $this->{$ownerKey}]);
+        $foreignKey = $this->prepareKey($foreignKey);
+        return $related::findOne([$foreignKey => $this->{$localKey}]);
     }
 }

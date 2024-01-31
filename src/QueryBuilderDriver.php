@@ -529,7 +529,7 @@ class QueryBuilderDriver
         /* begin query */
         $sql = $this->connection->prepareSql("{$this->select} FROM {$this->table} {$this->alias}", []);
         if ($this->select !== " * ") {
-            /* if field specified, can't return rear modelClass, return stdClass instead */
+            /* if field specified, can't return real modelClass, return stdClass instead */
             $this->class = stdClass::class;
         }
 
@@ -538,7 +538,7 @@ class QueryBuilderDriver
             foreach ($this->join as $v) {
                 $sql .= " {$v['type']} {$v['table']} ON {$v['on']} ";
             }
-            /* if join enabled can't return rear modelClass, return stdClass instead */
+            /* if join enabled can't return real modelClass, return stdClass instead */
             $this->class = stdClass::class;
         }
 
