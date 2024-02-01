@@ -179,7 +179,7 @@ trait HasRelationships
         $related,
         $localKey,
         $foreignKey,
-        $many = false,
+        $many = false
     )
     {
         /** @var $related ActiveRecordDriver */
