@@ -9,6 +9,9 @@ use PDO;
 
 abstract class ActiveRecordDriver extends stdClass
 {
+    /** @var stdClass */
+    protected $___technical_data;
+
     /** @var string if field name is different from 'id' redeclare this param in Model::class */
     protected static $_primary_key_field = 'id';
 
@@ -17,6 +20,33 @@ abstract class ActiveRecordDriver extends stdClass
 
     /** @var string */
     protected static $connection_name;
+
+    /**
+     *
+     */
+    public function __construct()
+    {
+        $this->___technical_data = new stdClass();
+    }
+
+    /**
+     * @param string $propertyName
+     * @param mixed $propertyValue
+     * @return void
+     */
+    public function __setTechnicalData($propertyName, $propertyValue)
+    {
+        $this->___technical_data->$propertyName = $propertyValue;
+    }
+
+    /**
+     * @param string $propertyName
+     * @return void
+     */
+    public function __getTechnicalData($propertyName)
+    {
+        return $this->___technical_data->$propertyName;
+    }
 
     /**
      * @return DbDriver

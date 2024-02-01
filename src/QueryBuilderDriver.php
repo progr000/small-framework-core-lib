@@ -304,7 +304,7 @@ class QueryBuilderDriver
                 RelationshipContainer::$_mainResultContainer[$_unique_result_key] = &$res;
                 RelationshipContainer::$_withRelations[$_unique_result_key] = &$this->relations;
                 foreach ($res as $obj) {
-                    $obj->___unique_result_key___ = $_unique_result_key;
+                    $obj->__setTechnicalData('unique_result_key', $_unique_result_key);
                 }
                 return $res;
             } else {
