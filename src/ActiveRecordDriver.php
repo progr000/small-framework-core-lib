@@ -9,17 +9,47 @@ use PDO;
 
 abstract class ActiveRecordDriver extends stdClass
 {
-    /** @var stdClass */
+    /**
+     * For store some technical data during script alive
+     * @var stdClass
+     */
     protected $___technical_data;
 
-    /** @var string if field name is different from 'id' redeclare this param in Model::class */
+    /**
+     * if field name is different from 'id' redeclare this param in Model::class
+     * @var string
+     */
     protected static $_primary_key_field = 'id';
 
-    /** @var string */
+    /**
+     * The table associated with the model.
+     * @var string|null
+     */
     protected static $_table_name;
 
-    /** @var string */
+    /**
+     * The connection name for the model.
+     * @var string|null
+     */
     protected static $connection_name;
+
+    /**
+     * Indicates if the model should be timestamped.
+     * @var bool
+     */
+    protected static $timestamps = true;
+
+    /**
+     * The name of the "created at" column.
+     * @var string
+     */
+    const CREATED_AT = 'created_at';
+
+    /**
+     * The name of the "updated at" column.
+     * @var string
+     */
+    const UPDATED_AT = 'updated_at';
 
     /**
      *
@@ -247,6 +277,9 @@ abstract class ActiveRecordDriver extends stdClass
      */
     public static function update(array $fields, $condition = [])
     {
+        if (static::$timestamps) {
+            $fields[static::UPDATED_AT] = self::getSqlDate();
+        }
         return self::table()->update($fields, $condition);
     }
 
@@ -258,7 +291,11 @@ abstract class ActiveRecordDriver extends stdClass
      */
     public static function upsert(array $fields, $uniqueBy = [])
     {
-        return self::table()->upsert($fields, $uniqueBy);
+        if (static::$timestamps) {
+            $fields[static::CREATED_AT] = self::getSqlDate();
+            $fields[static::UPDATED_AT] = self::getSqlDate();
+        }
+        return self::table()->upsert($fields, $uniqueBy, static::CREATED_AT);
     }
 
     /**
@@ -296,6 +333,7 @@ abstract class ActiveRecordDriver extends stdClass
     }
 
     /**
+     * @param array $data
      * @param array $only
      * @return void
      */
@@ -312,6 +350,13 @@ abstract class ActiveRecordDriver extends stdClass
         }
     }
 
+    private static function getSqlDate()
+    {
+        // dump(self::getDbConnection()->driver);
+        // TODO format of the date can be depend of self::getDbConnection()->driver
+        return date('Y-m-d H:i:s');
+    }
+
     /**
      * Save ActiveRecord
      * @return bool
@@ -320,6 +365,16 @@ abstract class ActiveRecordDriver extends stdClass
     public function save()
     {
         $pkf = static::$_primary_key_field;
+        // updated_at and created_at
+        if (static::$timestamps) {
+            $u_key = static::UPDATED_AT;
+            $c_key = static::CREATED_AT;
+            $this->$u_key = self::getSqlDate();
+            if (!isset($this->$pkf)) {
+                $this->$c_key = self::getSqlDate();
+            }
+        }
+        // get properties
         $mappedProperties = $this->mapProperties();
         if (isset($this->$pkf)) { // TODO repair case when I want to change primary key and this key already exists - than give not error but update another record,
             return $this->_update($mappedProperties);
@@ -416,6 +471,9 @@ abstract class ActiveRecordDriver extends stdClass
         $properties = get_object_vars($this);
         $mappedProperties = [];
         foreach ($properties as $propertyName => $propertyVal) {
+            if ($propertyName === '___technical_data') {
+                continue;
+            }
             $mappedProperties[$propertyName] = $this->$propertyName;
         }
         return $mappedProperties;

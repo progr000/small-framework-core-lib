@@ -40,6 +40,8 @@ class QueryBuilderDriver
     private $insert_update_upsert_data = [];
     /** @var array */
     private $upsert_unique_by = [];
+    /** @var string|null */
+    private $upsert_created_at_field_name;
 
     /** @var bool */
     private $only_show_sql = false;
@@ -431,11 +433,13 @@ class QueryBuilderDriver
     /**
      * @param array $fields
      * @param array $uniqueBy
+     * @param string|null $created_at_field_name
      * @return false|int|null|string
      * @throws DbException
      */
-    public function upsert(array $fields, $uniqueBy = [])
+    public function upsert(array $fields, $uniqueBy = [], $created_at_field_name = null)
     {
+        $this->upsert_created_at_field_name = $created_at_field_name;
         $this->insert_update_upsert_data = $fields;
         $this->upsert_unique_by = $uniqueBy;
         $sql = $this->prepareRawSql('upsert');
@@ -684,6 +688,10 @@ class QueryBuilderDriver
         $f = [];
         foreach ($this->insert_update_upsert_data as $field => $value) {
             $f[$field] = "{$field} = :$field";
+        }
+        unset($f[ActiveRecordDriver::CREATED_AT]);
+        if (isset($this->upsert_created_at_field_name)) {
+            unset($f[$this->upsert_created_at_field_name]);
         }
 
         /**/
