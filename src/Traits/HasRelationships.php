@@ -70,7 +70,7 @@ trait HasRelationships
      * @param string $related
      * @param string $foreignKey
      * @param string|null $localKey
-     * @return ActiveRecordDriver|null
+     * @return ActiveRecordDriver|mixed|null
      * @throws DbException
      */
     public function hasOne($related, $foreignKey, $localKey = null)
@@ -96,7 +96,12 @@ trait HasRelationships
         }
 
         // return non-eager-relations
-        return $related::findOne([$foreignKey => $this->{$localKey}]);
+        //return $related::findOne([$foreignKey => $this->{$localKey}]);
+        $key = md5($related . $foreignKey . $this->{$localKey} . $localKey . $this->{$localKey} . 'hasOne');
+        if (!isset($this->___technical_data->nonEagerRelationsData[$key])) {
+            $this->___technical_data->nonEagerRelationsData[$key] = $related::findOne([$foreignKey => $this->{$localKey}]);
+        }
+        return $this->___technical_data->nonEagerRelationsData[$key];
     }
 
     /**
@@ -129,14 +134,19 @@ trait HasRelationships
         }
 
         // return non-eager-relations
-        return $related::find()->where([$foreignKey => $this->{$localKey}])->all();
+        //return $related::find()->where([$foreignKey => $this->{$localKey}])->all();
+        $key = md5($related . $foreignKey . $this->{$localKey} . $localKey . $this->{$localKey} . 'hasMany');
+        if (!isset($this->___technical_data->nonEagerRelationsData[$key])) {
+            $this->___technical_data->nonEagerRelationsData[$key] = $related::find()->where([$foreignKey => $this->{$localKey}])->all();
+        }
+        return $this->___technical_data->nonEagerRelationsData[$key];
     }
 
     /**
      * @param string $related
      * @param string $localKey
      * @param string|null $foreignKey
-     * @return ActiveRecordDriver|null
+     * @return ActiveRecordDriver|mixed|null
      * @throws DbException
      */
     public function belongsTo($related, $localKey, $foreignKey = null)
@@ -162,7 +172,12 @@ trait HasRelationships
         }
 
         // return non-eager-relations
-        return $related::findOne([$foreignKey => $this->{$localKey}]);
+        //return $related::findOne([$foreignKey => $this->{$localKey}]);
+        $key = md5($related . $foreignKey . $this->{$localKey} . $localKey . $this->{$localKey} . 'belongsTo');
+        if (!isset($this->___technical_data->nonEagerRelationsData[$key])) {
+            $this->___technical_data->nonEagerRelationsData[$key] = $related::findOne([$foreignKey => $this->{$localKey}]);
+        }
+        return $this->___technical_data->nonEagerRelationsData[$key];
     }
 
     /**
