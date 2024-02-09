@@ -37,7 +37,7 @@ abstract class ActiveRecordDriver extends stdClass
      * Indicates if the model should be timestamped.
      * @var bool
      */
-    protected static $timestamps = true;
+    protected static $timestamps = false;
 
     /**
      * The name of the "created at" column.
@@ -52,11 +52,56 @@ abstract class ActiveRecordDriver extends stdClass
     const UPDATED_AT = 'updated_at';
 
     /**
-     *
+     * The model's default values for attributes.
+     * Default values for initialization
+     * fields on create new object (record)
+     * @var array
      */
-    public function __construct()
+    protected static $defaults = [];
+
+    /**
+     * @param array $fields
+     */
+    public function __construct(array $fields = [])
     {
+        /* determination is new record or old from database */
+        $is_new = true;
+        $dbg = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+        foreach ($dbg as $k => $item) {
+            if (isset($item['function'])) {
+                //dump($k . "=>" . $item['function']);
+                if (mb_strrpos(mb_strtolower($item['function']), 'fetch') !== false) {
+                    $is_new = false;
+                    break;
+                }
+            }
+        }
+        /* init ___technical_data */
         $this->___technical_data = new stdClass();
+        $this->___technical_data->_is_new_record = $is_new;
+        $this->___technical_data->_current_pkf_value = null;
+        if ($this->___technical_data->_is_new_record) {
+            /* fill by defaults */
+            foreach (static::$defaults as $key => $value) {
+                $this->{$key} = $value;
+            }
+            /* fill by given data if needed */
+            foreach ($fields as $key => $value) {
+                $this->{$key} = $value;
+            }
+        } else {
+            $pkf = static::$_primary_key_field;
+            $this->___technical_data->_current_pkf_value = $this->{$pkf};
+        }
+    }
+
+    /**
+     * @param array $fields
+     * @return static|ActiveRecordDriver
+     */
+    public static function create(array $fields = [])
+    {
+        return new static($fields);
     }
 
     /**
@@ -66,7 +111,7 @@ abstract class ActiveRecordDriver extends stdClass
      */
     public function __setTechnicalData($propertyName, $propertyValue)
     {
-        $this->___technical_data->$propertyName = $propertyValue;
+        $this->___technical_data->{$propertyName} = $propertyValue;
     }
 
     /**
@@ -75,7 +120,7 @@ abstract class ActiveRecordDriver extends stdClass
      */
     public function __getTechnicalData($propertyName)
     {
-        return $this->___technical_data->$propertyName;
+        return $this->___technical_data->{$propertyName};
     }
 
     /**
@@ -364,22 +409,21 @@ abstract class ActiveRecordDriver extends stdClass
      */
     public function save()
     {
-        $pkf = static::$_primary_key_field;
         // updated_at and created_at
         if (static::$timestamps) {
             $u_key = static::UPDATED_AT;
             $c_key = static::CREATED_AT;
-            $this->$u_key = self::getSqlDate();
-            if (!isset($this->$pkf)) {
-                $this->$c_key = self::getSqlDate();
+            $this->{$u_key} = self::getSqlDate();
+            if ($this->___technical_data->_is_new_record) {
+                $this->{$c_key} = self::getSqlDate();
             }
         }
         // get properties
         $mappedProperties = $this->mapProperties();
-        if (isset($this->$pkf)) { // TODO repair case when I want to change primary key and this key already exists - than give not error but update another record,
-            return $this->_update($mappedProperties);
-        } else {
+        if ($this->___technical_data->_is_new_record) {
             return $this->_insert($mappedProperties);
+        } else {
+            return $this->_update($mappedProperties);
         }
     }
 
@@ -401,8 +445,14 @@ abstract class ActiveRecordDriver extends stdClass
             $columns[] = "{$sql_quote}{$column}{$sql_quote} = :{$column}";
             $params[$column] = $value;
         }
+        /**/
+        $current_pkf_value = $this->{static::$_primary_key_field};
+        if (!is_null($this->___technical_data->_current_pkf_value)) {
+            $current_pkf_value = $this->___technical_data->_current_pkf_value;
+        }
+        /**/
         $sql = "UPDATE " . static::getTableName() . " SET " . implode(', ', $columns) . " " .
-            "WHERE {$sql_quote}" . static::$_primary_key_field . "{$sql_quote} = " . $this->{static::$_primary_key_field};
+            "WHERE {$sql_quote}" . static::$_primary_key_field . "{$sql_quote} = " . $current_pkf_value;
         //return self::getDbConnection()->exec($sql, $params);
         self::getDbConnection()->exec($sql, $params);
         return (sizeof(self::getDbConnection()->getErrors()) == 0);
@@ -474,7 +524,7 @@ abstract class ActiveRecordDriver extends stdClass
             if ($propertyName === '___technical_data') {
                 continue;
             }
-            $mappedProperties[$propertyName] = $this->$propertyName;
+            $mappedProperties[$propertyName] = $this->{$propertyName};
         }
         return $mappedProperties;
     }
@@ -493,8 +543,12 @@ abstract class ActiveRecordDriver extends stdClass
             if (!$property->isStatic()) {
                 $property->setAccessible(true);
                 $propertyName = $property->getName();
-                $this->$propertyName = $property->getValue($objectFromDb);
+                $this->{$propertyName} = $property->getValue($objectFromDb);
             }
         }
+
+        $pkf = static::$_primary_key_field;
+        $this->___technical_data->_is_new_record = false;
+        $this->___technical_data->_current_pkf_value = $this->{$pkf};
     }
 }
