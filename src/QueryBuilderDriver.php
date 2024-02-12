@@ -2,9 +2,9 @@
 
 namespace Core;
 
+use Core\Providers\ExtendedStdClass;
 use Core\Providers\RelationshipContainer;
 use PDO;
-use stdClass;
 use Core\Exceptions\DbException;
 
 class QueryBuilderDriver
@@ -300,7 +300,12 @@ class QueryBuilderDriver
         $sth = $this->connection->exec($sql);
         if ($sth) {
             //dump($sql);
-            if ($this->class !== 'stdClass' && !empty($this->relations)) {
+            //dump($this->class);
+            if (mb_strrpos($this->class, 'stdClass') === false &&
+                mb_strrpos($this->class, 'ExtendedStdClass') === false &&
+                method_exists($this->class, '__setTechnicalData') &&
+                !empty($this->relations))
+            {
                 $res = $sth->fetchAll(PDO::FETCH_CLASS, $this->class);
                 $_unique_result_key = md5($sql . $this->class);
                 RelationshipContainer::$_mainResultContainer[$_unique_result_key] = &$res;
@@ -560,7 +565,7 @@ class QueryBuilderDriver
         $sql = $this->connection->prepareSql("{$this->select} FROM {$this->table} {$this->alias}", []);
         if ($this->select !== " * ") {
             /* if field specified, can't return real modelClass, return stdClass instead */
-            $this->class = stdClass::class;
+            $this->class = ExtendedStdClass::class;
         }
 
         /* all joins for query */
@@ -569,7 +574,7 @@ class QueryBuilderDriver
                 $sql .= " {$v['type']} {$v['table']} ON {$v['on']} ";
             }
             /* if join enabled can't return real modelClass, return stdClass instead */
-            $this->class = stdClass::class;
+            $this->class = ExtendedStdClass::class;
         }
 
         /* where for query */

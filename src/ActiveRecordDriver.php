@@ -3,11 +3,12 @@
 namespace Core;
 
 use Core\Exceptions\DbException;
+use Core\Providers\ExtendedStdClass;
 use ReflectionObject;
 use stdClass;
 use PDO;
 
-abstract class ActiveRecordDriver extends stdClass
+abstract class ActiveRecordDriver extends ExtendedStdClass
 {
     /**
      * For store some technical data during script alive
@@ -372,7 +373,7 @@ abstract class ActiveRecordDriver extends stdClass
     {
         $sth = self::getDbConnection()->exec($sql, $params);
         if ($sth) {
-            return $sth->fetchAll(PDO::FETCH_CLASS, stdClass::class);
+            return $sth->fetchAll(PDO::FETCH_CLASS, ExtendedStdClass::class);
         }
         return null;
     }

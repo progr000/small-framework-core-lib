@@ -2,9 +2,9 @@
 
 namespace Core;
 
+use Core\Providers\ExtendedStdClass;
 use Exception;
 use PDO;
-use stdClass;
 use Core\Exceptions\DbException;
 use PDOStatement;
 
@@ -116,10 +116,11 @@ class DbDriver
 
     /**
      * @param string $table
+     * @param bool $only_show_sql
      * @param string $class
      * @return QueryBuilderDriver
      */
-    public function table($table, $only_show_sql = false, $class = stdClass::class)
+    public function table($table, $only_show_sql = false, $class = ExtendedStdClass::class)
     {
         return new QueryBuilderDriver($this, $class, $table, $only_show_sql);
     }
