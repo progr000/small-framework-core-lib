@@ -120,7 +120,15 @@ class WgetDriver
      */
     public function setHeaders(array $headers)
     {
-        $this->send_headers = array_merge($this->send_headers, $headers);
+        $prepared_headers = [];
+        foreach ($headers as $k => $v) {
+            if (gettype($k) === 'string') {
+                $prepared_headers[] = "{$k}: {$v}";
+            } else {
+                $prepared_headers[] = $v;
+            }
+        }
+        $this->send_headers = array_merge($this->send_headers, $prepared_headers);
         return $this;
     }
 

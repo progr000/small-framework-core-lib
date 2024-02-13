@@ -83,14 +83,25 @@ class WgetResponse
 
     /**
      * Return response as json
+     * @param null $key
+     * @param mixed $default
      * @return false|mixed
      */
-    public function json()
+    public function json($key = null, $default = null)
     {
         if (gettype($this->body) === 'string') {
-            return json_decode($this->body);
+            $decoded = json_decode((string) $this->body, true);
+
+            if (is_null($key)) {
+                return $decoded;
+            }
+
+            return isset($decoded[$key])
+                ? $decoded[$key]
+                : $default;
         }
-        return false;
+
+        return $default;
     }
 
     /**
