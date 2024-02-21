@@ -186,7 +186,7 @@ abstract class ConsoleDriver
             }
 
             /**/
-            if (empty($actions) || isset($actions['--usage']) || isset($actions['--help']) || isset($show_usage)) {
+            if (empty($actions) || key_exists('--usage', $actions) || key_exists('--help', $actions) || isset($show_usage)) {
                 $this->is_usage = true;
                 $this->usage();
                 return false;
