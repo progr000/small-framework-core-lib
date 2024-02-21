@@ -49,6 +49,9 @@ class QueryBuilderDriver
     /** @var array */
     private $relations = [];
 
+    /** @var array */
+    private static $logSqlQueries = [];
+
     /**
      * @param DbDriver $connection
      * @param string $class
@@ -299,6 +302,9 @@ class QueryBuilderDriver
         }
         $sth = $this->connection->exec($sql);
         if ($sth) {
+            if (config('IS_DEBUG', false)) {
+                self::$logSqlQueries[] = $sql;
+            }
             //dump($sql);
             //dump($this->class);
             if (mb_strrpos($this->class, 'stdClass') === false &&
@@ -731,5 +737,17 @@ class QueryBuilderDriver
         }
 
         return $this->connection->prepareSql($sql, $this->insert_update_upsert_data);
+    }
+
+    /**
+     * @return array|string
+     */
+    public static function getLogSqlQueries()
+    {
+        if (config('IS_DEBUG', false)) {
+            return self::$logSqlQueries;
+        } else {
+            return "This work only in debug mode, please put IS_DEBUG => true into config/main.php";
+        }
     }
 }
