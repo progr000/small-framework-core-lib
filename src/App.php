@@ -17,6 +17,8 @@ class App
 {
     /** @var self */
     private static $instance;
+    /** @var DebugDriver */
+    public static $debug;
     /** @var ConfigDriver */
     public static $config;
     /** @var RouteDriver */
@@ -55,6 +57,7 @@ class App
     private function __construct($config_dir)
     {
         /**/
+        self::$debug = DebugDriver::getInstance();
         self::$config = ConfigDriver::getInstance($config_dir);
         self::$session = SessionDriver::getInstance(self::$config->get('session-container-name', 'app-small-framework'));
         self::$cookie = CookieDriver::getInstance();
@@ -101,6 +104,7 @@ class App
         if (self::$instance === null) {
             self::$instance = new self($config_dir);
         }
+        self::$debug->setBootTiming();
         return self::$instance;
     }
 

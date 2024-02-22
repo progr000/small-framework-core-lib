@@ -54,6 +54,10 @@ class ViewDriver
         ob_implicit_flush(false);
         $vars['view'] = new self();
         extract($vars, EXTR_OVERWRITE);
+
+        /* for debug info */
+        App::$debug->_set('viewData', "{$tpl_path}/{$templateName}.php");
+
         include("{$tpl_path}/{$templateName}.php");
         $buffer = ob_get_contents();
         ob_get_clean();
@@ -95,6 +99,10 @@ class ViewDriver
         ob_implicit_flush(false);
         $vars['view'] = new self();
         extract($vars, EXTR_OVERWRITE);
+
+        /* for debug info */
+        App::$debug->_set('viewData', "{$tpl_path}/{$layout}.php");
+
         include("{$tpl_path}/{$layout}.php");
         $buffer = ob_get_contents();
         ob_end_clean();

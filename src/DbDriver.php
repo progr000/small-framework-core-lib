@@ -22,6 +22,8 @@ class DbDriver
     public $sql_quote = "";
     /** @var int|null */
     private $affectedRows;
+    /** @var string */
+    public $connection_name;
 
     /**
      * @param string $db_conf_name
@@ -44,6 +46,7 @@ class DbDriver
         /* try to obtain table prefix */
         $conn = config("databases->{$db_conf_name}", []);
         $this->table_prefix = isset($conn['table_prefix']) ? $conn['table_prefix'] : "";
+        $this->connection_name = $db_conf_name;
 
         /* connect to DB */
         if (is_array($conn) && !empty($conn['dsn']) && !empty($conn['user']) && !empty($conn['password'])) {

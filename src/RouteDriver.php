@@ -154,6 +154,12 @@ class RouteDriver
         $this->query = isset($uri[1]) ? $uri[1] : '';
         $this->script_root = $to_replace;
         $this->referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
+
+        /* for debug info */
+        App::$debug->_set('routeData', [
+            'uri' => $_SERVER['REQUEST_METHOD'] . " " . $_SERVER['REQUEST_URI'],
+            'referer' => $this->referer
+        ]);
     }
 
     /**
@@ -198,6 +204,9 @@ class RouteDriver
             $sess_csrf->put(['csrf' => $sess_csrf->get('previous_csrf')]);
             throw new HttpNotFoundException('Not found', 404);
         }
+
+        /* for debug info */
+        App::$debug->_set('routeData', $controllerAndAction);
 
         /**/
         if (isset($matches)) unset($matches[0]);
