@@ -9,6 +9,7 @@ use Core\Exceptions\HttpNotFoundException;
 use Core\Exceptions\IntegrityException;
 use Core\Exceptions\MaintenanceException;
 use Core\Exceptions\NotImplementedException;
+use Core\Exceptions\BadResponseException;
 use Core\Interfaces\CacheInterface;
 use Core\Providers\CacheProvider;
 use ReflectionException;
@@ -98,6 +99,7 @@ class App
      * Initialization App
      * @return App
      * @throws IntegrityException
+     * @throws ConfigException
      */
     public static function init($config_dir)
     {
@@ -114,6 +116,7 @@ class App
      * @throws ReflectionException
      * @throws MaintenanceException
      * @throws IntegrityException
+     * @throws BadResponseException
      */
     public function run()
     {
@@ -177,10 +180,10 @@ class App
             !self::$response->isJson() && $throw_body = ViewDriver::render('http-exceptions/405', $throw_body);
             self::$response->setBody($throw_body)->setStatus($e->getCode())->send();
             die();
-        } catch (DbException $e) {
+        } catch (\Exception $e) {
             $throw_body = ['status' => false, 'code' => $e->getCode(), 'message' => $e->getMessage(), 'error' => $e->getMessage()];
             if (self::$request->isAjax()) { self::$response->asJson(); }
-            !self::$response->isJson() && $throw_body = ViewDriver::render('http-exceptions/500', $throw_body);
+            !self::$response->isJson() && $throw_body = ViewDriver::render('http-exceptions/500', ['e' => $e]);
             self::$response->setBody($throw_body)->setStatus($e->getCode())->send();
             die();
         }

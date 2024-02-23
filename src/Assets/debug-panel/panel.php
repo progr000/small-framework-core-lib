@@ -5,6 +5,7 @@
 /** @var array $__view */
 /** @var array $__timeline */
 /** @var string $__memory */
+/** @var string $__DEBUG_DATA */
 
 /* timing */
 $total_t = round(($__timeline['AppFinish'] - $__timeline['BootStart']) * 1000, 2);
@@ -96,7 +97,7 @@ foreach ($__sql as $item) {
 
         <!-- dump-data -->
         <div class="phpdebugbar-panel js-dump-data phpdebugbar-active">
-            <div class="phpdebugbar-dump-console" style="height: 275px !important;">%%%DEBUG-DATA%%%</div>
+            <div class="phpdebugbar-dump-console" style="height: 275px !important;"><?= $__DEBUG_DATA ?></div>
         </div>
         <!-- timeline-data -->
         <div class="phpdebugbar-panel js-timeline-data">

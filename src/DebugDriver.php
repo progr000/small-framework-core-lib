@@ -133,12 +133,12 @@ class DebugDriver extends stdClass
         $this->timingData['AppFinish'] = microtime(true);
     }
 
-    public function showDebugPanel()
+    public function showDebugPanel($vars = [])
     {
         if (config('SHOW_DEBUG_PANEL', false)) {
             return
                 $this->getPanelCss() .
-                $this->getPanelHtml() .
+                $this->getPanelHtml($vars) .
                 $this->getPanelJs();
         }
 
@@ -174,12 +174,14 @@ class DebugDriver extends stdClass
     /**
      * @return string
      */
-    private function getPanelHtml()
+    private function getPanelHtml($vars = [])
     {
         if (file_exists(self::DEBUG_JS_FILE)) {
 
             ob_start();
             ob_implicit_flush(false);
+            $__DEBUG_DATA = '';
+            extract($vars, EXTR_OVERWRITE);
             $__sql = $this->getSqlLog();
             $__session = $this->getSessionData();
             $__route = $this->getRouteData();

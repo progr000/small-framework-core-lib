@@ -2,6 +2,8 @@
 
 namespace Core;
 
+use Core\Exceptions\IntegrityException;
+use Core\Exceptions\BadResponseException;
 use finfo;
 
 class ResponseDriver
@@ -148,6 +150,14 @@ class ResponseDriver
     }
 
     /**
+     * @return string
+     */
+    public function getBody()
+    {
+        return $this->body;
+    }
+
+    /**
      * @param string $debug_data
      * @return $this
      */
@@ -155,6 +165,14 @@ class ResponseDriver
     {
         $this->debug_data = $debug_data;
         return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDebugData()
+    {
+        return $this->debug_data;
     }
 
     /**
@@ -208,6 +226,8 @@ class ResponseDriver
 
     /**
      * @return void
+     * @throws IntegrityException
+     * @throws BadResponseException
      */
     public function send()
     {
@@ -220,52 +240,40 @@ class ResponseDriver
         $this->setHeader(['X-Powered-By: dont-worry-be-happy']);
         $this->prepareHeaders();
 
-        App::$debug->setAppTiming();
-        /*
-         * If debug is ON then will be show all dump()
-         * and another debug output before output base-content
-         * Or, you can add %%%DEBUG-DATA%%% in your template,
-         * then all debug output will be shown on that place
-         * instead %%%DEBUG-DATA%%%
-         */
+        /**/
         $this->body === null && $this->body = "";
 
-        if (is_string($this->body)) {
+        /* for debug stop timing */
+        App::$debug->setAppTiming();
 
-            if (config('SHOW_DEBUG_PANEL', false) && config('IS_DEBUG', false) && !$this->isJson()) {
-                $this->body = str_replace("</body>", App::$debug->showDebugPanel() . "</body>", $this->body);
+        /**/
+        if (is_string($this->body)) {
+            /* if final response is string then all OK and can send it to user-browser else */
+
+            /* global response-middleware check and apply */
+            $globalResponseMiddleware = config('global-response-middleware', []);
+            if (!is_array($globalResponseMiddleware)) {
+                throw new IntegrityException('"global-response-middleware" must be an array with middleware class names');
             }
-            if (config('IS_DEBUG', false) && !is_null($this->debug_data)) {
-                if (strrpos($this->body, "%%%DEBUG-DATA%%%") !== false) {
-                    /*
-                     * Тут будет произведена подстановка всех дебугов из dump()
-                     * вместо строки %%%DEBUG-DATA%%%
-                     */
-                    $this->body = str_replace("%%%DEBUG-DATA%%%", $this->debug_data, $this->body);
-                } else {
-                    /*
-                     * это выведет дебуг данные dump() выше всего вывода,
-                     * в случае отсутствия в шаблонах такой строки %%%DEBUG-DATA%%%
-                     * (в которую предпочтительно выдать эти данные)
-                     */
-                    echo $this->debug_data;
-                }
-            } else {
-                $this->body = str_replace("%%%DEBUG-DATA%%%", '<br />', $this->body);
+            foreach ($globalResponseMiddleware as $middleware) {
+                $m = new $middleware();
+                $m->handle(App::$response);
+                /* for debug stop timing */
+                App::$debug->setAppTiming();
             }
 
             /* base-content */
             echo $this->body;
 
         } else {
-
             /* error when response not a string */
-            echo "<html lang='en'><body>";
-            echo "Something went wrong, response-body is not a string. Probably you forgot set some middleware for this route<br/>";
-            echo "response type is: " . gettype($this->body);
-            echo "<hr/>";
-            echo $this->debug_data;
-            echo "</body></html>";
+
+            throw new BadResponseException(
+                "Wrong response body." . PHP_EOL .
+                "Response-body is not a string and can't be normally displayed in browser." . PHP_EOL .
+                "Probably you forgot set some middleware for this route.",
+                500
+            );
 
         }
         $this->isSent = true;
