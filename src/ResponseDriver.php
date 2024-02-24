@@ -207,6 +207,7 @@ class ResponseDriver
                 $h = "Service Unavailable";
                 break;
             default:
+                $status = 500;
                 $h = "Unknown";
                 break;
         }

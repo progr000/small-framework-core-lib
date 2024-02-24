@@ -3,7 +3,6 @@
 namespace Core;
 
 use Core\Exceptions\ConfigException;
-use Core\Exceptions\DbException;
 use Core\Exceptions\HttpForbiddenException;
 use Core\Exceptions\HttpNotFoundException;
 use Core\Exceptions\IntegrityException;
@@ -67,6 +66,14 @@ class App
         self::$request = new RequestDriver();
         self::$response = new ResponseDriver();
         self::$localization = LocalizationDriver::getInstance();
+
+        /* error_reporting and display_errors */
+        ini_set('error_reporting', self::$config->get('error_reporting', 0));
+        ini_set('display_errors', self::$config->get('display_errors', 0));
+        $error_handler = self::$config->get('error_handler', null);
+        if (is_callable($error_handler)) {
+            set_error_handler($error_handler);
+        }
 
         /**/
         self::$site_root = self::$config->get('SITE_ROOT', (defined('__WWW_DIR__') ? __WWW_DIR__ : null));
