@@ -2765,7 +2765,8 @@ ul.phpdebugbar-widgets-timeline .phpdebugbar-widgets-measure {
 ul.phpdebugbar-widgets-timeline li span.phpdebugbar-widgets-value {
     height: 16px;
     background-color: #63abca;
-    border-bottom: 2px solid #477e96;
+    /* border-bottom: 2px solid #477e96; */
+    border-bottom: 2px solid #63abca;
 }
 
 ul.phpdebugbar-widgets-timeline li span.phpdebugbar-widgets-label,

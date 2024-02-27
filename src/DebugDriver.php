@@ -138,8 +138,11 @@ class DebugDriver extends stdClass
         if (config('SHOW_DEBUG_PANEL', false)) {
             return
                 $this->getPanelCss() .
+                PHP_EOL .
                 $this->getPanelHtml($vars) .
-                $this->getPanelJs();
+                PHP_EOL .
+                $this->getPanelJs() .
+                PHP_EOL;
         }
 
         return '';

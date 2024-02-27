@@ -105,20 +105,20 @@ foreach ($__sql as $item) {
                 <li>
                     <table class="phpdebugbar-widgets-params phpdebugbar-timeline-table">
                         <tr>
-                            <td class="phpdebugbar-widgets-name">Booting (<?= $boot_p ?>%)</td>
+                            <td class="phpdebugbar-widgets-name">Booting - <?= $boot_t ?>ms</td>
                             <td class="phpdebugbar-widgets-value">
                                 <div class="phpdebugbar-widgets-measure">
-                                    <span class="phpdebugbar-widgets-value" style="width:<?= $boot_p ?>%"></span>
-                                    <span class="phpdebugbar-widgets-label"><?= $boot_t ?>ms</span>
+                                    <span class="phpdebugbar-widgets-value percentage" style="width:<?= $boot_p ?>%"></span>
+                                    <span class="phpdebugbar-widgets-label"><?= $boot_p ?>%</span>
                                 </div>
                             </td>
                         </tr>
                         <tr>
-                            <td class="phpdebugbar-widgets-name">Application (<?= $app_p ?>%)</td>
+                            <td class="phpdebugbar-widgets-name">Application - <?= $app_t ?>ms</td>
                             <td class="phpdebugbar-widgets-value">
                                 <div class="phpdebugbar-widgets-measure">
-                                    <span class="phpdebugbar-widgets-value" style="width:<?= $app_p ?>%"></span>
-                                    <span class="phpdebugbar-widgets-label"><?= $app_t ?>ms</span>
+                                    <span class="phpdebugbar-widgets-value percentage" style="width:<?= $app_p ?>%"></span>
+                                    <span class="phpdebugbar-widgets-label"><?= $app_p ?>%</span>
                                 </div>
                             </td>
                         </tr>
