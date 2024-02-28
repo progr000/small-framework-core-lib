@@ -10,6 +10,7 @@ use Core\Exceptions\MaintenanceException;
 use Core\Exceptions\NotImplementedException;
 use Core\Exceptions\BadResponseException;
 use Core\Interfaces\CacheInterface;
+use Core\Interfaces\MiddlewareInterface;
 use Core\Providers\CacheProvider;
 use ReflectionException;
 
@@ -141,7 +142,9 @@ class App
             }
             foreach ($globalMiddleware as $middleware) {
                 $m = new $middleware();
-                $m->handle(App::$request);
+                if ($m instanceof MiddlewareInterface) {
+                    $m->handleOnRequest(App::$request, App::$response);
+                }
             }
 
             /* localization init */

@@ -4,6 +4,7 @@ namespace Core;
 
 use Core\Exceptions\IntegrityException;
 use Core\Exceptions\BadResponseException;
+use Core\Interfaces\MiddlewareInterface;
 use finfo;
 
 class ResponseDriver
@@ -22,8 +23,12 @@ class ResponseDriver
     private $returnAsJson;
     /** @var bool */
     private $returnAsFile;
+    /** @var bool */
+    private $returnAsHtml;
     /** @var null|string */
     private $fileAppType;
+    /** @var array */
+    private $personalRouteMiddlewareToApply = [];
 
     /**
      * Constructor
@@ -35,6 +40,16 @@ class ResponseDriver
         $this->isSent = false;
         $this->returnAsJson = false;
         $this->returnAsFile = false;
+        $this->returnAsHtml = true;
+    }
+
+    /**
+     * @param string $middleware
+     * @return void
+     */
+    public function setPersonalRouteMiddlewareToApply($middleware)
+    {
+        $this->personalRouteMiddlewareToApply[] = $middleware;
     }
 
     /**
@@ -90,12 +105,21 @@ class ResponseDriver
     }
 
     /**
+     * @return bool
+     */
+    public function isHtml()
+    {
+        return $this->returnAsHtml;
+    }
+
+    /**
      * @return $this
      */
     public function asJson()
     {
         $this->returnAsJson = true;
         $this->returnAsFile = false;
+        $this->returnAsHtml = false;
         $this->setHeader(['Content-Type: application/json']);
         return $this;
     }
@@ -118,6 +142,7 @@ class ResponseDriver
         /**/
         $this->returnAsFile = true;
         $this->returnAsJson = false;
+        $this->returnAsHtml = false;
         $this->fileAppType = $application_type;
         if ($inlile)
             $disposition = "inline";
@@ -251,16 +276,18 @@ class ResponseDriver
         if (is_string($this->body)) {
             /* if final response is string then all OK and can send it to user-browser else */
 
-            /* global response-middleware check and apply */
-            $globalResponseMiddleware = config('global-response-middleware', []);
-            if (!is_array($globalResponseMiddleware)) {
-                throw new IntegrityException('"global-response-middleware" must be an array with middleware class names');
+            /* personal and global response-middleware check and apply */
+            $globalMiddleware = config('global-middleware', []);
+            if (!is_array($globalMiddleware)) {
+                throw new IntegrityException('"global-middleware" must be an array with middleware class names');
             }
-            foreach ($globalResponseMiddleware as $middleware) {
+            foreach (array_merge($this->personalRouteMiddlewareToApply, $globalMiddleware) as $middleware) {
                 $m = new $middleware();
-                $m->handle(App::$response);
-                /* for debug stop timing */
-                App::$debug->setAppTiming();
+                if ($m instanceof MiddlewareInterface) {
+                    $m->handleOnResponse($this);
+                    /* for debug stop timing */
+                    App::$debug->setAppTiming();
+                }
             }
 
             /* base-content */

@@ -5,6 +5,7 @@ namespace Core;
 use Core\Exceptions\HttpNotFoundException;
 use Core\Exceptions\IntegrityException;
 use Core\Interfaces\RequestInterface;
+use Core\Interfaces\MiddlewareInterface;
 use ReflectionException;
 
 /**
@@ -219,7 +220,10 @@ class RouteDriver
             }
             foreach ($controllerAndAction['middleware'] as $middleware) {
                 $m = new $middleware();
-                $m->handle(App::$request);
+                if ($m instanceof MiddlewareInterface) {
+                    $m->handleOnRequest(App::$request, App::$response);
+                    App::$response->setPersonalRouteMiddlewareToApply($middleware);
+                }
             }
         }
 
@@ -274,7 +278,9 @@ class RouteDriver
                             $allMiddleware = config('global-middleware', []);
                             foreach ($allMiddleware as $middleware) {
                                 $m = new $middleware();
-                                $m->handle($tmpObj);
+                                if ($m instanceof MiddlewareInterface) {
+                                    $m->handleOnRequest($tmpObj, App::$response);
+                                }
                             }
                         }
                         $reflect[] = $tmpObj;
