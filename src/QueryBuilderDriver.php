@@ -541,7 +541,7 @@ class QueryBuilderDriver
      */
     private function addRawLimit($type, $sql)
     {
-        if ($this->connection->driver === 'sqlsrv') {
+        if ($this->connection->driver === DbDriver::mssql_driver) {
             $TOP = "";
             $LIMIT = "";
             if ($this->orderBy === "") {
@@ -609,7 +609,7 @@ class QueryBuilderDriver
     {
         /* unset some stuf for delete */
         $this->select = "";
-        if ($this->connection->driver === 'sqlsrv') {
+        if ($this->connection->driver === DbDriver::mssql_driver) {
             $this->orderBy = "";
             $this->offset = 0;
         }
@@ -714,11 +714,11 @@ class QueryBuilderDriver
         }
 
         /**/
-        if ($this->connection->driver === 'mysql') {
+        if ($this->connection->driver === DbDriver::mysql_driver) {
 
             $sql .= " ON DUPLICATE KEY UPDATE " . implode(', ', $f);
 
-        } elseif ($this->connection->driver === 'pgsql') {
+        } elseif ($this->connection->driver === DbDriver::pgsql_driver) {
 
             if (empty($this->upsert_unique_by)) {
                 throw new DbException("You must specify 'uniqueBy'");

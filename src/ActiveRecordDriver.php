@@ -440,7 +440,7 @@ abstract class ActiveRecordDriver extends ExtendedStdClass
         $params = [];
         foreach ($mappedProperties as $column => $value) {
             // TODO *** CHECK this
-            if (self::getDbConnection()->driver === 'sqlsrv' && $column === static::$_primary_key_field) {
+            if (self::getDbConnection()->driver === DbDriver::mssql_driver && $column === static::$_primary_key_field) {
                 continue;
             }
             $columns[] = "{$sql_quote}{$column}{$sql_quote} = :{$column}";

@@ -10,6 +10,11 @@ use PDOStatement;
 
 class DbDriver
 {
+    const mssql_driver = 'sqlsrv';
+    const mysql_driver = 'mysql';
+    const pgsql_driver = 'pgsql';
+    const sqlite_driver = 'sqlite';
+
     /** @var PDO  */
     private $pdo;
     /** @var array */
@@ -58,14 +63,14 @@ class DbDriver
                 );
                 //$this->pdo->setAttribute(PDO::ATTR_AUTOCOMMIT,0);
                 $this->driver = mb_strtolower($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
-                if ($this->driver === 'sqlsrv') {
+                if ($this->driver === self::mssql_driver) {
                     $this->sql_quote = '"';
-                } elseif ($this->driver === 'mysql') {
+                } elseif ($this->driver === self::mysql_driver) {
                     $this->sql_quote = '`';
-                } elseif ($this->driver === 'pgsql') {
+                } elseif ($this->driver === self::pgsql_driver) {
                     $this->sql_quote = '"';
                 }
-                if (isset($conn['charset']) && $this->driver !== 'sqlsrv') {
+                if (isset($conn['charset']) && $this->driver !== self::mssql_driver) {
                     $this->pdo->exec("SET NAMES '{$conn['charset']}'");
                 }
             } catch (Exception $e) {
