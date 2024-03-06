@@ -135,6 +135,9 @@ class MigrationDriver
                 return false;
             }
         } catch (Exception $e) {
+            LogDriver::error($e->getMessage(), 1);
+            LogDriver::error($e->getFile() . " (Line: " . $e->getLine() . ")", 2);
+            LogDriver::error($e->getTraceAsString(), 3);
             @unlink(self::$lock_file);
             return false;
         }
@@ -163,7 +166,7 @@ class MigrationDriver
                         App::$db->rollBack();
                         $executeMigration->showError();
                         //LogDriver::warning(App::$db->getErrors(), 0);
-                        LogDriver::warning($this->errors, 0);
+                        LogDriver::warning($this->errors, 1);
                         return false;
                     }
                     $cnt++;
