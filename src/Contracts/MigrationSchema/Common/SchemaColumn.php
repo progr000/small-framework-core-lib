@@ -14,8 +14,18 @@ use Core\Exceptions\DbException;
  */
 class SchemaColumn extends stdClass
 {
+    const TYPE_MANUAL_RAW = 'manual_raw';
+
     const TYPE_STRING = 'string';
     const TYPE_CHAR = 'char';
+    const TYPE_TEXT = 'text';
+    const TYPE_BLOB = 'blob';
+
+    const TYPE_DATE = 'date';
+    const TYPE_TIME = 'time';
+    const TYPE_DATETIME = 'datetime';
+    const TYPE_TIMESTAMP = 'timestamp';
+    const TYPE_YEAR = 'year';
 
     const TYPE_BIT = 'bit';
     const TYPE_BOOL = 'bool';
@@ -28,6 +38,8 @@ class SchemaColumn extends stdClass
     const TYPE_DECIMAL = 'decimal';
     public $schemaTable;
 
+    /** @var string */
+    private $_manual_text = "";
     /** @var string */
     private $_type;
     /** @var bool */
@@ -90,6 +102,16 @@ class SchemaColumn extends stdClass
     }
 
     /**
+     * @param $text
+     * @return void
+     */
+    public function manual_raw($text)
+    {
+        $this->_type = self::TYPE_MANUAL_RAW;
+        $this->_manual_text = $text;
+    }
+
+    /**
      * @param int $length
      * @return $this
      */
@@ -112,12 +134,65 @@ class SchemaColumn extends stdClass
     }
 
     /**
-     * @param int $length
      * @return $this
      */
-    public function len($length)
+    public function text()
     {
-        $this->_length = $length;
+        $this->_type = self::TYPE_TEXT;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function blob()
+    {
+        $this->_type = self::TYPE_BLOB;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function date()
+    {
+        $this->_type = self::TYPE_DATE;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function time()
+    {
+        $this->_type = self::TYPE_TIME;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function datetime()
+    {
+        $this->_type = self::TYPE_DATETIME;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function timestamp()
+    {
+        $this->_type = self::TYPE_TIMESTAMP;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function year()
+    {
+        $this->_type = self::TYPE_YEAR;
         return $this;
     }
 
@@ -214,6 +289,16 @@ class SchemaColumn extends stdClass
     public function unsigned()
     {
         $this->_unsigned = true;
+        return $this;
+    }
+
+    /**
+     * @param int $length
+     * @return $this
+     */
+    public function len($length)
+    {
+        $this->_length = $length;
         return $this;
     }
 

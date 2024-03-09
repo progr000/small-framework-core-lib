@@ -35,12 +35,24 @@ class mysqlPrepareField extends PrepareFieldInterface
                     break;
                 case SchemaColumn::TYPE_STRING:
                 case SchemaColumn::TYPE_CHAR:
+                case SchemaColumn::TYPE_TEXT:
+                case SchemaColumn::TYPE_BLOB:
                     $this->string();
+                    break;
+                case SchemaColumn::TYPE_DATE:
+                case SchemaColumn::TYPE_TIME:
+                case SchemaColumn::TYPE_DATETIME:
+                case SchemaColumn::TYPE_TIMESTAMP:
+                case SchemaColumn::TYPE_YEAR:
+                    $this->date();
                     break;
                 case SchemaColumn::TYPE_FLOAT:
                 case SchemaColumn::TYPE_DOUBLE:
                 case SchemaColumn::TYPE_DECIMAL:
                     $this->float();
+                    break;
+                case SchemaColumn::TYPE_MANUAL_RAW:
+                    $this->manual_raw();
                     break;
                 default:
                     throw new DbException(get_class($this) . "::prepareColumn(): You should specify column type for column `{$this->item->name}`");
@@ -85,6 +97,14 @@ class mysqlPrepareField extends PrepareFieldInterface
         }
 
         return PHP_EOL . $this->itemString;
+    }
+
+    /**
+     * @return void
+     */
+    private function manual_raw()
+    {
+        $this->itemString .= $this->item->__get('_manual_text');
     }
 
     /**
@@ -160,20 +180,45 @@ class mysqlPrepareField extends PrepareFieldInterface
     }
 
     /**
-     * prepare varchar and char fields
+     * prepare varchar, char, text and blob fields
      * @return void
      */
     private function string()
     {
+        /* type */
         $type = $this->item->__get('_type');
         if ($type === SchemaColumn::TYPE_STRING) {
             $type = 'varchar';
         }
-        $this->itemString .= " {$type}({$this->item->__get('_length')})";
 
+        if (!in_array($type, [SchemaColumn::TYPE_BLOB, SchemaColumn::TYPE_TEXT])) {
+            /* length */
+            $this->itemString .= " {$type}({$this->item->__get('_length')})";
+            /* default value */
+            if (!is_null($this->item->__get('_default'))) {
+                /* default */
+                $this->itemString .= " DEFAULT '{$this->item->__get('_default')}'";
+            }
+        } else {
+            $this->itemString .= " {$type}";
+        }
+    }
+
+    /**
+     * prepare date, time, datetime, timestamp and year fields
+     * @return void
+     */
+    private function date()
+    {
+        $type = $this->item->__get('_type');
+        $this->itemString .= " {$type}";
         if (!is_null($this->item->__get('_default'))) {
             /* default */
-            $this->itemString .= " DEFAULT '{$this->item->__get('_default')}'";
+            if ($type !== SchemaColumn::TYPE_YEAR) {
+                $this->itemString .= " DEFAULT '{$this->item->__get('_default')}'";
+            } else {
+                $this->itemString .= " DEFAULT {$this->item->__get('_default')}";
+            }
         }
     }
 }
