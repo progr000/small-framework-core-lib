@@ -57,7 +57,7 @@ class QueryBuilderDriver
     public function __construct($connection, $class, $table, $only_show_sql=false)
     {
         $this->connection = $connection;
-        $this->sql_quote = $this->connection->sql_quote;
+        $this->sql_quote = $this->connection->getSqlQuote();
         $this->class = $class;
         $this->table = $table;
         $this->only_show_sql = $only_show_sql;
@@ -135,7 +135,7 @@ class QueryBuilderDriver
      */
     private function prepareJoinTableName($table)
     {
-        $table = str_replace(['{{', '}}'], [$this->connection->table_prefix, ''], $table);
+        $table = str_replace(['{{', '}}'], [$this->connection->getTablePrefix(), ''], $table);
         $table = replaceMultiSpacesAndNewLine(trim($table));
         $table = str_replace([$this->sql_quote, ' as '], ['', ' AS '], $table);
         $tmp = explode(' AS ', $table);
@@ -297,21 +297,7 @@ class QueryBuilderDriver
         if ($this->only_show_sql) {
             return $sql;
         }
-        $sql_start = microtime(true);
         $sth = $this->connection->exec($sql);
-        /* +++ for debug panel */
-        if (config('IS_DEBUG', false)) {
-            $sql_finish = microtime(true);
-            App::$debug->_set('sqlLog', [0 => [
-                'sql' => $sql,
-                'sqlTimeStart' => $sql_start,
-                'sqlTimeFinish' => $sql_finish,
-                'backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3),
-                'connection' => $this->connection->connection_name,
-                'driver' => $this->connection->driver,
-            ]]);
-        }
-        /* --- */
         if ($sth) {
             //dump($sql);
             //dump($this->class);
@@ -541,7 +527,7 @@ class QueryBuilderDriver
      */
     private function addRawLimit($type, $sql)
     {
-        if ($this->connection->driver === 'sqlsrv') {
+        if ($this->connection->getDriver() === DbDriver::mssql_driver) {
             $TOP = "";
             $LIMIT = "";
             if ($this->orderBy === "") {
@@ -609,7 +595,7 @@ class QueryBuilderDriver
     {
         /* unset some stuf for delete */
         $this->select = "";
-        if ($this->connection->driver === 'sqlsrv') {
+        if ($this->connection->getDriver() === DbDriver::mssql_driver) {
             $this->orderBy = "";
             $this->offset = 0;
         }
@@ -714,11 +700,11 @@ class QueryBuilderDriver
         }
 
         /**/
-        if ($this->connection->driver === 'mysql') {
+        if ($this->connection->getDriver() === DbDriver::mysql_driver) {
 
             $sql .= " ON DUPLICATE KEY UPDATE " . implode(', ', $f);
 
-        } elseif ($this->connection->driver === 'pgsql') {
+        } elseif ($this->connection->getDriver() === DbDriver::pgsql_driver) {
 
             if (empty($this->upsert_unique_by)) {
                 throw new DbException("You must specify 'uniqueBy'");

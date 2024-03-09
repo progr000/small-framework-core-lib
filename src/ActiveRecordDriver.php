@@ -398,8 +398,8 @@ abstract class ActiveRecordDriver extends ExtendedStdClass
 
     private static function getSqlDate()
     {
-        // dump(self::getDbConnection()->driver);
-        // TODO format of the date can be depend of self::getDbConnection()->driver
+        // dump(self::getDbConnection()->getDriver());
+        // TODO format of the date can be depend of self::getDbConnection()->getDriver()
         return date('Y-m-d H:i:s');
     }
 
@@ -435,12 +435,12 @@ abstract class ActiveRecordDriver extends ExtendedStdClass
      */
     private function _update(array $mappedProperties)
     {
-        $sql_quote = self::getDbConnection()->sql_quote;
+        $sql_quote = self::getDbConnection()->getSqlQuote();
         $columns = [];
         $params = [];
         foreach ($mappedProperties as $column => $value) {
             // TODO *** CHECK this
-            if (self::getDbConnection()->driver === 'sqlsrv' && $column === static::$_primary_key_field) {
+            if (self::getDbConnection()->getDriver() === DbDriver::mssql_driver && $column === static::$_primary_key_field) {
                 continue;
             }
             $columns[] = "{$sql_quote}{$column}{$sql_quote} = :{$column}";
@@ -466,7 +466,7 @@ abstract class ActiveRecordDriver extends ExtendedStdClass
      */
     private function _insert(array $mappedProperties)
     {
-        $sql_quote = self::getDbConnection()->sql_quote;
+        $sql_quote = self::getDbConnection()->getSqlQuote();
         //$filteredProperties = array_filter($mappedProperties);
         $filteredProperties = $mappedProperties;
 
@@ -497,7 +497,7 @@ abstract class ActiveRecordDriver extends ExtendedStdClass
      */
     public function delete()
     {
-        $sql_quote = self::getDbConnection()->sql_quote;
+        $sql_quote = self::getDbConnection()->getSqlQuote();
         $sql = "DELETE FROM " . static::getTableName() . " WHERE {$sql_quote}" . static::$_primary_key_field . "{$sql_quote} = :id";
         self::getDbConnection()->exec(
             $sql,

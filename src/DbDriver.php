@@ -10,20 +10,25 @@ use PDOStatement;
 
 class DbDriver
 {
+    const mssql_driver = 'sqlsrv';
+    const mysql_driver = 'mysql';
+    const pgsql_driver = 'pgsql';
+    const sqlite_driver = 'sqlite';
+
     /** @var PDO  */
     private $pdo;
     /** @var array */
     private $errors;
     /** @var string */
-    public $table_prefix = "";
+    private $table_prefix = "";
     /** @var string */
-    public $driver;
+    private $driver;
     /** @var string */
-    public $sql_quote = "";
+    private $sql_quote = "";
     /** @var int|null */
     private $affectedRows;
     /** @var string */
-    public $connection_name;
+    private $connection_name;
 
     /**
      * @param string $db_conf_name
@@ -56,22 +61,49 @@ class DbDriver
                     $conn['user'],
                     $conn['password']
                 );
+                $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 //$this->pdo->setAttribute(PDO::ATTR_AUTOCOMMIT,0);
                 $this->driver = mb_strtolower($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
-                if ($this->driver === 'sqlsrv') {
+                if ($this->driver === self::mssql_driver) {
                     $this->sql_quote = '"';
-                } elseif ($this->driver === 'mysql') {
+                } elseif ($this->driver === self::mysql_driver) {
                     $this->sql_quote = '`';
-                } elseif ($this->driver === 'pgsql') {
+                } elseif ($this->driver === self::pgsql_driver) {
                     $this->sql_quote = '"';
                 }
-                if (isset($conn['charset']) && $this->driver !== 'sqlsrv') {
+                if (isset($conn['charset']) && $this->driver !== self::mssql_driver) {
                     $this->pdo->exec("SET NAMES '{$conn['charset']}'");
                 }
             } catch (Exception $e) {
 
             }
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getDriver()
+    {
+        return $this->driver;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSqlQuote()
+    {
+        return $this->sql_quote;
+    }
+
+    public function getTablePrefix()
+    {
+        return $this->table_prefix;
+    }
+
+    public function getConnectionName()
+    {
+        return $this->connection_name;
     }
 
     /**
@@ -200,11 +232,35 @@ class DbDriver
             $sql = str_replace(['{{', '}}'], ["{$this->sql_quote}{$this->table_prefix}", "{$this->sql_quote}"], $sql);
 
             $sth = $this->pdo->prepare($sql);
+
+            /* +++ for debug panel */
+            $sql_start = microtime(true);
+            /* --- */
+
             $result = $sth->execute($params);
+
+            $ready_sql = $this->prepareSql($sql, $params);
+            /* +++ for debug panel */
+            if (config('IS_DEBUG', false)) {
+                $sql_finish = microtime(true);
+                App::$debug->_set('sqlLog', [0 => [
+                    'sql' => $ready_sql,
+                    'params' => $params,
+                    'status' => 'successful',
+                    'label' => '',
+                    'sqlTimeStart' => $sql_start,
+                    'sqlTimeFinish' => $sql_finish,
+                    'backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3),
+                    'connection' => $this->connection_name,
+                    'driver' => $this->driver,
+                ]]);
+            }
+            /* --- */
+
             $this->affectedRows = $sth->rowCount();
             if ($result === false) {
                 //$this->errors[] = ['query' => $sql, 'data' => $params];
-                $this->errors[] = $this->prepareSql($sql, $params);
+                $this->errors[] = $ready_sql;
                 $this->errors[] = $sth->errorInfo();
                 $this->errors[] = $this->pdo->errorInfo();
                 return false;
@@ -212,14 +268,35 @@ class DbDriver
             return $sth;
 
         } catch (Exception $e) {
+            /* +++ for debug panel */
+            if (config('IS_DEBUG', false)) {
+                App::$debug->_set('sqlLog', [0 => [
+                    'sql' => $sql,
+                    'params' => $params,
+                    'status' => 'failed',
+                    'label' => $e->getMessage(),
+                    'sqlTimeStart' => microtime(true),
+                    'sqlTimeFinish' => microtime(true),
+                    'backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3),
+                    'connection' => $this->connection_name,
+                    'driver' => $this->driver,
+                ]]);
+            }
+            /* --- */
             $this->errors[] = $e->getMessage();
             if ($this->pdo) {
+                $this->errors[] = $sql;
                 $this->errors[] = $this->pdo->errorInfo();
                 if ($this->pdo->inTransaction()) {
                     $this->pdo->rollBack();
                 }
             }
-            return false;
+            $sql_error_handler = config('sql_error_handler', null);
+            if (is_callable($sql_error_handler)) {
+                return $sql_error_handler($e, $sql);
+            } else {
+                return false;
+            }
         }
     }
 
