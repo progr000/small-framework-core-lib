@@ -157,10 +157,12 @@ class RouteDriver
         $this->referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
 
         /* for debug info */
-        App::$debug->_set('routeData', [
-            'uri' => $_SERVER['REQUEST_METHOD'] . " " . $_SERVER['REQUEST_URI'],
-            'referer' => $this->referer
-        ]);
+        if (isset($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'])) {
+            App::$debug->_set('routeData', [
+                'uri' => $_SERVER['REQUEST_METHOD'] . " " . $_SERVER['REQUEST_URI'],
+                'referer' => $this->referer
+            ]);
+        }
     }
 
     /**
