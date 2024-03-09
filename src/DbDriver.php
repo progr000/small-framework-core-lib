@@ -72,9 +72,18 @@ class DbDriver
                     $this->sql_quote = '"';
                 }
                 if (isset($conn['charset']) && $this->driver !== self::mssql_driver) {
-                    $this->pdo->exec("SET NAMES '{$conn['charset']}'");
+                    try {
+                        $this->pdo->exec("SET NAMES '{$conn['charset']}'");
+                    } catch (Exception $e) {
+                        // skip this error
+                    }
                 }
             } catch (Exception $e) {
+
+                $sql_error_handler = config('sql_error_handler', null);
+                if (is_callable($sql_error_handler)) {
+                    $sql_error_handler($e);
+                }
 
             }
         }
