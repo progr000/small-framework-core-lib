@@ -179,13 +179,13 @@ foreach ($__sql as $item) {
                             }
                         }
                         ?>
-                        <li class="phpdebugbar-widgets-list-item" data-connection="migration">
-                            <code class="phpdebugbar-widgets-sql"><span class="hljs-operator"><?= $item['sql'] ?></span></code>
+                        <li class="phpdebugbar-widgets-list-item <?= $item['status'] ?>" data-connection="migration" title="<?= $item['label'] ?>"><!--
+                            --><code class="phpdebugbar-widgets-sql"><span class="hljs-operator"><?= $item['sql'] ?></span></code>
                             <span title="Duration" class="phpdebugbar-widgets-duration"><?= round(($item['sqlTimeFinish'] - $item['sqlTimeStart']) * 1000, 2); ?>ms</span>
                             <span title="Backtrace" class="phpdebugbar-widgets-stmt-id"><?= $caller ?></span>
                             <span title="Connection" class="phpdebugbar-widgets-database"><?= $item['connection'] ?></span>
-                            <span title="Driver" class="phpdebugbar-widgets-database"><?= $item['driver'] ?></span>
-                        </li>
+                            <span title="Driver" class="phpdebugbar-widgets-database"><?= $item['driver'] ?></span><!--
+                        --></li>
                         <?php
                     }
                     ?>

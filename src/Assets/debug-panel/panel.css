@@ -1868,7 +1868,7 @@ div.phpdebugbar input[type='text'], div.phpdebugbar input[type='password'] {
 
 div.phpdebugbar code, div.phpdebugbar pre, div.phpdebugbar samp {
   background: none;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  /*font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;*/
   font-size: 1em;
   border: 0;
   padding: 0;
@@ -2141,7 +2141,7 @@ ul.phpdebugbar-widgets-list {
   margin: 0;
   padding: 0;
   list-style: none;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  /*font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;*/
 }
   ul.phpdebugbar-widgets-list li.phpdebugbar-widgets-list-item {
     padding: 3px 6px;
@@ -2257,7 +2257,7 @@ dl.phpdebugbar-widgets-kvlist {
 
 dl.phpdebugbar-widgets-varlist,
 dl.phpdebugbar-widgets-htmlvarlist {
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  /*font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;*/
 }
   dl.phpdebugbar-widgets-htmlvarlist dd {
     cursor: initial;
@@ -2283,7 +2283,7 @@ ul.phpdebugbar-widgets-timeline {
     ul.phpdebugbar-widgets-timeline li span.phpdebugbar-widgets-collector {
       position: absolute;
       font-size: 12px;
-      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+      /*font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;*/
       color: #555;
       top: 4px;
       left: 5px;
@@ -2310,7 +2310,7 @@ ul.phpdebugbar-widgets-timeline {
       width: 70%;
       margin: 10px;
       border: 1px solid #ddd;
-      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+      /*font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;*/
       border-collapse: collapse;
     }
       ul.phpdebugbar-widgets-timeline table.phpdebugbar-widgets-params td {
@@ -2351,7 +2351,7 @@ div.phpdebugbar-widgets-exceptions li.phpdebugbar-widgets-list-item {
     margin: 10px;
     padding: 5px;
     border: 1px solid #ddd;
-    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    /*font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;*/
   }
 
 div.phpdebugbar-widgets-exceptions a.phpdebugbar-widgets-editor-link:before {
@@ -2614,7 +2614,7 @@ div.phpdebugbar-minimized {
 
 div.phpdebugbar code, div.phpdebugbar pre, div.phpdebugbar samp {
     background: none;
-    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    /*font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;*/
     font-size: 1em;
     border: 0;
     padding: 0;
@@ -3543,7 +3543,7 @@ div.phpdebugbar .hljs-number {
 }
 
 div.phpdebugbar-widgets-templates div.phpdebugbar-widgets-status {
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  /*font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;*/
   padding: 6px 6px;
   border-bottom: 1px solid #ddd;
   font-weight: bold;
@@ -3603,7 +3603,7 @@ div.phpdebugbar-widgets-templates table.phpdebugbar-widgets-params {
   width: 70%;
   margin: 10px;
   border: 1px solid #ddd;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  /*font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;*/
   border-collapse: collapse;
 }
 div.phpdebugbar-widgets-templates table.phpdebugbar-widgets-params td {
@@ -3616,7 +3616,7 @@ div.phpdebugbar-widgets-templates table.phpdebugbar-widgets-params .phpdebugbar-
 }
 
 div.phpdebugbar-widgets-sqlqueries .phpdebugbar-widgets-status {
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  /*font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;*/
   padding: 6px 6px;
   border-bottom: 1px solid #ddd;
   font-weight: bold;
@@ -3679,7 +3679,7 @@ div.phpdebugbar-widgets-sqlqueries table.phpdebugbar-widgets-params {
   width: 70%;
   margin: 10px;
   border: 1px solid #ddd;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  /*font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;*/
   border-collapse: collapse;
 }
   div.phpdebugbar-widgets-sqlqueries table.phpdebugbar-widgets-params td {
@@ -3766,4 +3766,12 @@ div.phpdebugbar-widgets-sqlqueries div.phpdebugbar-widgets-toolbar a.phpdebugbar
   display: table !important;
   border: 0 !important;
   width: 99% !important;
+}
+
+li.phpdebugbar-widgets-list-item.successful code {
+  background-color: rgba(62, 131, 85, 0.44);
+}
+li.phpdebugbar-widgets-list-item.failed code {
+  background-color: rgba(131, 62, 62, 0.44) !important;
+  cursor: help;
 }
