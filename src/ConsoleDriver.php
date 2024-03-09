@@ -228,6 +228,7 @@ abstract class ConsoleDriver
         $params = array_merge($this->available_params, $this->available_params_sys);
 
         $Usage = LogDriver::createMessage("\n")
+            ->setLevel(0)
             ->messageAppend("Usage: [warn]./run {$this->className} params[/warn]\n")
             ->messageAppend("\n")
             ->messageAppend("params:\n");
