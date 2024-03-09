@@ -190,6 +190,8 @@ class App
             !self::$response->isJson() && $throw_body = ViewDriver::render('http-exceptions/405', $throw_body);
             self::$response->setBody($throw_body)->setStatus($e->getCode())->send();
             die();
+        } catch (MaintenanceException $e) {
+            throw new MaintenanceException($e->getMessage());
         } catch (\Exception $e) {
             $throw_body = ['status' => false, 'code' => $e->getCode(), 'message' => $e->getMessage(), 'error' => $e->getMessage()];
             if (self::$request->isAjax()) { self::$response->asJson(); }
