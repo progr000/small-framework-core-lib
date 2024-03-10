@@ -19,6 +19,27 @@ abstract class MigrationSchemaInterface
     }
 
     /**
+     * @param string $queries
+     * @param array $params
+     * @return bool
+     * @throws DbException
+     */
+    protected function exec($queries, $params = [])
+    {
+        $queries_ = explode(';', $queries);
+        foreach ($queries_ as $sql) {
+            $sql = trim($sql);
+            if (!empty($sql)) {
+                if (!$this->db->exec($sql, $params)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * @param string $table
      * @return bool
      * @throws DbException
@@ -41,16 +62,16 @@ abstract class MigrationSchemaInterface
     /**
      * @param string $tableName
      * @param \Closure $function
-     * @param array $options
+     * @param string $options
      * @return mixed
      */
-    abstract public function createTable($tableName, \Closure $function, array $options = []);
+    abstract public function createTable($tableName, \Closure $function, $options = "");
 
     /**
      * @param string $tableName
      * @param \Closure $function
-     * @param array $options
+     * @param string $options
      * @return mixed
      */
-    abstract public function createTableIfNotExists($tableName, \Closure $function, array $options = []);
+    abstract public function createTableIfNotExists($tableName, \Closure $function, $options = "");
 }

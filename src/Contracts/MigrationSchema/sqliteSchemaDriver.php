@@ -2,11 +2,12 @@
 
 namespace Core\Contracts\MigrationSchema;
 
+use Core\Contracts\MigrationSchema\Common\SchemaColumn;
 use Core\Contracts\MigrationSchema\Common\SchemaTable;
 use Core\Exceptions\DbException;
 use Core\Interfaces\MigrationSchemaInterface;
 
-class mysqlSchemaDriver extends MigrationSchemaInterface
+class sqliteSchemaDriver extends MigrationSchemaInterface
 {
     /** @var string */
     private $if_not_exists = "";
@@ -25,15 +26,28 @@ class mysqlSchemaDriver extends MigrationSchemaInterface
 
         /* init sql for create table */
         $sql = "CREATE TABLE {$this->if_not_exists} {$tableName} (";
-        /* columns and indexes */
+        /* columns */
         $sql .= implode(", ", $table->columns);
         if (count($table->indexes) > 0) {
-            $sql .= ", " . implode(", ", $table->indexes);
+            foreach ($table->indexes as $key => $index) {
+                /** @var SchemaColumn $index */
+                if (!$index->is_foreign) {
+                    $for_prepend = (string)$index;
+                    unset($table->indexes[$key]);
+                }
+            }
+            if (count($table->indexes) > 0) {
+                $sql .= ", " . implode(", ", $table->indexes);
+            }
         }
         /* finalize sql for create table */
-        $sql .= PHP_EOL . ") ";
-        $sql .= PHP_EOL . $options;
+        $sql .= PHP_EOL . ")" . ($options !== "" ? " {$options};" : ";") . PHP_EOL;
+        /* indexes */
+        if (count($table->prepend) > 0) {
+            $sql .=  str_replace('%%table_name%%', $tableName, implode(";" . PHP_EOL, $table->prepend));
+        }
 
+        //dd($sql);
         return $sql;
     }
 
@@ -44,7 +58,7 @@ class mysqlSchemaDriver extends MigrationSchemaInterface
      * @return bool|\PDOStatement
      * @throws DbException
      */
-    public function createTable($tableName, \Closure $function, $options = "ENGINE = InnoDB COLLATE = utf8_general_ci")
+    public function createTable($tableName, \Closure $function, $options = "")
     {
         $this->if_not_exists = "";
         $sql = $this->createStatement($tableName, $function, $options);
@@ -58,7 +72,7 @@ class mysqlSchemaDriver extends MigrationSchemaInterface
      * @return bool|\PDOStatement
      * @throws DbException
      */
-    public function createTableIfNotExists($tableName, \Closure $function, $options = "ENGINE = InnoDB COLLATE = utf8_general_ci")
+    public function createTableIfNotExists($tableName, \Closure $function, $options = "")
     {
         $this->if_not_exists = "IF NOT EXISTS";
         $sql = $this->createStatement($tableName, $function, $options);

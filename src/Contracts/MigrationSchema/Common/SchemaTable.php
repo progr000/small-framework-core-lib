@@ -14,8 +14,10 @@ class SchemaTable
     public $columns = [];
     /** @var array */
     public $indexes = [];
-    /** @var string */
-    public $append = "";
+    /** @var mixed */
+    public $append;
+    /** @var mixed */
+    public $prepend;
     /** @var bool */
     public $pkf_is_defined = false;
     
