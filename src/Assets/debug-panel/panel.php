@@ -93,11 +93,11 @@ foreach ($__sql as $item) {
         </div>
     </div>
 
-    <div class="phpdebugbar-body" style="height: 300px;">
+    <div class="phpdebugbar-body">
 
         <!-- dump-data -->
         <div class="phpdebugbar-panel js-dump-data phpdebugbar-active">
-            <div class="phpdebugbar-dump-console" style="height: 275px !important;"><?= $__DEBUG_DATA ?></div>
+            <div class="phpdebugbar-dump-console" style="height: 100% !important;"><?= $__DEBUG_DATA ?></div>
         </div>
         <!-- timeline-data -->
         <div class="phpdebugbar-panel js-timeline-data">
