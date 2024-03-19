@@ -16,8 +16,9 @@
     let panel_current_height = localStorage.getItem('php-debug-panel-height');
     let panel_maximized = parseInt(localStorage.getItem('php-debug-panel-maximize'));
     let panel_is_hidden = parseInt(localStorage.getItem('php-debug-panel-hidden'));
-    
+    let panel_init_height = 300;
     let oldClientY = null;
+
     addEventListener('mousemove', function(event) {
         if (oldClientY !== null && panel_maximized) {
             let newClientY = event.clientY;
@@ -142,7 +143,7 @@
     selectMenu(current_tab);
     /* init height for debug panel */
     if (panel_current_height === null) {
-        panel_current_height = 300;
+        panel_current_height = panel_init_height + 'px';
     }
     panel_body.style.height = panel_current_height;
     _body_.style.marginBottom = parseInt(panel_body.style.height) + phpdebugbar_margin_bottom + 'px';
