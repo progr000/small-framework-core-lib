@@ -139,6 +139,11 @@ class RequestDriver implements RequestInterface
         $this->full_url = $this->route . ($this->query ? '?' . $this->query : '');
         $this->referer = App::$route->getReferer();
         $this->ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
+        if (!$this->ip) {
+            if (php_sapi_name() === 'cli') {
+                $this->ip = '127.0.0.1';
+            }
+        }
         $this->headers = function_exists('getallheaders') ? getallheaders() : [];
 
         /* check protocol via proxy */
