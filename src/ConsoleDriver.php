@@ -213,8 +213,13 @@ abstract class ConsoleDriver
             return $actions;
 
         } catch (Exception $e) {
-            echo $e->getMessage() . "\n";
-            echo "Please repair errors and try again.\n";
+            if (config('IS_DEBUG', false)) {
+                echo $e->getMessage() . "\n";
+                echo $e->getTraceAsString() . "\n";
+            } else {
+                echo "An error occurred. For more information use IS_DEBUG=true in config\n";
+            }
+            echo "Please repair error and try again.\n";
             return false;
         }
     }
