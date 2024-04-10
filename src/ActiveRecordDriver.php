@@ -396,11 +396,15 @@ abstract class ActiveRecordDriver extends ExtendedStdClass
         }
     }
 
+    /**
+     * @return string
+     */
     private static function getSqlDate()
     {
+        // INFO: created_at and updated_at always saved in UTC
         // dump(self::getDbConnection()->getDriver());
-        // TODO format of the date can be depend of self::getDbConnection()->getDriver()
-        return date('Y-m-d H:i:s');
+        // TODO the date format can be depend on self::getDbConnection()->getDriver()
+        return gmdate('Y-m-d H:i:s');
     }
 
     /**
