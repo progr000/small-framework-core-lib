@@ -82,7 +82,7 @@ class App
         if (!self::$site_url && self::$request->protocol() && self::$request->host() && self::$request->port()) {
             self::$site_url = self::$request->protocol() . "://" . self::$request->host();
             if (!in_array(self::$request->port(), [80, 443, "80", "443"])) {
-                self::$site_url .= ":" . self::$request->port();
+                //self::$site_url .= ":" . self::$request->port();
             }
         }
         
