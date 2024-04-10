@@ -28,8 +28,6 @@ class LogDriver
     private static $instancesCount = 0;
     /** @var string */
     private static $path_to_log_file;
-    /** @var bool */
-    public static $execute_ob_end_flush = true;
 
     /**
      * Constructor
@@ -112,7 +110,6 @@ class LogDriver
     public static function beginConsole($height = "97%", $width = "98%")
     {
         if (PHP_SAPI !== 'cli') {
-            ob_implicit_flush(true);
             echo '<div class="console" style="background-color: #333333; color: #cccccc; border: 1px solid #000; padding: 10px; height: ' . $height . '; width: ' . $width . '; overflow: auto"><pre style="margin: 0; padding: 0;">';
             echo "<script>let elements = document.getElementsByClassName('console');</script>";
         }
@@ -389,7 +386,6 @@ class LogDriver
             echo (isset($this->replace[$this->msg->type][$this->cli_or_html]) ? $this->replace[$this->msg->type][$this->cli_or_html] : '') . str_replace($a_s, $a_r, $this->msg->text) . $close_tag;
             if (PHP_SAPI !== 'cli') {
                 echo "<script>for (let i = 0; i < elements.length; i++) { elements[i].scrollTop = elements[i].scrollHeight; }</script>";
-                if (ob_get_contents() && self::$execute_ob_end_flush) { ob_end_flush(); }
             }
         }
     }
@@ -405,9 +401,9 @@ class LogDriver
         if (self::$log_resource) {
             fflush(self::$log_resource);
             //if (self::$instancesCount == 0) {
-                //dump('log file is closed');
-                //fclose(self::$log_resource);
-                //self::$log_resource = null;
+            //dump('log file is closed');
+            //fclose(self::$log_resource);
+            //self::$log_resource = null;
             //}
         }
     }
