@@ -18,6 +18,8 @@ class WgetResponse
     private $response_headers = false;
     /** @var int|false */
     private $status = false;
+    /** @var string */
+    private $url;
     /** @var array */
     private $errors;
 
@@ -37,6 +39,7 @@ class WgetResponse
                 $this->errors[] = curl_errno($curl_resource);
                 return;
             }
+            $this->url = curl_getinfo($curl_resource, CURLINFO_EFFECTIVE_URL);
             $this->status = intval(curl_getinfo($curl_resource, CURLINFO_HTTP_CODE));
             $header_size = curl_getinfo($curl_resource, CURLINFO_HEADER_SIZE);
             $this->response_headers = mb_substr($response, 0, $header_size);
@@ -53,6 +56,14 @@ class WgetResponse
     public function getErrors()
     {
         return $this->errors;
+    }
+
+    /**
+     * @return string
+     */
+    public function url()
+    {
+        return $this->url;
     }
 
     /**

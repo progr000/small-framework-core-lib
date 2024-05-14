@@ -107,7 +107,7 @@ class WgetDriver
         if (empty($data)) {
             $data = [];
         }
-        if ($this->flagAsJson) {
+        if ($this->flagAsJson && is_array($data)) {
             $data = json_encode($data);
         }
         curl_setopt($this->curl, CURLOPT_POSTFIELDS, $data);
@@ -154,13 +154,40 @@ class WgetDriver
 
     /**
      * @param string $url
+     * @param null|array|string $get_data
+     * @param null|array|string $body_data
      * @return WgetResponse
      */
-    public function get($url)
+    public function get($url, $get_data = null, $body_data = null)
     {
+        if (!is_null($get_data)) {
+            $url = trim(trim($url, '?'), '&');
+            $str = "";
+            if (is_string($get_data)) {
+                $str = trim(trim($get_data, '?'), '&');
+            } elseif (is_array($get_data)) {
+                foreach ($get_data as $k => $v) {
+                    if (!is_array($v) && !is_object($v)) {
+                        $str .= $k . '=' . urlencode($v) . '&';
+                    } elseif (is_array($v)) {
+                        foreach ($v as $k2 => $v2) {
+                            $str .= $k . '=' . urlencode($v2) . '&';
+                        }
+                    }
+                }
+            }
+            /**/
+            if (strrpos($url, '?') === false) {
+                $url .= '?' . $str;
+            } else {
+                $url .= '&' . $str;
+            }
+        }
+
         return $this
             ->setUrl($url)
             ->setMethod('GET')
+            ->setData($body_data)
             ->exec();
     }
 
