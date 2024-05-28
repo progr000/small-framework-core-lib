@@ -15,7 +15,7 @@ if (!function_exists('dumpIntoStr')) {
         ob_end_clean();
 
         if (PHP_SAPI !== 'cli') {
-            $ret = "<style>pre.dump-dd{width:fit-content;background-color:#333333;border:1px dashed #cccccc;color:#cccccc;padding:5px}span.dump-collapsed span{display:none}span.js-dump-collapse{display:unset !important;}span.js-dump-collapse.dump-collapsed:before{position:relative;content:'+';font-weight:bold;color:#6caa36;cursor:pointer}span.js-dump-collapse.dump-un-collapsed:before{position:relative;content:'-';font-weight:bold;color:#d02a2c;cursor:pointer}</style>";
+            $ret = "<style>pre.dump-dd{width:fit-content;background-color:#333333;border:1px dashed #cccccc;color:#cccccc;padding:5px}span.dump-collapsed span{display:none}span.js-dump-collapse{display:unset!important;}span.js-dump-collapse.dump-collapsed:before{position:relative;content:'+';font-weight:bold;color:#6caa36;cursor:pointer}span.js-dump-collapse.dump-un-collapsed:before{position:relative;content:'-';font-weight:bold;color:#d02a2c;cursor:pointer}span.dump-expand-all:before{position:relative;content:'(expand all)';font-weight:bold;color:#6caa36;cursor:pointer}span.dump-collapse-all:before{position:relative;content:'(collapse all)';font-weight:bold;color:#d02a2c;cursor:pointer}</style>";
             $ret .= '<pre class="dump-dd">';
 
             $out1 = htmlentities($out);
@@ -23,7 +23,12 @@ if (!function_exists('dumpIntoStr')) {
             $tmp_delimiter = "[^!!@$#$#$%%START_POS%^!!@$#$#$%%]";
             while (($first = strpos($out1, '{')) !== false) {
                 $id = "collapsed-{$i}-" . mt_rand(); //md5(microtime() . );
-                $out1 = mb_substr($out1, 0, $first) . '<span class="js-dump-collapse '.($i > 0 ? 'dump-collapsed' : 'dump-un-collapsed').'" data-id="' . $id . '">&nbsp;</span><span class="' . ($i > 0 ? 'dump-collapsed' : 'dump-un-collapsed') . '" id="' . $id . '">' . $tmp_delimiter . '<span>' . mb_substr($out1, $first + 1);
+                $out1 =
+                    mb_substr($out1, 0, $first) .
+                    '<span class="js-dump-collapse ' . ($i > 0 ? 'dump-collapsed' : 'dump-un-collapsed') . '" data-id="' . $id . '">&nbsp;</span>' .
+                    ($i > 0 ? '' : '<span class="js-expand-collapse dump-expand-all" data-action="expand" data-id="' . $id . '">&nbsp;</span>') .
+                    ($i > 0 ? '' : '<span class="js-expand-collapse dump-collapse-all" data-action="collapse" data-id="' . $id . '">&nbsp;</span>') .
+                    '<span class="js-container-collapse ' . ($i > 0 ? 'dump-collapsed' : 'dump-un-collapsed') . '" id="' . $id . '">' . $tmp_delimiter . '<span>' . mb_substr($out1, $first + 1);
                 $i++;
             }
             $out1 = str_replace('}', '</span>}</span>', $out1);
@@ -31,7 +36,7 @@ if (!function_exists('dumpIntoStr')) {
 
             $ret .= trim($out1);
             $ret .= '</pre>';
-            $ret .= "<script>(function(){let el=document.querySelectorAll('.js-dump-collapse');for(let i=0;i<el.length;i++){el[i].onclick=function(e){this.classList.toggle('dump-collapsed');this.classList.toggle('dump-un-collapsed');let el2=document.querySelector('#'+this.getAttribute('data-id'));el2.classList.toggle('dump-collapsed');el2.classList.toggle('dump-un-collapsed');e.preventDefault();e.stopImmediatePropagation();};}})();</script>";
+            $ret .= "<script>(function(){let el=document.querySelectorAll('.js-dump-collapse');for(let i=0;i<el.length;i++){el[i].onclick=function(e){this.classList.toggle('dump-collapsed');this.classList.toggle('dump-un-collapsed');let el2=document.querySelector('#'+this.getAttribute('data-id'));el2.classList.toggle('dump-collapsed');el2.classList.toggle('dump-un-collapsed');e.preventDefault();e.stopImmediatePropagation();};}let el_expand=document.querySelectorAll('.js-expand-collapse');for(let i=0;i<el_expand.length;i++){let act=el_expand[i].getAttribute('data-action');let el_inner_main=document.querySelector('#'+el_expand[i].getAttribute('data-id'));let parent=el_expand[i].parentNode;el_expand[i].onclick=function(){if(act==='expand'){parent.querySelector('.js-dump-collapse').classList.remove('dump-collapsed');parent.querySelector('.js-dump-collapse').classList.add('dump-un-collapsed');el_inner_main.classList.remove('dump-collapsed');el_inner_main.classList.add('dump-un-collapsed');}else{parent.querySelector('.js-dump-collapse').classList.add('dump-collapsed');parent.querySelector('.js-dump-collapse').classList.remove('dump-un-collapsed');el_inner_main.classList.add('dump-collapsed');el_inner_main.classList.remove('dump-un-collapsed');}el_inner_main.querySelectorAll('.js-dump-collapse').forEach(function(el){el.classList.remove(act==='expand'?'dump-collapsed':'dump-un-collapsed');el.classList.add(act==='expand'?'dump-un-collapsed':'dump-collapsed');});el_inner_main.querySelectorAll('.js-container-collapse').forEach(function(el){el.classList.remove(act==='expand'?'dump-collapsed':'dump-un-collapsed');el.classList.add(act === 'expand'?'dump-un-collapsed':'dump-collapsed');});};}})();</script>";
 
             return $ret;
         } else {
