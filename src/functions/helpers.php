@@ -32,7 +32,11 @@ if (!function_exists('config')) {
      */
     function config($key, $default = null)
     {
-        return App::$config->get($key, $default);
+        if (App::$config && is_object(App::$config) && method_exists(App::$config, 'get')) {
+            return App::$config->get($key, $default);
+        }
+
+        return $default;
     }
 }
 
