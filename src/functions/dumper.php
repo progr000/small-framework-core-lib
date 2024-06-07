@@ -15,7 +15,7 @@ if (!function_exists('dumpIntoStr')) {
         ob_end_clean();
 
         if (PHP_SAPI !== 'cli') {
-            $ret = "<style>pre.dump-dd{width:fit-content;background-color:#333333;border:1px dashed #cccccc;color:#cccccc;padding:5px}span.dump-collapsed span{display:none}span.js-dump-collapse{display:unset !important;}span.js-dump-collapse.dump-collapsed:before{position:relative;content:'+';font-weight:bold;color:#6caa36;cursor:pointer}span.js-dump-collapse.dump-un-collapsed:before{position:relative;content:'-';font-weight:bold;color:#d02a2c;cursor:pointer}span.dump-expand-all:before{position:relative;content:'+++';font-weight:bold;color:#6caa36;cursor:pointer}span.dump-collapse-all:before{position:relative;content:'---';font-weight:bold;color:#d02a2c;cursor:pointer}</style>";
+            $ret = "<style>pre.dump-dd{width:fit-content;background-color:#333333;border:1px dashed #cccccc;color:#cccccc;padding:5px}span.dump-collapsed span{display:none}span.js-dump-collapse{display:unset !important;}span.js-dump-collapse.dump-collapsed:before{position:relative;content:'+';font-weight:bold;color:#6caa36;cursor:pointer}span.js-dump-collapse.dump-un-collapsed:before{position:relative;content:'-';font-weight:bold;color:#d02a2c;cursor:pointer}span.dump-expand-all:before{position:relative;content:'+>>';font-weight:bold;color:#6caa36;cursor:pointer}span.dump-collapse-all:before{position:relative;content:'<<-';font-weight:bold;color:#d02a2c;cursor:pointer}</style>";
             $ret .= '<pre class="dump-dd">';
 
             $out1 = htmlentities($out);
@@ -29,7 +29,7 @@ if (!function_exists('dumpIntoStr')) {
                 $out1 =
                     mb_substr($out1, 0, $first) .
                     '<span id="' . $id_p_m . '" class="js-dump-collapse ' . ($i > 0 ? 'dump-collapsed' : 'dump-un-collapsed') . '" data-id-expand="' . $id_expand . '" data-id="' . $id . '">&nbsp;</span>/ ' .
-                    '<span id="' . $id_expand . '" class="js-expand-collapse ' . ($i > 0 ? 'dump-expand-all' : 'dump-collapse-all') . '" data-id-pm="' . $id_p_m . '" data-id="' . $id . '" title="' . ($i > 0 ? 'expand all' : 'collapse all') . '">&nbsp;</span>' .
+                    '<span id="' . $id_expand . '" class="js-expand-collapse ' . ($i > 0 ? 'dump-expand-all' : 'dump-collapse-all') . '" data-id-pm="' . $id_p_m . '" data-id="' . $id . '" title="expand/collapse all">&nbsp;</span>' .
                     '<span class="js-container-collapse ' . ($i > 0 ? 'dump-collapsed' : 'dump-un-collapsed') . '" id="' . $id . '">' . $tmp_delimiter . '<span>' . mb_substr($out1, $first + 1);
                 $i++;
             }

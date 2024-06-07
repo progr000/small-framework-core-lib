@@ -45,7 +45,7 @@ class WgetDriver
         curl_setopt($instance->curl, CURLINFO_HEADER_OUT, true);
         curl_setopt($instance->curl, CURLOPT_VERBOSE, true);
         curl_setopt($instance->curl, CURLOPT_HEADER, true);
-        //curl_setopt($instance->curl,CURLOPT_ENCODING , "gzip");  // TODO: discover this
+        curl_setopt($instance->curl,CURLOPT_ENCODING , "gzip");  // TODO: discover this
         if (config('IGNORE_SSL_ERRORS', false)) {
             curl_setopt($instance->curl, CURLOPT_SSL_VERIFYHOST, 0);
             curl_setopt($instance->curl, CURLOPT_SSL_VERIFYPEER, 0);
@@ -108,7 +108,7 @@ class WgetDriver
         if (empty($data)) {
             $data = [];
         }
-        if ($this->flagAsJson && is_array($data)) {
+        if ($this->flagAsJson) {
             $data = json_encode($data);
         }
         curl_setopt($this->curl, CURLOPT_POSTFIELDS, $data);
@@ -155,18 +155,18 @@ class WgetDriver
 
     /**
      * @param string $url
-     * @param null|array|string $get_data
-     * @param null|array|string $body_data
+     * @param null|string|array $get_data
+     * @param null|string|array $body_data
      * @return WgetResponse
      */
     public function get($url, $get_data = null, $body_data = null)
     {
         if (!is_null($get_data)) {
             $url = trim(trim($url, '?'), '&');
-            $str = "";
             if (is_string($get_data)) {
                 $str = trim(trim($get_data, '?'), '&');
             } elseif (is_array($get_data)) {
+                $str = "";
                 foreach ($get_data as $k => $v) {
                     if (!is_array($v) && !is_object($v)) {
                         $str .= $k . '=' . urlencode($v) . '&';
