@@ -3777,3 +3777,9 @@ li.phpdebugbar-widgets-list-item.failed code {
   background-color: rgba(131, 62, 62, 0.44) !important;
   cursor: help;
 }
+
+div.phpdebugbar pre {
+  border: 1px #fff dashed;
+  margin-bottom: 5px;
+  padding: 3px;
+}
