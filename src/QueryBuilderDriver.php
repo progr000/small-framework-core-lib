@@ -373,6 +373,52 @@ class QueryBuilderDriver
     }
 
     /**
+     * @param string $field
+     * @return false|mixed
+     * @throws DbException
+     */
+    public function max($field)
+    {
+        $this->select = " max({$this->sql_quote}{$field}{$this->sql_quote}) as {$this->sql_quote}max_{$field}{$this->sql_quote} ";
+        $this->orderBy = "";
+        $sql = $this->prepareRawSql('select');
+        if ($this->only_show_sql) {
+            return $sql;
+        }
+        $sth = $this->connection->exec($sql);
+        if ($sth) {
+            $res = $sth->fetch(PDO::FETCH_ASSOC);
+            if (isset($res["max_{$field}"])) {
+                return $res["max_{$field}"];
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param string $field
+     * @return false|mixed
+     * @throws DbException
+     */
+    public function min($field)
+    {
+        $this->select = " min({$this->sql_quote}{$field}{$this->sql_quote}) as {$this->sql_quote}min_{$field}{$this->sql_quote} ";
+        $this->orderBy = "";
+        $sql = $this->prepareRawSql('select');
+        if ($this->only_show_sql) {
+            return $sql;
+        }
+        $sth = $this->connection->exec($sql);
+        if ($sth) {
+            $res = $sth->fetch(PDO::FETCH_ASSOC);
+            if (isset($res["min_{$field}"])) {
+                return $res["min_{$field}"];
+            }
+        }
+        return false;
+    }
+
+    /**
      * @param array|string $condition
      * @param array $params
      * @return false|int|null|string
