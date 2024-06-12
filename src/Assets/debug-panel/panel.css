@@ -3778,7 +3778,7 @@ li.phpdebugbar-widgets-list-item.failed code {
   cursor: help;
 }
 
-div.phpdebugbar pre {
+div.phpdebugbar-dump-console pre {
   border: 1px #fff dashed;
   margin-bottom: 5px;
   padding: 3px;
