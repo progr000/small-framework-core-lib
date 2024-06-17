@@ -13,6 +13,8 @@ class SchemaTable
     /** @var array */
     public $columns = [];
     /** @var array */
+    public $drop_columns = [];
+    /** @var array */
     public $indexes = [];
     /** @var mixed */
     public $append;
@@ -41,6 +43,24 @@ class SchemaTable
     {
         $this->columns[$name] = (new SchemaColumn($this, $name, false, false));
         return $this->columns[$name];
+    }
+
+    /**
+     * @param string $name
+     * @return SchemaColumn
+     */
+    public function addColumn($name)
+    {
+        return $this->column($name);
+    }
+
+    /**
+     * @param string $name
+     * @return void
+     */
+    public function dropColumn($name)
+    {
+        $this->drop_columns[$name] = $name;
     }
 
     /**
