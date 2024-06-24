@@ -72,7 +72,7 @@ foreach ($__sql as $item) {
             <a class="phpdebugbar-minimize-btn"></a>
             <a class="phpdebugbar-maximize-btn"></a>
             <span class="phpdebugbar-indicator"><i class="phpdebugbar-fa phpdebugbar-fa-code"></i>
-                <span class="phpdebugbar-text"><?= phpversion() ?>></span>
+                <span class="phpdebugbar-text"><?= phpversion() ?></span>
                 <span class="phpdebugbar-tooltip">PHP Version</span>
             </span>
             <span class="phpdebugbar-indicator">
