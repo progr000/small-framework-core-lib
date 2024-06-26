@@ -23,7 +23,6 @@
     },
     "autoload": {
         "files": [
-            "src/functions/dumper.php",
             "src/functions/helpers.php"
         ],
         "psr-4": {
