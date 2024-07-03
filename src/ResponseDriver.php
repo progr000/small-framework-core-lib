@@ -273,7 +273,7 @@ class ResponseDriver
         App::$debug->setAppTiming();
 
         /**/
-        if (is_string($this->body)) {
+        if (is_string($this->body) || $this->isJson()) {
             /* if final response is string then all OK and can send it to user-browser else */
 
             /* personal and global response-middleware check and apply */
@@ -291,7 +291,7 @@ class ResponseDriver
             }
 
             /* base-content */
-            echo $this->body;
+            echo is_string($this->body) ? $this->body : json_encode($this->body);
 
         } else {
             /* error when response not a string */
