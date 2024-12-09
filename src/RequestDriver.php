@@ -337,7 +337,7 @@ class RequestDriver implements RequestInterface
     /**
      * @return string
      */
-    public function method()
+    public function httpMethod()
     {
         return $this->method;
     }

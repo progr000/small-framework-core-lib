@@ -233,7 +233,7 @@ foreach ($__sql as $item) {
 
                 <dt class="phpdebugbar-widgets-key"><span title="Method">Method:</span></dt>
                 <dd class="phpdebugbar-widgets-value">
-                    <?= \Core\App::$request->method() ?>
+                    <?= \Core\App::$request->httpMethod() ?>
                 </dd>
 
                 <?php

@@ -190,7 +190,7 @@ class RouteDriver
                         : '';
                     $isRouteFound = true;
                     break;
-                } elseif (mb_strtoupper($controllerAndAction['method']) === App::$request->method()) {
+                } elseif (mb_strtoupper($controllerAndAction['method']) === App::$request->httpMethod()) {
                     $this->route_pattern = $pattern;
                     $this->route_name = isset($controllerAndAction['name'])
                         ? $controllerAndAction['name']
