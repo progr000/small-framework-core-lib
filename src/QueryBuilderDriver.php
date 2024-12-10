@@ -284,6 +284,18 @@ class QueryBuilderDriver
     }
 
     /**
+     * @param string $condition
+     * @param array $params
+     * @return QueryBuilderDriver
+     * @throws DbException
+     */
+    public function having($condition, $params = [])
+    {
+        $this->having = " HAVING " . $this->prepareCondition($condition, $params);
+        return $this;
+    }
+
+    /**
      * @param int $value
      * @return $this;
      */
@@ -654,6 +666,11 @@ class QueryBuilderDriver
 
         /* group for query */
         $sql .= $this->groupBy;
+
+        /* having for query */
+        if ($this->groupBy && $this->having) {
+            $sql .= $this->having;
+        }
 
         /* order for query */
         $sql .= $this->orderBy;
