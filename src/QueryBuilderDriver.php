@@ -30,6 +30,10 @@ class QueryBuilderDriver
     private $orWhere = [];
     /** @var string */
     private $orderBy = "";
+    /** @var string */
+    private $groupBy = ""; // TODO: need to check this method for all sql-drivers
+    /** @var string */
+    private $having = ""; // TODO: need to write method having
     /** @var int */
     private $limit = 0;
     /** @var int */
@@ -252,6 +256,28 @@ class QueryBuilderDriver
             }
             if (sizeof($array_order)) {
                 $this->orderBy = " ORDER BY " . implode(', ', $array_order) . " ";
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @param array|string $columns
+     * @return $this
+     */
+    public function groupBy($columns)
+    {
+        if (gettype($columns) === 'string') {
+            $this->groupBy = " GROUP BY {$columns} ";
+        } else {
+            $array_group = [];
+            foreach ($columns as $k => $v) {
+                $sort_field = str_replace([$this->sql_quote, "'", '"', "`"], "", $v);
+                $sort_field = "{$this->sql_quote}" . str_replace(".", "{$this->sql_quote}.{$this->sql_quote}", $sort_field) . "{$this->sql_quote}";
+                $array_group[] = $sort_field;
+            }
+            if (sizeof($array_group)) {
+                $this->groupBy = " GROUP BY " . implode(', ', $array_group) . " ";
             }
         }
         return $this;
@@ -625,6 +651,9 @@ class QueryBuilderDriver
 
         /* where for query */
         $sql .= $this->prepareRawWhere();
+
+        /* group for query */
+        $sql .= $this->groupBy;
 
         /* order for query */
         $sql .= $this->orderBy;
