@@ -10,6 +10,7 @@ class SessionDriver
     private $container;
 
     /**
+     * @param string $container
      * @return SessionDriver
      */
     public static function getInstance($container)

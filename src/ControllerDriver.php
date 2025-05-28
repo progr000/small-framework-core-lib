@@ -2,7 +2,7 @@
 
 namespace Core;
 
-class ControllerDriver
+abstract class ControllerDriver
 {
     public $layout;
 

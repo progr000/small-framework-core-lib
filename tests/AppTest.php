@@ -4,7 +4,7 @@ namespace Tests;
 
 use Core\App;
 use Core\ConfigDriver;
-use Core\Contracts\CacheDrivers\nullCacheDriver;
+use Core\Contracts\CacheDrivers\fileCacheDriver;
 use Core\CookieDriver;
 use Core\DebugDriver;
 use Core\LocalizationDriver;
@@ -51,7 +51,7 @@ class AppTest extends _BaseTestCase
         $this->assertInstanceOf(ConfigDriver::class, $app::$config);
         $this->assertInstanceOf(SessionDriver::class, $app::$session);
         $this->assertInstanceOf(CookieDriver::class, $app::$cookie);
-        $this->assertInstanceOf(nullCacheDriver::class, $app::$cache);
+        $this->assertInstanceOf(fileCacheDriver::class, $app::$cache);
         $this->assertInstanceOf(RouteDriver::class, $app::$route);
         $this->assertInstanceOf(RequestDriver::class, $app::$request);
         $this->assertInstanceOf(ResponseDriver::class, $app::$response);
