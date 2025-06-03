@@ -59,8 +59,11 @@ class CookieDriver
      * @param mixed $default
      * @return mixed
      */
-    public function get($key, $default)
+    public function get($key, $default = null)
     {
+        if (in_array($key, ['PHPSESSID'])) {
+            return $_COOKIE[$key];
+        }
         if (isset($_COOKIE[$key])) {
             return unserialize($this->decrypt($_COOKIE[$key]));
         }
@@ -76,17 +79,63 @@ class CookieDriver
      * @param string $domain
      * @param bool $secure
      * @param bool $httpOnly
-     * @return void
+     * @return bool
      */
     public function make($name, $value, $ttl_seconds = 0, $path = "/", $domain = "", $secure = false, $httpOnly = true)
     {
-        App::$response->setCookie($name, $this->encrypt(serialize($value)), [
-            'expire' => ($ttl_seconds > 0) ? time() + $ttl_seconds : 0,
-            'path' => $path,
-            'domain' => $domain,
-            'secure' => $secure,
-            'httponly' => $httpOnly
-        ]);
+        return setcookie(
+            $name,
+            $this->encrypt(serialize($value)),
+            ($ttl_seconds > 0) ? time() + $ttl_seconds : 0,
+            $path,
+            $domain,
+            $secure,
+            $httpOnly
+        );
+//        App::$response->setCookie($name, $this->encrypt(serialize($value)), [
+//            'expire' => ($ttl_seconds > 0) ? time() + $ttl_seconds : 0,
+//            'path' => $path,
+//            'domain' => $domain,
+//            'secure' => $secure,
+//            'httponly' => $httpOnly
+//        ]);
+    }
+
+    /**
+     * @param string $name
+     * @param mixed $value
+     * @param int $ttl_seconds
+     * @param string $path
+     * @param string $domain
+     * @param bool $secure
+     * @param bool $httpOnly
+     * @return bool
+     */
+    public function set($name, $value, $ttl_seconds = 0, $path = "/", $domain = "", $secure = false, $httpOnly = true)
+    {
+        return $this->make($name, $value, $ttl_seconds, $path, $domain, $secure, $httpOnly);
+    }
+
+    /**
+     * @param string $name
+     * @param string $path
+     * @param string $domain
+     * @param bool $secure
+     * @param bool $httpOnly
+     * @return bool
+     */
+    public function delete($name, $path = "/", $domain = "", $secure = false, $httpOnly = true)
+    {
+        unset($_COOKIE[$name]);
+        return setcookie(
+            $name,
+            "",
+            time() - 3600,
+            $path,
+            $domain,
+            $secure,
+            $httpOnly
+        );
     }
 
     /**
@@ -103,6 +152,10 @@ class CookieDriver
      */
     public function all()
     {
-        return $_COOKIE;
+        $all = [];
+        foreach ($_COOKIE as $key => $value) {
+            $all[$key] = $this->get($key);
+        }
+        return $all;
     }
 }

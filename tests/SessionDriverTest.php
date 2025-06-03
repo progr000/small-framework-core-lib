@@ -39,10 +39,10 @@ class SessionDriverTest extends _BaseTestCase
      */
     public function testGetExisted()
     {
-        $_SESSION['app-small-framework']['test-param-to-set'] = self::randomAlphanumericString();
-        $value = App::$session->get('test-param-to-set');
+        $_SESSION['app-small-framework']['test-session-var-to-set'] = self::randomAlphanumericString();
+        $value = App::$session->get('test-session-var-to-set');
 
-        $this->assertEquals($_SESSION['app-small-framework']['test-param-to-set'], $value);
+        $this->assertEquals($_SESSION['app-small-framework']['test-session-var-to-set'], $value);
     }
 
     /**
@@ -50,7 +50,7 @@ class SessionDriverTest extends _BaseTestCase
      */
     public function testGetNonExisted()
     {
-        $val = App::$session->get('test-param-non-exist');
+        $val = App::$session->get('test-session-var-non-exist');
         $this->assertEquals(null, $val);
     }
 
@@ -59,7 +59,7 @@ class SessionDriverTest extends _BaseTestCase
      */
     public function testGetNonExistedButDefaultValue()
     {
-        $val = App::$session->get('test-param-non-exist', 111);
+        $val = App::$session->get('test-session-var-non-exist', 111);
         $this->assertEquals(111, $val);
     }
 

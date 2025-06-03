@@ -7,6 +7,11 @@ use Core\LocalizationDriver;
 
 class LocalizationDriverTest extends _BaseTestCase
 {
+    /**
+     * @return void
+     * @throws \Core\Exceptions\ConfigException
+     * @throws \Core\Exceptions\IntegrityException
+     */
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
