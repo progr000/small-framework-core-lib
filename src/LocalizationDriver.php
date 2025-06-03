@@ -28,14 +28,20 @@ class LocalizationDriver
     }
 
     /**
-     *
+     * @return bool
      */
     public function init()
     {
         $file = config('localization', []);
         if (!empty($file['json-path']) && file_exists($file['json-path'] . "/" .  App::$locale . ".json")) {
-            $this->container = json_decode(file_get_contents($file['json-path'] . "/" .  App::$locale . ".json"), true);
+            try {
+                $this->container = json_decode(file_get_contents($file['json-path'] . "/" .  App::$locale . ".json"), true);
+                return !empty($this->container);
+            } catch (\Exception $e) {
+                return false;
+            }
         }
+        return false;
     }
 
     /**
