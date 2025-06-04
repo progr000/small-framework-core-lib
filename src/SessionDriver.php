@@ -54,31 +54,34 @@ class SessionDriver
     /**
      * @param string $key
      * @param mixed $value
-     * @return void
+     * @return bool
      */
     public function set($key, $value)
     {
         $_SESSION[$this->container][$key] = $value;
+        return isset($_SESSION[$this->container][$key]);
     }
 
     /**
      * @param array $data
-     * @return void
+     * @return bool
      */
     public function put($data)
     {
         foreach ($data as $k => $v) {
             $_SESSION[$this->container][$k] = $v;
         }
+        return true;
     }
 
     /**
      * @param string $key
-     * @return void
+     * @return bool
      */
     public function delete($key)
     {
         unset($_SESSION[$this->container][$key]);
+        return !isset($_SESSION[$this->container][$key]);
     }
 
     /**

@@ -30,7 +30,8 @@ class SessionDriverTest extends _BaseTestCase
     public function testSet()
     {
         $test_value = self::randomAlphanumericString();
-        App::$session->set('test-param-to-set', $test_value);
+        $ret = App::$session->set('test-param-to-set', $test_value);
+        $this->assertTrue($ret);
         $this->assertEquals($test_value, App::$session->get('test-param-to-set'));
     }
 
@@ -68,7 +69,8 @@ class SessionDriverTest extends _BaseTestCase
      */
     public function testPut()
     {
-        App::$session->put($this->put);
+        $ret = App::$session->put($this->put);
+        $this->assertTrue($ret);
         $this->assertEquals(1, App::$session->get('a'));
         $this->assertEquals(2, App::$session->get('b'));
         $this->assertEquals(3, App::$session->get('c'));

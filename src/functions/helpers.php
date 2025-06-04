@@ -30,8 +30,12 @@ if (!function_exists('config')) {
      * @param mixed $default
      * @return mixed
      */
-    function config($key, $default = null)
+    function config($key = null, $default = null)
     {
+        if (is_null($key)) {
+            return App::$config;
+        }
+
         if (App::$config && is_object(App::$config) && method_exists(App::$config, 'get')) {
             return App::$config->get($key, $default);
         }
@@ -111,8 +115,8 @@ if (!function_exists('minimize')) {
             return $str;
         }
         return str_replace(
-            ["\n", "\r\n", ": ", "; ", "} ", "{ ", " }", " {", " =", "= ", ", ", " ,"],
-            ["", "", ":", ";", "}", "{", "}", "{", "=", "=", ",", ","],
+            ["> ", "\n", "\r\n", ": ", "; ", "} ", "{ ", " }", " {", " =", "= ", ", ", " ,"],
+            [">", "", "", ":", ";", "}", "{", "}", "{", "=", "=", ",", ","],
             replaceMultiSpacesAndNewLine($str)
         );
     }
@@ -146,7 +150,7 @@ if (!function_exists('replaceMultiSpacesAndNewLine')) {
      */
     function replaceMultiSpacesAndNewLine($str, $to = " ")
     {
-        return preg_replace("/[\s]+/", $to, $str);
+        return trim(preg_replace("/[\s]+/", $to, $str));
     }
 }
 
@@ -174,7 +178,7 @@ if (!function_exists('size_format')) {
     /**
      * @param integer $bytes
      * @param integer $decimal_digits
-     * @param string $force ('b', 'Kb', 'Mb', 'Gb', 'Tb', 'Pb')
+     * @param string $force ('B', 'KB', 'MB', 'GB', 'TB', 'PB')
      * @param string $space_between
      * @param bool $no_power
      * @return string
@@ -188,9 +192,9 @@ if (!function_exists('size_format')) {
             $power = ($bytes > 0) ? floor(log($bytes, 1024)) : 0;
         }
         if ($no_power) {
-            return number_format(round($bytes / pow(1024, $power), 2), $decimal_digits, '.', '');
+            return number_format(round($bytes / pow(1024, $power), $decimal_digits), $decimal_digits, '.', '');
         } else {
-            return number_format(round($bytes / pow(1024, $power), 2), $decimal_digits, '.', '') . $space_between . $units[$power];
+            return number_format(round($bytes / pow(1024, $power), $decimal_digits), $decimal_digits, '.', '') . $space_between . $units[$power];
         }
     }
 }
