@@ -63,11 +63,14 @@ class DebugDriver extends stdClass
     {
         if (config('IS_DEBUG', false)) {
             if (isset($this->$container)) {
+                $this->$container = array_merge($this->$container, (is_array($data) ? $data : [$data]));
+                /*
                 if (!is_array($data)) {
                     $this->$container = array_merge($this->$container, [$data]);
                 } else {
                     $this->$container = array_merge($this->$container, $data);
                 }
+                */
             }
         }
     }
@@ -119,6 +122,9 @@ class DebugDriver extends stdClass
         return $this->_get('viewData');
     }
 
+    /**
+     * @return void
+     */
     public function setBootTiming()
     {
         $this->timingData['BootFinish'] = microtime(true);
@@ -133,6 +139,10 @@ class DebugDriver extends stdClass
         $this->timingData['AppFinish'] = microtime(true);
     }
 
+    /**
+     * @param array $vars
+     * @return string
+     */
     public function showDebugPanel($vars = [])
     {
         if (config('SHOW_DEBUG_PANEL', false)) {
@@ -175,7 +185,8 @@ class DebugDriver extends stdClass
     }
 
     /**
-     * @return string
+     * @param array $vars
+     * @return false|string
      */
     private function getPanelHtml($vars = [])
     {

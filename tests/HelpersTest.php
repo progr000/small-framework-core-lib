@@ -5,7 +5,6 @@ namespace Tests;
 use Core\App;
 use Core\ConfigDriver;
 use Core\CookieDriver;
-use Core\LocalizationDriver;
 use Core\SessionDriver;
 use Core\WgetDriver;
 

@@ -3,7 +3,6 @@
 namespace Tests;
 
 use Core\App;
-use Core\ConfigDriver;
 use Core\SessionDriver;
 
 class SessionDriverTest extends _BaseTestCase
