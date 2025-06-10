@@ -218,8 +218,8 @@ class DbDriver
 
     /**
      * Execute query
-     * @param $sql
-     * @param $params
+     * @param string $sql
+     * @param array $params
      * @return false|PDOStatement
      * @throws DbException
      */
