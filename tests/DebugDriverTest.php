@@ -115,4 +115,16 @@ class DebugDriverTest extends _BaseTestCase
         $second = $property->getValue(App::$debug);
         $this->assertNotEquals($first, $second);
     }
+
+    /**
+     * @return void
+     */
+    public function testShowDebugPanel()
+    {
+        config()->set('SHOW_DEBUG_PANEL', true);
+        $res = App::$debug->showDebugPanel();
+        $this->assertContains("div.phpdebugbar-dump-console pre", $res);
+        $this->assertContains("function showPanel()", $res);
+        $this->assertContains('<a class="phpdebugbar-restore-btn">Debug</a>', $res);
+    }
 }
