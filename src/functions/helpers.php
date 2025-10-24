@@ -154,26 +154,6 @@ if (!function_exists('replaceMultiSpacesAndNewLine')) {
     }
 }
 
-if (!function_exists('http')) {
-    /**
-     * @return \Core\WgetDriver
-     */
-    function http()
-    {
-        return Core\WgetDriver::init();
-    }
-}
-
-if (!function_exists('httpClient')) {
-    /**
-     * @return \Core\WgetDriver
-     */
-    function httpClient()
-    {
-        return Core\WgetDriver::init();
-    }
-}
-
 if (!function_exists('size_format')) {
     /**
      * @param integer $bytes

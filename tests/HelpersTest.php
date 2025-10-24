@@ -6,7 +6,6 @@ use Core\App;
 use Core\ConfigDriver;
 use Core\CookieDriver;
 use Core\SessionDriver;
-use Core\WgetDriver;
 
 class HelpersTest extends _BaseTestCase
 {
@@ -151,26 +150,6 @@ EOF;
 EOF;
         $res = replaceMultiSpacesAndNewLine($str);
         $this->assertEquals("test string new line string", $res);
-    }
-
-    /**
-     * @return void
-     */
-    public function testHttp()
-    {
-        $ret = http();
-        $this->assertEquals(WgetDriver::class, get_class($ret));
-        $this->assertTrue(method_exists($ret, 'post'));
-    }
-
-    /**
-     * @return void
-     */
-    public function testHttpClient()
-    {
-        $ret = http();
-        $this->assertEquals(WgetDriver::class, get_class($ret));
-        $this->assertTrue(method_exists($ret, 'post'));
     }
 
     /**
