@@ -4,6 +4,8 @@ namespace Tests;
 
 use Core\DbDriver;
 use Core\QueryBuilderDriver;
+use Core\Exceptions\IntegrityException;
+use Maksym\Config\ConfigException;
 
 class DbDriverTest extends _BaseTestCase
 {
@@ -12,8 +14,8 @@ class DbDriverTest extends _BaseTestCase
 
     /**
      * @return void
-     * @throws \Core\Exceptions\ConfigException
-     * @throws \Core\Exceptions\IntegrityException
+     * @throws ConfigException
+     * @throws IntegrityException
      */
     public static function setUpBeforeClass()
     {

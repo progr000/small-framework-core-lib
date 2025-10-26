@@ -2,8 +2,9 @@
 
 namespace Tests;
 
+use Maksym\Config\ConfigDriver;
+use Maksym\Config\ConfigException;
 use Core\App;
-use Core\ConfigDriver;
 use Core\Contracts\CacheDrivers\fileCacheDriver;
 use Core\CookieDriver;
 use Core\DebugDriver;
@@ -27,12 +28,11 @@ class AppTest extends _BaseTestCase
     /**
      * @test
      * @return void
-     * @throws \Core\Exceptions\ConfigException
-     * @throws \Core\Exceptions\IntegrityException
+     * @throws ConfigException
      */
     public function testAppInitNoConfig()
     {
-        $this->expectException(\Core\Exceptions\IntegrityException::class);
+        $this->expectException(ConfigException::class);
         $this->expectExceptionMessageRegExp("*Configuration file is missing*");
         App::init(__DIR__);
     }
@@ -40,8 +40,7 @@ class AppTest extends _BaseTestCase
     /**
      * @test
      * @return void
-     * @throws \Core\Exceptions\ConfigException
-     * @throws \Core\Exceptions\IntegrityException
+     * @throws ConfigException
      */
     public function testAppInitOk()
     {

@@ -19,7 +19,8 @@
         "ext-iconv": "*",
         "ext-openssl": "*",
         "ext-curl": "*",
-        "ext-memcached": "*"
+        "ext-memcached": "*",
+        "maksym/config-lib": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "@stable",

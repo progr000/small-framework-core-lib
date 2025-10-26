@@ -24,25 +24,25 @@ if (!function_exists('replace_vars')) {
     }
 }
 
-if (!function_exists('config')) {
-    /**
-     * @param string $key
-     * @param mixed $default
-     * @return mixed
-     */
-    function config($key = null, $default = null)
-    {
-        if (is_null($key)) {
-            return App::$config;
-        }
-
-        if (App::$config && is_object(App::$config) && method_exists(App::$config, 'get')) {
-            return App::$config->get($key, $default);
-        }
-
-        return $default;
-    }
-}
+//if (!function_exists('config')) {
+//    /**
+//     * @param string $key
+//     * @param mixed $default
+//     * @return mixed
+//     */
+//    function config($key = null, $default = null)
+//    {
+//        if (is_null($key)) {
+//            return App::$config;
+//        }
+//
+//        if (App::$config && is_object(App::$config) && method_exists(App::$config, 'get')) {
+//            return App::$config->get($key, $default);
+//        }
+//
+//        return $default;
+//    }
+//}
 
 if (!function_exists('session')) {
     /**

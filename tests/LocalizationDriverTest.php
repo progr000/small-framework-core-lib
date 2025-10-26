@@ -4,13 +4,13 @@ namespace Tests;
 
 use Core\App;
 use Core\LocalizationDriver;
+use Maksym\Config\ConfigException;
 
 class LocalizationDriverTest extends _BaseTestCase
 {
     /**
      * @return void
-     * @throws \Core\Exceptions\ConfigException
-     * @throws \Core\Exceptions\IntegrityException
+     * @throws ConfigException
      */
     public static function setUpBeforeClass()
     {
