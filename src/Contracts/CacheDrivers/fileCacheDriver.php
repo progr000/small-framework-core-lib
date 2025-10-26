@@ -2,7 +2,7 @@
 
 namespace Core\Contracts\CacheDrivers;
 
-use Core\Exceptions\ConfigException;
+use Maksym\Config\ConfigException;
 use Core\Interfaces\CacheInterface;
 
 class fileCacheDriver extends CacheInterface

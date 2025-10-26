@@ -3,7 +3,7 @@
 namespace Core\Providers;
 
 use Core\App;
-use Core\Exceptions\ConfigException;
+use Maksym\Config\ConfigException;
 
 class CacheProvider
 {

@@ -3,7 +3,6 @@
 namespace Tests;
 
 use Core\App;
-use Core\ConfigDriver;
 use Core\CookieDriver;
 use Core\SessionDriver;
 
@@ -24,23 +23,6 @@ class HelpersTest extends _BaseTestCase
         $this->assertEquals("Hello World!", $str_res1);
         $str_res2 = replace_vars($str2, $replace_arr);
         $this->assertEquals("Hello World!", $str_res2);
-    }
-
-    /**
-     * @return void
-     */
-    public function testConfig()
-    {
-        // check receive config object with null key
-        $conf = config();
-        $this->assertInstanceOf(ConfigDriver::class, $conf);
-        $this->assertTrue(method_exists($conf, 'get') && method_exists($conf, 'exist'));
-        $this->assertTrue($conf->exist('test-param'));
-        $this->assertEquals('test-value', $conf->get('test-param'));
-
-        // check receive config var with key
-        $this->assertEquals('test-value', config('test-param'));
-        $this->assertEquals(111, config('test-param-not-exist', 111));
     }
 
     /**

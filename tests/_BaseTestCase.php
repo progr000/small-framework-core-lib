@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Core\App;
+use Maksym\Config\ConfigException;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionException;
@@ -11,8 +12,7 @@ abstract class _BaseTestCase extends TestCase
 {
     /**
      * @return void
-     * @throws \Core\Exceptions\ConfigException
-     * @throws \Core\Exceptions\IntegrityException
+     * @throws ConfigException
      */
     public static function setUpBeforeClass()
     {

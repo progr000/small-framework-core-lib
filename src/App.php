@@ -2,7 +2,8 @@
 
 namespace Core;
 
-use Core\Exceptions\ConfigException;
+use Maksym\Config\ConfigDriver;
+use Maksym\Config\ConfigException;
 use Core\Exceptions\HttpForbiddenException;
 use Core\Exceptions\HttpNotFoundException;
 use Core\Exceptions\IntegrityException;
@@ -52,7 +53,6 @@ class App
 
     /**
      * @param string $config_dir
-     * @throws IntegrityException
      * @throws ConfigException
      */
     private function __construct($config_dir)
@@ -106,7 +106,6 @@ class App
     /**
      * Initialization App
      * @return App
-     * @throws IntegrityException
      * @throws ConfigException
      */
     public static function init($config_dir)
