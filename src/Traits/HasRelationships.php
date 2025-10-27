@@ -3,8 +3,9 @@
 namespace Core\Traits;
 
 use Core\ActiveRecordDriver;
-use Core\Exceptions\DbException;
 use Core\Providers\RelationshipContainer;
+use Core\Exceptions\DbException;
+use Maksym\Config\ConfigException;
 
 trait HasRelationships
 {
@@ -109,7 +110,7 @@ trait HasRelationships
      * @param string $foreignKey
      * @param string|null $localKey
      * @return array|false|string
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     public function hasMany($related, $foreignKey, $localKey = null)
     {
@@ -187,7 +188,7 @@ trait HasRelationships
      * @param string $foreignKey
      * @param bool $many
      * @return mixed|null
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     private function commonPartForAll(
         $_unique_relative_result_key,
