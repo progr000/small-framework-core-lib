@@ -2,6 +2,7 @@
 
 namespace Core;
 
+use Maksym\Config\ConfigException;
 use stdClass;
 
 class DebugDriver extends stdClass
@@ -58,6 +59,7 @@ class DebugDriver extends stdClass
      * @param string $container
      * @param array|string $data
      * @return void
+     * @throws ConfigException
      */
     public function _set($container, $data)
     {
@@ -78,6 +80,7 @@ class DebugDriver extends stdClass
     /**
      * @param string $container
      * @return mixed
+     * @throws ConfigException
      */
     public function _get($container)
     {
@@ -92,6 +95,7 @@ class DebugDriver extends stdClass
 
     /**
      * @return array
+     * @throws ConfigException
      */
     public function getSqlLog()
     {
@@ -108,6 +112,7 @@ class DebugDriver extends stdClass
 
     /**
      * @return array
+     * @throws ConfigException
      */
     public function getRouteData()
     {
@@ -116,6 +121,7 @@ class DebugDriver extends stdClass
 
     /**
      * @return array
+     * @throws ConfigException
      */
     public function getViewData()
     {
@@ -142,6 +148,7 @@ class DebugDriver extends stdClass
     /**
      * @param array $vars
      * @return string
+     * @throws ConfigException
      */
     public function showDebugPanel($vars = [])
     {
@@ -173,6 +180,7 @@ class DebugDriver extends stdClass
 
     /**
      * @return string
+     * @throws ConfigException
      */
     private function getPanelJs()
     {
@@ -187,6 +195,7 @@ class DebugDriver extends stdClass
     /**
      * @param array $vars
      * @return false|string
+     * @throws ConfigException
      */
     private function getPanelHtml($vars = [])
     {

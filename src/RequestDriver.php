@@ -461,7 +461,9 @@ class RequestDriver implements RequestInterface
      */
     public function header($key = null, $default = null)
     {
-        if (is_null($key)) return $this->headers;
+        if (is_null($key)) {
+            return $this->headers;
+        }
         return isset($this->headers[$key]) ? $this->headers[$key] : $default;
     }
 
@@ -480,7 +482,9 @@ class RequestDriver implements RequestInterface
      */
     public function post($key = null, $default = null)
     {
-        if (is_null($key)) return $this->post;
+        if (is_null($key)) {
+            return $this->post;
+        }
         return isset($this->post[$key]) ? $this->post[$key] : $default;
     }
 
@@ -491,7 +495,9 @@ class RequestDriver implements RequestInterface
      */
     public function get($key = null, $default = null)
     {
-        if (is_null($key)) return $this->get;
+        if (is_null($key)) {
+            return $this->get;
+        }
         return isset($this->get[$key]) ? $this->get[$key] : $default;
     }
 
@@ -502,7 +508,9 @@ class RequestDriver implements RequestInterface
      */
     public function cookie($key = null, $default = null)
     {
-        if (is_null($key)) return $this->cookie;
+        if (is_null($key)) {
+            return $this->cookie;
+        }
         return isset($this->cookie[$key]) ? $this->cookie[$key] : $default;
     }
 
@@ -513,7 +521,9 @@ class RequestDriver implements RequestInterface
      */
     public function json($key = null, $default = null)
     {
-        if (is_null($key)) return $this->json;
+        if (is_null($key)) {
+            return $this->json;
+        }
         return isset($this->json[$key]) ? $this->json[$key] : $default;
     }
 
@@ -524,7 +534,9 @@ class RequestDriver implements RequestInterface
      */
     public function server($key = null, $default = null)
     {
-        if (is_null($key)) return $this->get;
+        if (is_null($key)) {
+            return $this->server;
+        }
         return isset($this->server[$key]) ? $this->server[$key] : $default;
     }
 
@@ -535,7 +547,9 @@ class RequestDriver implements RequestInterface
      */
     public function all($key = null, $default = null)
     {
-        if (is_null($key)) return $this->all_request;
+        if (is_null($key)) {
+            return $this->all_request;
+        }
         return isset($this->all_request[$key]) ? $this->all_request[$key] : $default;
     }
 
@@ -545,7 +559,9 @@ class RequestDriver implements RequestInterface
      */
     public function file($key = null)
     {
-        if (is_null($key)) return $this->files;
+        if (is_null($key)) {
+            return $this->files;
+        }
         return isset($this->files[$key]) ? $this->files[$key] : null;
     }
 

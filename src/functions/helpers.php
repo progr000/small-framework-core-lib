@@ -86,8 +86,10 @@ if (!function_exists('asset')) {
 
 if (!function_exists('minimize')) {
     /**
+     * TODO: create separate helper on packagist.org and move this function there (and other helpful functions)
      * @param string $str
      * @return string
+     * @throws Maksym\Config\ConfigException
      */
     function minimize($str)
     {
@@ -125,6 +127,7 @@ if (!function_exists('url')) {
 
 if (!function_exists('replaceMultiSpacesAndNewLine')) {
     /**
+     * TODO: create separate helper on packagist.org and move this function there (and other helpful functions)
      * @param string $str
      * @return string
      */
