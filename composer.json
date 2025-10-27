@@ -23,7 +23,7 @@
     "ext-curl": "*",
     "ext-memcached": "*",
     "maksym/config-lib": "^1.0",
-    "maksym/debug-panel": "dev-dev"
+    "maksym/debug-panel": "^1.0.0"
   },
   "require-dev": {
     "phpunit/phpunit": "@stable",
