@@ -37,7 +37,7 @@ class ViewDriver
      * @param array $vars
      * @return string
      * @throws IntegrityException
-     * @throws HttpNotFoundException
+     * @throws HttpNotFoundException|\Maksym\Config\ConfigException
      */
     public static function renderPart($templateName, array &$vars = [])
     {
@@ -77,7 +77,7 @@ class ViewDriver
      * @param null $layout
      * @return string
      * @throws IntegrityException
-     * @throws HttpNotFoundException
+     * @throws HttpNotFoundException|\Maksym\Config\ConfigException
      */
     public static function render($templateName, array $vars = [], $layout = null)
     {

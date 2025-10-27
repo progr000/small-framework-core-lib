@@ -4,6 +4,7 @@ namespace Core;
 
 use Core\Providers\ExtendedStdClass;
 use Exception;
+use Maksym\Config\ConfigException;
 use PDO;
 use Core\Exceptions\DbException;
 use PDOStatement;
@@ -147,6 +148,7 @@ class DbDriver
      * @param array $params
      * @return false|mixed
      * @throws DbException
+     * @throws ConfigException
      */
     public function getOne($sql, $params = [])
     {
@@ -221,7 +223,7 @@ class DbDriver
      * @param string $sql
      * @param array $params
      * @return false|PDOStatement
-     * @throws DbException
+     * @throws DbException|\Maksym\Config\ConfigException
      */
     public function exec($sql, $params = [])
     {
@@ -256,7 +258,7 @@ class DbDriver
                     'sql' => $ready_sql,
                     'params' => $params,
                     'status' => 'successful',
-                    'label' => '',
+                    'label' => 'successful',
                     'sqlTimeStart' => $sql_start,
                     'sqlTimeFinish' => $sql_finish,
                     'backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3),
