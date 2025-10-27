@@ -23,7 +23,6 @@
     "ext-curl": "*",
     "ext-memcached": "*",
     "maksym/config-lib": "^1.0",
-    "maksym/debug-panel": "^1.0.0",
     "maksym/helper-functions": "^1.0"
   },
   "require-dev": {

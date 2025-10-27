@@ -4,7 +4,7 @@ namespace Tests;
 
 use Maksym\Config\ConfigDriver;
 use Maksym\Config\ConfigException;
-use Maksym\DebugPanel\DebugPanelDriver;
+//use Maksym\DebugPanel\DebugPanelDriver;
 use Core\App;
 use Core\Contracts\CacheDrivers\fileCacheDriver;
 use Core\CookieDriver;
@@ -46,7 +46,7 @@ class AppTest extends _BaseTestCase
     {
         $app = App::init(__DIR__ . DIRECTORY_SEPARATOR . 'config');
         $this->assertInstanceOf(App::class, $app);
-        $this->assertInstanceOf(DebugPanelDriver::class, $app::$debug);
+        //$this->assertInstanceOf(DebugPanelDriver::class, $app::$debug);
         $this->assertInstanceOf(ConfigDriver::class, $app::$config);
         $this->assertInstanceOf(SessionDriver::class, $app::$session);
         $this->assertInstanceOf(CookieDriver::class, $app::$cookie);

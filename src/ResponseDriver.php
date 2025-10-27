@@ -272,7 +272,7 @@ class ResponseDriver
         $this->body === null && $this->body = "";
 
         /* for debug stop timing */
-        App::$debug->setAppTiming();
+        App::$debug && App::$debug->setAppTiming();
 
         /**/
         if (is_string($this->body) || $this->isJson()) {
@@ -288,7 +288,7 @@ class ResponseDriver
                 if ($m instanceof MiddlewareInterface) {
                     $m->handleOnResponse($this);
                     /* for debug stop timing */
-                    App::$debug->setAppTiming();
+                    App::$debug && App::$debug->setAppTiming();
                 }
             }
 

@@ -263,7 +263,7 @@ class DbDriver
             /* +++ for debug panel */
             if (config('IS_DEBUG', false)) {
                 $sql_finish = microtime(true);
-                App::$debug->_set('sqlLog', [0 => [
+                App::$debug && App::$debug->_set('sqlLog', [0 => [
                     'sql' => $ready_sql,
                     'params' => $params,
                     'status' => 'successful',
@@ -290,7 +290,7 @@ class DbDriver
         } catch (Exception $e) {
             /* +++ for debug panel */
             if (config('IS_DEBUG', false)) {
-                App::$debug->_set('sqlLog', [0 => [
+                App::$debug && App::$debug->_set('sqlLog', [0 => [
                     'sql' => $sql,
                     'params' => $params,
                     'status' => 'failed',
