@@ -2,6 +2,7 @@
 
 namespace Core;
 
+use Maksym\Config\ConfigException;
 use Core\Exceptions\DbException;
 use Core\Providers\ExtendedStdClass;
 use ReflectionObject;
@@ -125,7 +126,7 @@ abstract class ActiveRecordDriver extends ExtendedStdClass
 
     /**
      * @return DbDriver
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     protected static function getDbConnection()
     {
@@ -158,8 +159,8 @@ abstract class ActiveRecordDriver extends ExtendedStdClass
     }
 
     /**
-     * @return array|mixed
-     * @throws DbException
+     * @return array
+     * @throws DbException|ConfigException
      */
     public static function getErrors()
     {
@@ -217,7 +218,7 @@ abstract class ActiveRecordDriver extends ExtendedStdClass
 
     /**
      * @param array $condition
-     * @return $this|ActiveRecordDriver
+     * @return static|ActiveRecordDriver
      * @throws DbException
      */
     public static function firstOrNew($condition = [])
@@ -277,7 +278,7 @@ abstract class ActiveRecordDriver extends ExtendedStdClass
     /**
      * @param bool $only_show_sql
      * @return QueryBuilderDriver
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     public static function find($only_show_sql = false)
     {
@@ -287,7 +288,7 @@ abstract class ActiveRecordDriver extends ExtendedStdClass
     /**
      * @param bool $only_show_sql
      * @return QueryBuilderDriver
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     public static function table($only_show_sql = false)
     {
@@ -297,7 +298,7 @@ abstract class ActiveRecordDriver extends ExtendedStdClass
     /**
      * @param bool $only_show_sql
      * @return QueryBuilderDriver
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     public static function query($only_show_sql = false)
     {
@@ -307,7 +308,7 @@ abstract class ActiveRecordDriver extends ExtendedStdClass
     /**
      * @param array $fields
      * @return false|int|string|null
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     public static function insert(array $fields)
     {
@@ -318,7 +319,7 @@ abstract class ActiveRecordDriver extends ExtendedStdClass
      * @param array $fields
      * @param array $condition
      * @return false|int|string|null
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     public static function update(array $fields, $condition = [])
     {
@@ -332,7 +333,7 @@ abstract class ActiveRecordDriver extends ExtendedStdClass
      * @param array $fields
      * @param array $uniqueBy
      * @return false|int|string|null
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     public static function upsert(array $fields, $uniqueBy = [])
     {
@@ -347,7 +348,7 @@ abstract class ActiveRecordDriver extends ExtendedStdClass
      * @param array|string $condition
      * @param array $params
      * @return false|int|null
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     public static function deleteRecords($condition = [], $params = [])
     {
@@ -366,7 +367,7 @@ abstract class ActiveRecordDriver extends ExtendedStdClass
      * @param string $sql
      * @param array $params
      * @return array|false|null
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     public static function execRawSql($sql, $params=[])
     {
@@ -433,7 +434,7 @@ abstract class ActiveRecordDriver extends ExtendedStdClass
     /**
      * @param array $mappedProperties
      * @return bool
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     private function _update(array $mappedProperties)
     {
@@ -464,7 +465,7 @@ abstract class ActiveRecordDriver extends ExtendedStdClass
     /**
      * @param array $mappedProperties
      * @return bool
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     private function _insert(array $mappedProperties)
     {
@@ -495,7 +496,7 @@ abstract class ActiveRecordDriver extends ExtendedStdClass
     }
 
     /**
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     public function delete()
     {
@@ -509,7 +510,7 @@ abstract class ActiveRecordDriver extends ExtendedStdClass
     }
 
     /**
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     public function getError()
     {

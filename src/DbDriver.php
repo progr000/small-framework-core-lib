@@ -2,11 +2,11 @@
 
 namespace Core;
 
+use Maksym\Config\ConfigException;
+use Core\Exceptions\DbException;
 use Core\Providers\ExtendedStdClass;
 use Exception;
-use Maksym\Config\ConfigException;
 use PDO;
-use Core\Exceptions\DbException;
 use PDOStatement;
 
 class DbDriver
@@ -34,6 +34,7 @@ class DbDriver
     /**
      * @param string $db_conf_name
      * @return DbDriver
+     * @throws ConfigException
      */
     public static function getInstance($db_conf_name = 'db-main')
     {
@@ -46,6 +47,7 @@ class DbDriver
 
     /**
      * @param string $db_conf_name
+     * @throws ConfigException
      */
     private function __construct($db_conf_name = 'db-main')
     {
@@ -106,11 +108,17 @@ class DbDriver
         return $this->sql_quote;
     }
 
+    /**
+     * @return mixed|string
+     */
     public function getTablePrefix()
     {
         return $this->table_prefix;
     }
 
+    /**
+     * @return string
+     */
     public function getConnectionName()
     {
         return $this->connection_name;
@@ -118,7 +126,7 @@ class DbDriver
 
     /**
      * Return error-stack
-     * @return mixed
+     * @return array
      */
     public function getErrors()
     {
@@ -131,6 +139,7 @@ class DbDriver
      * @param array $params
      * @return array|false
      * @throws DbException
+     * @throws ConfigException
      */
     public function getAll($sql, $params = [])
     {
@@ -173,7 +182,7 @@ class DbDriver
 
     /**
      * @param $val
-     * @return false|int|string|void
+     * @return false|int|string
      * @throws DbException
      */
     public function prepareValType($val)
@@ -223,7 +232,7 @@ class DbDriver
      * @param string $sql
      * @param array $params
      * @return false|PDOStatement
-     * @throws DbException|\Maksym\Config\ConfigException
+     * @throws DbException|ConfigException
      */
     public function exec($sql, $params = [])
     {

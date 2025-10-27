@@ -2,9 +2,9 @@
 
 namespace Core;
 
+use PDO;
 use Core\Providers\ExtendedStdClass;
 use Core\Providers\RelationshipContainer;
-use PDO;
 use Core\Exceptions\DbException;
 
 class QueryBuilderDriver
