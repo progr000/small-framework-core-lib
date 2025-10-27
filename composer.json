@@ -22,8 +22,8 @@
     "ext-openssl": "*",
     "ext-curl": "*",
     "ext-memcached": "*",
-    "maksym/config-lib": "^1.0",
-    "maksym/helper-functions": "^1.0"
+    "maksym/config-lib": ">=1.0",
+    "maksym/helper-functions": ">=1.0"
   },
   "require-dev": {
     "phpunit/phpunit": "@stable",
