@@ -19,8 +19,8 @@ class App
 {
     /** @var self */
     private static $instance;
-    /** @var DebugPanelDriver */
-    public static $debug;
+    /** @var DebugPanelDriver|null */
+    public static $debug = null;
     /** @var ConfigDriver */
     public static $config;
     /** @var RouteDriver */
@@ -58,7 +58,10 @@ class App
     private function __construct($config_dir)
     {
         /**/
-        self::$debug = DebugPanelDriver::getInstance();
+        $DebugPanelDriver_className = "Maksym\\DebugPanel\\DebugPanelDriver";
+        if (class_exists($DebugPanelDriver_className)) {
+            self::$debug = $DebugPanelDriver_className::getInstance();
+        }
         self::$config = ConfigDriver::getInstance($config_dir);
         self::$session = SessionDriver::getInstance(self::$config->get('session-container-name', 'app-small-framework'));
         self::$cookie = CookieDriver::getInstance();
@@ -113,7 +116,7 @@ class App
         if (self::$instance === null) {
             self::$instance = new self($config_dir);
         }
-        self::$debug->setBootTiming();
+        self::$debug && self::$debug->setBootTiming();
         return self::$instance;
     }
 

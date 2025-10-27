@@ -159,7 +159,7 @@ class RouteDriver
 
         /* for debug info */
         if (isset($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'])) {
-            App::$debug->_set('routeData', [
+            App::$debug && App::$debug->_set('routeData', [
                 'uri' => $_SERVER['REQUEST_METHOD'] . " " . $_SERVER['REQUEST_URI'],
                 'referer' => $this->referer
             ]);
@@ -209,7 +209,7 @@ class RouteDriver
         }
 
         /* for debug info */
-        App::$debug->_set('routeData', $controllerAndAction);
+        App::$debug && App::$debug->_set('routeData', $controllerAndAction);
 
         /**/
         if (isset($matches)) unset($matches[0]);

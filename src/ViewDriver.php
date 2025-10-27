@@ -57,7 +57,7 @@ class ViewDriver
         extract($vars, EXTR_OVERWRITE);
 
         /* for debug info */
-        App::$debug->_set('viewData', "{$tpl_path}/{$templateName}.php");
+        App::$debug && App::$debug->_set('viewData', "{$tpl_path}/{$templateName}.php");
 
         include("{$tpl_path}/{$templateName}.php");
         $buffer = ob_get_contents();
@@ -102,7 +102,7 @@ class ViewDriver
         extract($vars, EXTR_OVERWRITE);
 
         /* for debug info */
-        App::$debug->_set('viewData', "{$tpl_path}/{$layout}.php");
+        App::$debug && App::$debug->_set('viewData', "{$tpl_path}/{$layout}.php");
 
         include("{$tpl_path}/{$layout}.php");
         $buffer = ob_get_contents();
