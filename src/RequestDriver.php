@@ -262,7 +262,6 @@ class RequestDriver implements RequestInterface
      */
     public function validate()
     {
-        //dd($this->rules());
         if (empty($this->rules())) {
             return null;
         }

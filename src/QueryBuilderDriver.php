@@ -337,8 +337,6 @@ class QueryBuilderDriver
         }
         $sth = $this->connection->exec($sql);
         if ($sth) {
-            //dump($sql);
-            //dump($this->class);
             if (mb_strrpos($this->class, 'stdClass') === false &&
                 mb_strrpos($this->class, 'ExtendedStdClass') === false &&
                 method_exists($this->class, '__setTechnicalData') &&

@@ -107,7 +107,6 @@ abstract class MigrationSchemaInterface
         /* finalize sql for create table */
         $sql .= PHP_EOL;
 
-        //dd($sql);
         return $this->exec($sql);
     }
 }

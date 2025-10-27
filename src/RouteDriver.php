@@ -118,7 +118,6 @@ class RouteDriver
                 $this->available_routes[] = ['controller' => null, 'action' => $v, 'pattern' => $pattern, 'name' => null];
             }
         }
-        //dd($this->available_routes);
         $this->prepareURI();
     }
 
@@ -181,7 +180,6 @@ class RouteDriver
         foreach ($this->available_routes as $controllerAndAction) {
 
             $pattern = $controllerAndAction['pattern'];
-            //dump($pattern, $controllerAndAction);
             unset($matches);
             preg_match($pattern, $this->route, $matches);
             if (!empty($matches)) {
@@ -241,7 +239,6 @@ class RouteDriver
         } else {
 
             //$controller = new $controllerAndAction['controller'](...$matches);
-            //dd($controllerAndAction['controller']);
             $controller = new $controllerAndAction['controller']();
             $this->controller = get_class($controller);
 

@@ -131,7 +131,6 @@ class ValidatorDriver
             $test_var = true;
             foreach ($methods as $method) {
                 if (isset($this->data[$key]) || $method['exec'] === 'required') {
-                    //dump($this->data[$key], $method, $this->$method($key, $params));
                     if ($method['type'] === 'function') {
                         if (!$this->{$method['exec']}($key, $params)) {
                             $ret = false;
@@ -191,7 +190,6 @@ class ValidatorDriver
      */
     private function int($key, array $params = [])
     {
-        //dump("int($key, " . json_encode($params) .")");
         if (preg_match("/^[0-9]+$/", $this->data[$key])) {
             $val = intval($this->data[$key]);
             if (isset($params['min']) || isset($params['max'])) {
@@ -236,7 +234,6 @@ class ValidatorDriver
      */
     private function double($key, array $params = [])
     {
-        //dump("double($key, " . json_encode($params) .")");
         if (preg_match("/^[0-9]{1,10}(?:\.[0-9]{1,5})?$/", $this->data[$key])) {
             $val = doubleval($this->data[$key]);
             if (isset($params['min']) || isset($params['max'])) {

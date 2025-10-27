@@ -47,7 +47,6 @@ class sqliteSchemaDriver extends MigrationSchemaInterface
             $sql .=  str_replace('%%table_name%%', $tableName, implode(";" . PHP_EOL, $table->prepend));
         }
 
-        //dd($sql);
         return $sql;
     }
 

@@ -34,10 +34,8 @@ class LogDriver
      */
     private function __construct()
     {
-        //dump('construct');
         $this->cli_or_html = (PHP_SAPI === 'cli') ? 'cli' : 'html';
         if (self::$log_resource === null && self::$path_to_log_file !== null) {
-            //dump('open file');
             if (false === (self::$log_resource = @fopen(self::$path_to_log_file, 'a'))) {
                 self::$log_resource = false;
                 echo "Can't create log file '" . self::$path_to_log_file . "', continue without log.\n";
@@ -397,11 +395,9 @@ class LogDriver
     {
         self::$instancesCount--;
 
-        //dump('destruct');
         if (self::$log_resource) {
             fflush(self::$log_resource);
             //if (self::$instancesCount == 0) {
-            //dump('log file is closed');
             //fclose(self::$log_resource);
             //self::$log_resource = null;
             //}

@@ -70,7 +70,6 @@ abstract class ActiveRecordDriver extends ExtendedStdClass
         $dbg = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
         foreach ($dbg as $k => $item) {
             if (isset($item['function'])) {
-                //dump($k . "=>" . $item['function']);
                 if (mb_strrpos(mb_strtolower($item['function']), 'fetch') !== false) {
                     $is_new = false;
                     break;
@@ -402,7 +401,6 @@ abstract class ActiveRecordDriver extends ExtendedStdClass
     private static function getSqlDate()
     {
         // INFO: created_at and updated_at always saved in UTC
-        // dump(self::getDbConnection()->getDriver());
         // TODO the date format can be depend on self::getDbConnection()->getDriver()
         return gmdate('Y-m-d H:i:s');
     }
