@@ -72,7 +72,7 @@ trait HasRelationships
      * @param string $foreignKey
      * @param string|null $localKey
      * @return ActiveRecordDriver|mixed|null
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     public function hasOne($related, $foreignKey, $localKey = null)
     {
@@ -148,7 +148,7 @@ trait HasRelationships
      * @param string $localKey
      * @param string|null $foreignKey
      * @return ActiveRecordDriver|mixed|null
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     public function belongsTo($related, $localKey, $foreignKey = null)
     {

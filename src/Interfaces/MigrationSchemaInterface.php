@@ -5,6 +5,7 @@ namespace Core\Interfaces;
 use Core\Contracts\MigrationSchema\Common\SchemaTable;
 use Core\DbDriver;
 use Core\Exceptions\DbException;
+use Maksym\Config\ConfigException;
 
 abstract class MigrationSchemaInterface
 {
@@ -23,7 +24,7 @@ abstract class MigrationSchemaInterface
      * @param string $queries
      * @param array $params
      * @return bool
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     protected function exec($queries, $params = [])
     {
@@ -43,7 +44,7 @@ abstract class MigrationSchemaInterface
     /**
      * @param string $table
      * @return bool
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     public function dropTable($table)
     {
@@ -53,7 +54,7 @@ abstract class MigrationSchemaInterface
     /**
      * @param string $table
      * @return bool|\PDOStatement
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     public function dropTableIfExists($table)
     {
@@ -80,7 +81,7 @@ abstract class MigrationSchemaInterface
      * @param string $tableName
      * @param \Closure $function
      * @return bool
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     public function table($tableName, \Closure $function)
     {

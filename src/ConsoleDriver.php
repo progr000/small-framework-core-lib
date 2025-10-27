@@ -3,6 +3,7 @@
 namespace Core;
 
 use Exception;
+use Maksym\Config\ConfigException;
 
 abstract class ConsoleDriver
 {
@@ -122,6 +123,7 @@ abstract class ConsoleDriver
      * Init, start validation and then start processes
      * @param array $arguments
      * @return array|bool
+     * @throws ConfigException
      */
     protected function starter(array $arguments)
     {

@@ -4,6 +4,7 @@ namespace Core;
 
 use finfo;
 use Exception;
+use Maksym\Config\ConfigException;
 
 class SendmailDriver
 {
@@ -325,6 +326,7 @@ class SendmailDriver
     /**
      * Create sign for message by openssl
      * @return string
+     * @throws ConfigException
      */
     private function signLetter()
     {
@@ -371,6 +373,7 @@ class SendmailDriver
     /**
      * Try to send message
      * @return false|array
+     * @throws ConfigException
      */
     public function send()
     {

@@ -2,10 +2,10 @@
 
 namespace Core;
 
-use Core\Exceptions\HttpNotFoundException;
-use Core\Exceptions\IntegrityException;
 use Core\Interfaces\RequestInterface;
 use Core\Interfaces\MiddlewareInterface;
+use Core\Exceptions\HttpNotFoundException;
+use Core\Exceptions\IntegrityException;
 use Maksym\Config\ConfigException;
 use ReflectionException;
 
@@ -39,7 +39,7 @@ class RouteDriver
 
     /**
      * Route constructor.
-     * @throws IntegrityException
+     * @throws IntegrityException|ConfigException
      */
     private function __construct()
     {

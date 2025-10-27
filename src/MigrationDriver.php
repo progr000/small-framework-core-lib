@@ -2,6 +2,7 @@
 
 namespace Core;
 
+use Maksym\Config\ConfigException;
 use Core\Exceptions\DbException;
 use Exception;
 
@@ -80,7 +81,7 @@ class MigrationDriver
      * Initialization before migrations begin
      * Get data abut done and undone migrations
      * @return void
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     private function init()
     {
@@ -121,7 +122,7 @@ class MigrationDriver
      * Execute migration Class
      * @param string $file
      * @param string $method
-     * @return mixed
+     * @return bool
      */
     private function execute($file, $method)
     {
@@ -147,7 +148,7 @@ class MigrationDriver
      * Execute UP method for all (or count=steps) undone migration classes
      * @param int|null $steps
      * @return bool
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     public function up($steps = null)
     {
@@ -185,7 +186,7 @@ class MigrationDriver
      * Execute DOWN method for last one (or last count=steps) done migration classes
      * @param int $steps
      * @return bool
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     public function down($steps = null)
     {
@@ -259,7 +260,7 @@ class MigrationDriver
     /**
      * Undone all migration and then done all migrations
      * @return void
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     public function reset()
     {
@@ -270,7 +271,7 @@ class MigrationDriver
     /**
      * Undone all migrations
      * @return void
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     public function refresh()
     {

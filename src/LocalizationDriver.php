@@ -2,6 +2,8 @@
 
 namespace Core;
 
+use Maksym\Config\ConfigException;
+
 class LocalizationDriver
 {
     /** @var self */
@@ -29,6 +31,7 @@ class LocalizationDriver
 
     /**
      * @return bool
+     * @throws ConfigException
      */
     public function init()
     {

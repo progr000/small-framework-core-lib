@@ -2,6 +2,7 @@
 
 namespace Core;
 
+use Maksym\Config\ConfigException;
 use Core\Exceptions\IntegrityException;
 use Core\Exceptions\BadResponseException;
 use Core\Interfaces\MiddlewareInterface;
@@ -254,6 +255,7 @@ class ResponseDriver
      * @return void
      * @throws IntegrityException
      * @throws BadResponseException
+     * @throws ConfigException
      */
     public function send()
     {

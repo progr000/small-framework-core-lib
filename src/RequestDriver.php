@@ -3,8 +3,8 @@
 namespace Core;
 
 use Core\Interfaces\RequestInterface;
-use Exception;
 use Core\Exceptions\ValidatorException;
+use Exception;
 
 class RequestDriver implements RequestInterface
 {

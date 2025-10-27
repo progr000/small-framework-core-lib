@@ -3,8 +3,9 @@
 namespace Core\Contracts\MigrationSchema;
 
 use Core\Contracts\MigrationSchema\Common\SchemaTable;
-use Core\Exceptions\DbException;
 use Core\Interfaces\MigrationSchemaInterface;
+use Core\Exceptions\DbException;
+use Maksym\Config\ConfigException;
 
 class mysqlSchemaDriver extends MigrationSchemaInterface
 {
@@ -56,7 +57,7 @@ class mysqlSchemaDriver extends MigrationSchemaInterface
      * @param \Closure $function
      * @param string $options
      * @return bool|\PDOStatement
-     * @throws DbException
+     * @throws DbException|ConfigException
      */
     public function createTableIfNotExists($tableName, \Closure $function, $options = "ENGINE = InnoDB COLLATE = utf8_general_ci")
     {

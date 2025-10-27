@@ -14,7 +14,6 @@ use Core\Exceptions\BadResponseException;
 use Core\Interfaces\CacheInterface;
 use Core\Interfaces\MiddlewareInterface;
 use Core\Providers\CacheProvider;
-use ReflectionException;
 
 class App
 {
@@ -121,10 +120,10 @@ class App
     /**
      * @return void
      * @throws HttpNotFoundException
-     * @throws ReflectionException
      * @throws MaintenanceException
      * @throws IntegrityException
      * @throws BadResponseException
+     * @throws ConfigException
      */
     public function run()
     {

@@ -4,6 +4,7 @@ namespace Core;
 
 use Core\Exceptions\IntegrityException;
 use Core\Exceptions\HttpNotFoundException;
+use Maksym\Config\ConfigException;
 
 /**
  * Class View
@@ -21,7 +22,7 @@ class ViewDriver
      * @param string $template
      * @param array $vars
      * @return string
-     * @throws HttpNotFoundException|IntegrityException
+     * @throws HttpNotFoundException|IntegrityException|ConfigException
      */
     public function renderView($template, array &$vars = [])
     {
@@ -37,7 +38,7 @@ class ViewDriver
      * @param array $vars
      * @return string
      * @throws IntegrityException
-     * @throws HttpNotFoundException|\Maksym\Config\ConfigException
+     * @throws HttpNotFoundException|ConfigException
      */
     public static function renderPart($templateName, array &$vars = [])
     {
@@ -77,7 +78,7 @@ class ViewDriver
      * @param null $layout
      * @return string
      * @throws IntegrityException
-     * @throws HttpNotFoundException|\Maksym\Config\ConfigException
+     * @throws HttpNotFoundException|ConfigException
      */
     public static function render($templateName, array $vars = [], $layout = null)
     {

@@ -1,6 +1,8 @@
 <?php
 
 use Core\App;
+use Core\CookieDriver;
+use Core\SessionDriver;
 
 if (!function_exists('replace_vars')) {
     /**
@@ -28,7 +30,7 @@ if (!function_exists('session')) {
     /**
      * @param string|array|null $key
      * @param mixed $default
-     * @return \Core\SessionDriver|mixed|void
+     * @return SessionDriver|mixed|void
      */
     function session($key = null, $default = null)
     {
@@ -49,7 +51,7 @@ if (!function_exists('cookie')) {
     /**
      * @param string|array|null $key
      * @param mixed $default
-     * @return \Core\CookieDriver|mixed|void
+     * @return CookieDriver|mixed|void
      */
     function cookie($key = null, $default = null)
     {
