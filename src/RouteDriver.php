@@ -6,6 +6,7 @@ use Core\Exceptions\HttpNotFoundException;
 use Core\Exceptions\IntegrityException;
 use Core\Interfaces\RequestInterface;
 use Core\Interfaces\MiddlewareInterface;
+use Maksym\Config\ConfigException;
 use ReflectionException;
 
 /**
@@ -139,6 +140,7 @@ class RouteDriver
      * to use sub-folder in document_root
      * as if it were document_root
      * @return void
+     * @throws ConfigException
      */
     private function prepareURI()
     {
@@ -170,7 +172,7 @@ class RouteDriver
      * and try to execute and return result
      * @return mixed
      * @throws HttpNotFoundException
-     * @throws ReflectionException
+     * @throws ReflectionException|ConfigException
      */
     public function processRoute()
     {

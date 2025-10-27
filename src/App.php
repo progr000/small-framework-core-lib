@@ -4,6 +4,7 @@ namespace Core;
 
 use Maksym\Config\ConfigDriver;
 use Maksym\Config\ConfigException;
+use Maksym\DebugPanel\DebugPanelDriver;
 use Core\Exceptions\HttpForbiddenException;
 use Core\Exceptions\HttpNotFoundException;
 use Core\Exceptions\IntegrityException;
@@ -19,7 +20,7 @@ class App
 {
     /** @var self */
     private static $instance;
-    /** @var DebugDriver */
+    /** @var DebugPanelDriver */
     public static $debug;
     /** @var ConfigDriver */
     public static $config;
@@ -58,7 +59,7 @@ class App
     private function __construct($config_dir)
     {
         /**/
-        self::$debug = DebugDriver::getInstance();
+        self::$debug = DebugPanelDriver::getInstance();
         self::$config = ConfigDriver::getInstance($config_dir);
         self::$session = SessionDriver::getInstance(self::$config->get('session-container-name', 'app-small-framework'));
         self::$cookie = CookieDriver::getInstance();
