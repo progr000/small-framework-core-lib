@@ -3,6 +3,7 @@
 use Core\App;
 use Core\CookieDriver;
 use Core\SessionDriver;
+use Maksym\Config\ConfigException;
 
 if (!function_exists('replace_vars')) {
     /**
@@ -104,5 +105,20 @@ if (!function_exists('url')) {
         $params = ltrim(trim($params), '?');
 
         return App::$site_url . "/" . ltrim($path, '/') . ($params ? "?" . $params : "");
+    }
+}
+
+if (!function_exists('set_debug_data')) {
+    /**
+     * @param string $container_name
+     * @param array|string $data
+     * @return void
+     * @throws ConfigException
+     */
+    function set_debug_data($container_name, $data)
+    {
+        if (App::$debug && config('IS_DEBUG', false)) {
+            App::$debug->_set($container_name, $data);
+        }
     }
 }

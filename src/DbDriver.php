@@ -261,20 +261,18 @@ class DbDriver
 
             $ready_sql = $this->prepareSql($sql, $params);
             /* +++ for debug panel */
-            if (config('IS_DEBUG', false)) {
-                $sql_finish = microtime(true);
-                App::$debug && App::$debug->_set('sqlLog', [0 => [
-                    'sql' => $ready_sql,
-                    'params' => $params,
-                    'status' => 'successful',
-                    'label' => 'successful',
-                    'sqlTimeStart' => $sql_start,
-                    'sqlTimeFinish' => $sql_finish,
-                    'backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3),
-                    'connection' => $this->connection_name,
-                    'driver' => $this->driver,
-                ]]);
-            }
+            $sql_finish = microtime(true);
+            set_debug_data('sqlLog', [0 => [
+                'sql' => $ready_sql,
+                'params' => $params,
+                'status' => 'successful',
+                'label' => 'successful',
+                'sqlTimeStart' => $sql_start,
+                'sqlTimeFinish' => $sql_finish,
+                'backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3),
+                'connection' => $this->connection_name,
+                'driver' => $this->driver,
+            ]]);
             /* --- */
 
             $this->affectedRows = $sth->rowCount();
@@ -289,19 +287,17 @@ class DbDriver
 
         } catch (Exception $e) {
             /* +++ for debug panel */
-            if (config('IS_DEBUG', false)) {
-                App::$debug && App::$debug->_set('sqlLog', [0 => [
-                    'sql' => $sql,
-                    'params' => $params,
-                    'status' => 'failed',
-                    'label' => $e->getMessage(),
-                    'sqlTimeStart' => microtime(true),
-                    'sqlTimeFinish' => microtime(true),
-                    'backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3),
-                    'connection' => $this->connection_name,
-                    'driver' => $this->driver,
-                ]]);
-            }
+            set_debug_data('sqlLog', [0 => [
+                'sql' => $sql,
+                'params' => $params,
+                'status' => 'failed',
+                'label' => $e->getMessage(),
+                'sqlTimeStart' => microtime(true),
+                'sqlTimeFinish' => microtime(true),
+                'backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3),
+                'connection' => $this->connection_name,
+                'driver' => $this->driver,
+            ]]);
             /* --- */
             $this->errors[] = $e->getMessage();
             if ($this->pdo) {

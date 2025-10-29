@@ -30,11 +30,28 @@ class SessionDriver
     }
 
     /**
+     * @return bool
+     */
+    private function is_session_started()
+    {
+        if (php_sapi_name() !== 'cli') {
+            if (version_compare(phpversion(), '5.4.0', '>=')) {
+                return session_status() === PHP_SESSION_ACTIVE;
+            } else {
+                return session_id() !== '';
+            }
+        }
+        return false;
+    }
+
+    /**
      *
      */
     public function init()
     {
-        session_start();
+        if (!$this->is_session_started()) {
+            session_start();
+        }
     }
 
     /**
