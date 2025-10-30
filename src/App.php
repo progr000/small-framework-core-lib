@@ -2,9 +2,10 @@
 
 namespace Core;
 
+use Core\Providers\DebugProvider;
 use Maksym\Config\ConfigDriver;
 use Maksym\Config\ConfigException;
-use Maksym\DebugPanel\DebugPanelDriver;
+use Core\Interfaces\DebugPanelDriverInterface;
 use Core\Exceptions\HttpForbiddenException;
 use Core\Exceptions\HttpNotFoundException;
 use Core\Exceptions\IntegrityException;
@@ -19,7 +20,7 @@ class App
 {
     /** @var self */
     private static $instance;
-    /** @var DebugPanelDriver|null */
+    /** @var DebugPanelDriverInterface|mixed|null */
     public static $debug = null;
     /** @var ConfigDriver */
     public static $config;
@@ -41,7 +42,7 @@ class App
     public static $db;
     /** @var DbDriver[] */
     public static $DbInstances;
-    /** @var \Models\User */
+    /** @var object Model\User */
     public static $user;
     /** @var string */
     public static $site_root;
@@ -58,11 +59,8 @@ class App
     private function __construct($config_dir)
     {
         /**/
-        $DebugPanelDriver_className = "Maksym\\DebugPanel\\DebugPanelDriver";
-        if (class_exists($DebugPanelDriver_className)) {
-            self::$debug = $DebugPanelDriver_className::getInstance();
-        }
         self::$config = ConfigDriver::getInstance($config_dir);
+        self::$debug = (new DebugProvider())->register();
         self::$session = SessionDriver::getInstance(self::$config->get('session-container-name', 'app-small-framework'));
         self::$cookie = CookieDriver::getInstance();
         self::$cache = (new CacheProvider())->register();
@@ -116,7 +114,7 @@ class App
         if (self::$instance === null) {
             self::$instance = new self($config_dir);
         }
-        self::$debug && self::$debug->setBootTiming();
+        is_object(self::$debug) && method_exists(self::$debug, 'setBootTiming') && self::$debug->setBootTiming();
         return self::$instance;
     }
 

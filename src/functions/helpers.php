@@ -117,8 +117,11 @@ if (!function_exists('set_debug_data')) {
      */
     function set_debug_data($container_name, $data)
     {
-        if (App::$debug && config('IS_DEBUG', false)) {
-            App::$debug->_set($container_name, $data);
+        if (is_object(App::$debug) &&
+            method_exists(App::$debug, 'set') &&
+            config('IS_DEBUG', false))
+        {
+            App::$debug->set($container_name, $data);
         }
     }
 }
