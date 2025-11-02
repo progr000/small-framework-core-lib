@@ -38,10 +38,8 @@ class App
     public static $cookie;
     /** @var CacheInterface */
     public static $cache;
-    /** @var DbDriver */
+    /** @var Maksym\Db\DbDriver */
     public static $db;
-    /** @var DbDriver[] */
-    public static $DbInstances;
     /** @var object Model\User */
     public static $user;
     /** @var string */
@@ -91,15 +89,18 @@ class App
         self::$locale = self::$config->get('localization', ['default-locale' => "en"])['default-locale'];
 
         /**/
-        foreach (self::$config->get('databases', []) as $conn_name => $conn_params) {
-            if ($conn_name !== 'default-db-connection-name') {
-                DbDriver::getInstance($conn_name);
+        $dbDriverClass = 'Maksym\\Db\\DbDriver';
+        if (self::$config->exist('databases') && class_exists($dbDriverClass)) {
+            foreach (self::$config->get('databases', []) as $conn_name => $conn_params) {
+                if ($conn_name !== 'default-db-connection-name') {
+                    $dbDriverClass::getInstance($conn_name);
+                }
             }
-        }
-        if (isset(self::$config->get('databases', [])['default-db-connection-name'])
-            && isset(App::$DbInstances[self::$config->get('databases', [])['default-db-connection-name']])
-        ) {
-            self::$db = DbDriver::getInstance(self::$config->get('databases', [])['default-db-connection-name']);
+            if (isset(self::$config->get('databases', [])['default-db-connection-name'])
+                && isset($dbDriverClass::$DbInstances[self::$config->get('databases', [])['default-db-connection-name']])
+            ) {
+                self::$db = $dbDriverClass::getInstance(self::$config->get('databases', [])['default-db-connection-name']);
+            }
         }
 
     }

@@ -4,6 +4,7 @@ namespace Core;
 
 use Exception;
 use Maksym\Config\ConfigException;
+use Maksym\Log\LogDriver;
 
 abstract class ConsoleDriver
 {
