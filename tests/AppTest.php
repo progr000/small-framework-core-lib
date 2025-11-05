@@ -4,14 +4,14 @@ namespace Tests;
 
 use Maksym\Config\ConfigDriver;
 use Maksym\Config\ConfigException;
+use Maksym\SessCook\CookieDriver;
+use Maksym\SessCook\SessionDriver;
 use Core\App;
 use Core\Contracts\CacheDrivers\fileCacheDriver;
-use Core\CookieDriver;
 use Core\LocalizationDriver;
 use Core\RequestDriver;
 use Core\ResponseDriver;
 use Core\RouteDriver;
-use Core\SessionDriver;
 
 class AppTest extends _BaseTestCase
 {

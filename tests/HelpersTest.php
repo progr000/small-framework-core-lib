@@ -3,8 +3,8 @@
 namespace Tests;
 
 use Core\App;
-use Core\CookieDriver;
-use Core\SessionDriver;
+use Maksym\SessCook\CookieDriver;
+use Maksym\SessCook\SessionDriver;
 
 class HelpersTest extends _BaseTestCase
 {

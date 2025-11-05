@@ -1,8 +1,8 @@
 <?php
 
 use Core\App;
-use Core\CookieDriver;
-use Core\SessionDriver;
+use Maksym\SessCook\CookieDriver;
+use Maksym\SessCook\SessionDriver;
 use Maksym\Config\ConfigException;
 
 if (!function_exists('replace_vars')) {

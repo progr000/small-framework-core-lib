@@ -2,9 +2,11 @@
 
 namespace Core;
 
-use Core\Providers\DebugProvider;
 use Maksym\Config\ConfigDriver;
 use Maksym\Config\ConfigException;
+use Maksym\SessCook\CookieDriver;
+use Maksym\SessCook\SessionDriver;
+use Core\Providers\DebugProvider;
 use Core\Interfaces\DebugPanelDriverInterface;
 use Core\Exceptions\HttpForbiddenException;
 use Core\Exceptions\HttpNotFoundException;
@@ -60,7 +62,7 @@ class App
         self::$config = ConfigDriver::getInstance($config_dir);
         self::$debug = (new DebugProvider())->register();
         self::$session = SessionDriver::getInstance(self::$config->get('session-container-name', 'app-small-framework'));
-        self::$cookie = CookieDriver::getInstance();
+        self::$cookie = CookieDriver::getInstance(self::$config->get('cookie-enc-key', 'cookie-enc-key-value'));
         self::$cache = (new CacheProvider())->register();
         self::$route = RouteDriver::getInstance();
         self::$request = new RequestDriver();
