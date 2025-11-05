@@ -3,7 +3,7 @@
 namespace Core\Contracts\CacheDrivers;
 
 use Core\Interfaces\CacheInterface;
-use Core\SessionDriver;
+use Maksym\SessCook\SessionDriver;
 
 class sessionCacheDriver extends CacheInterface
 {
