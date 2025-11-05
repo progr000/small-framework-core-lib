@@ -7,6 +7,7 @@ use Core\Interfaces\MiddlewareInterface;
 use Core\Exceptions\HttpNotFoundException;
 use Core\Exceptions\IntegrityException;
 use Maksym\Config\ConfigException;
+use Maksym\SessCook\SessionDriver;
 use ReflectionException;
 
 /**

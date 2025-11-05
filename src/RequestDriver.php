@@ -2,6 +2,7 @@
 
 namespace Core;
 
+use Maksym\SessCook\SessionDriver;
 use Core\Interfaces\RequestInterface;
 use Core\Exceptions\ValidatorException;
 use Exception;
