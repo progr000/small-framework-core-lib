@@ -6,6 +6,8 @@ use Maksym\Config\ConfigDriver;
 use Maksym\Config\ConfigException;
 use Maksym\SessCook\CookieDriver;
 use Maksym\SessCook\SessionDriver;
+use Maksym\Cache\Interfaces\CacheInterface;
+use Maksym\Cache\Providers\CacheProvider;
 use Core\Providers\DebugProvider;
 use Core\Interfaces\DebugPanelDriverInterface;
 use Core\Exceptions\HttpForbiddenException;
@@ -14,9 +16,7 @@ use Core\Exceptions\IntegrityException;
 use Core\Exceptions\MaintenanceException;
 use Core\Exceptions\NotImplementedException;
 use Core\Exceptions\BadResponseException;
-use Core\Interfaces\CacheInterface;
 use Core\Interfaces\MiddlewareInterface;
-use Core\Providers\CacheProvider;
 
 class App
 {
