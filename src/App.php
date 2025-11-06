@@ -36,9 +36,9 @@ class App
     public static $session;
     /** @var CookieDriver */
     public static $cookie;
-    /** @var Maksym\Cache\Interfaces\CacheInterface */
+    /** @var \Maksym\Cache\Interfaces\CacheInterface */
     public static $cache;
-    /** @var Maksym\Db\DbDriver */
+    /** @var \Maksym\Db\DbDriver */
     public static $db;
     /** @var object Model\User */
     public static $user;
