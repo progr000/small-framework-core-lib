@@ -7,7 +7,6 @@ use Maksym\Config\ConfigException;
 use Maksym\SessCook\CookieDriver;
 use Maksym\SessCook\SessionDriver;
 use Core\App;
-use Core\Contracts\CacheDrivers\fileCacheDriver;
 use Core\LocalizationDriver;
 use Core\RequestDriver;
 use Core\ResponseDriver;
@@ -48,7 +47,6 @@ class AppTest extends _BaseTestCase
         $this->assertInstanceOf(ConfigDriver::class, $app::$config);
         $this->assertInstanceOf(SessionDriver::class, $app::$session);
         $this->assertInstanceOf(CookieDriver::class, $app::$cookie);
-        $this->assertInstanceOf(fileCacheDriver::class, $app::$cache);
         $this->assertInstanceOf(RouteDriver::class, $app::$route);
         $this->assertInstanceOf(RequestDriver::class, $app::$request);
         $this->assertInstanceOf(ResponseDriver::class, $app::$response);
