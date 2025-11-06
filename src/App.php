@@ -14,9 +14,7 @@ use Core\Exceptions\IntegrityException;
 use Core\Exceptions\MaintenanceException;
 use Core\Exceptions\NotImplementedException;
 use Core\Exceptions\BadResponseException;
-use Core\Interfaces\CacheInterface;
 use Core\Interfaces\MiddlewareInterface;
-use Core\Providers\CacheProvider;
 
 class App
 {
@@ -38,9 +36,9 @@ class App
     public static $session;
     /** @var CookieDriver */
     public static $cookie;
-    /** @var CacheInterface */
+    /** @var \Maksym\Cache\Interfaces\CacheInterface */
     public static $cache;
-    /** @var Maksym\Db\DbDriver */
+    /** @var \Maksym\Db\DbDriver */
     public static $db;
     /** @var object Model\User */
     public static $user;
@@ -63,7 +61,6 @@ class App
         self::$debug = (new DebugProvider())->register();
         self::$session = SessionDriver::getInstance(self::$config->get('session-container-name', 'app-small-framework'));
         self::$cookie = CookieDriver::getInstance(self::$config->get('cookie-enc-key', 'cookie-enc-key-value'));
-        self::$cache = (new CacheProvider())->register();
         self::$route = RouteDriver::getInstance();
         self::$request = new RequestDriver();
         self::$response = new ResponseDriver();
@@ -89,6 +86,12 @@ class App
         
         /**/
         self::$locale = self::$config->get('localization', ['default-locale' => "en"])['default-locale'];
+
+        /**/
+        $cacheDriverClass = 'Maksym\Cache\Providers\CacheProvider';
+        if (self::$config->exist('caching') && class_exists($cacheDriverClass)) {
+            self::$cache = (new $cacheDriverClass())->register();
+        }
 
         /**/
         $dbDriverClass = 'Maksym\\Db\\DbDriver';
