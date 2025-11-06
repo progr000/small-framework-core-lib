@@ -6,8 +6,6 @@ use Maksym\Config\ConfigDriver;
 use Maksym\Config\ConfigException;
 use Maksym\SessCook\CookieDriver;
 use Maksym\SessCook\SessionDriver;
-use Maksym\Cache\Interfaces\CacheInterface;
-use Maksym\Cache\Providers\CacheProvider;
 use Core\Providers\DebugProvider;
 use Core\Interfaces\DebugPanelDriverInterface;
 use Core\Exceptions\HttpForbiddenException;
@@ -38,7 +36,7 @@ class App
     public static $session;
     /** @var CookieDriver */
     public static $cookie;
-    /** @var CacheInterface */
+    /** @var Maksym\Cache\Interfaces\CacheInterface */
     public static $cache;
     /** @var Maksym\Db\DbDriver */
     public static $db;
@@ -63,7 +61,6 @@ class App
         self::$debug = (new DebugProvider())->register();
         self::$session = SessionDriver::getInstance(self::$config->get('session-container-name', 'app-small-framework'));
         self::$cookie = CookieDriver::getInstance(self::$config->get('cookie-enc-key', 'cookie-enc-key-value'));
-        self::$cache = (new CacheProvider())->register();
         self::$route = RouteDriver::getInstance();
         self::$request = new RequestDriver();
         self::$response = new ResponseDriver();
@@ -89,6 +86,12 @@ class App
         
         /**/
         self::$locale = self::$config->get('localization', ['default-locale' => "en"])['default-locale'];
+
+        /**/
+        $cacheDriverClass = 'Maksym\Cache\Providers\CacheProvider';
+        if (self::$config->exist('caching') && class_exists($cacheDriverClass)) {
+            self::$cache = (new $cacheDriverClass())->register();
+        }
 
         /**/
         $dbDriverClass = 'Maksym\\Db\\DbDriver';
