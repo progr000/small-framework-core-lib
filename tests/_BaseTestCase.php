@@ -16,7 +16,7 @@ abstract class _BaseTestCase extends TestCase
      */
     public static function setUpBeforeClass()
     {
-        App::init(__DIR__ . DIRECTORY_SEPARATOR . 'config');
+        App::init(__DIR__ . DIRECTORY_SEPARATOR . "config/main.php");
     }
 
     /**
@@ -60,6 +60,9 @@ abstract class _BaseTestCase extends TestCase
         return $string;
     }
 
+    /**
+     * @return int
+     */
     public static function randInt()
     {
         return rand(10000, 99999);
@@ -67,7 +70,6 @@ abstract class _BaseTestCase extends TestCase
 
     /**
      * Sets a protected property on a given object via reflection
-     *
      * @param $object - instance in which protected value is being modified
      * @param $property - property on instance being modified
      * @param $value - new value of the property being modified

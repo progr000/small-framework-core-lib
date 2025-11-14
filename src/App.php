@@ -112,13 +112,14 @@ class App
 
     /**
      * Initialization App
+     * @param $config_file
      * @return App
      * @throws ConfigException
      */
-    public static function init($config_dir)
+    public static function init($config_file)
     {
         if (self::$instance === null) {
-            self::$instance = new self($config_dir);
+            self::$instance = new self($config_file);
         }
         is_object(self::$debug) && method_exists(self::$debug, 'setBootTiming') && self::$debug->setBootTiming();
         return self::$instance;

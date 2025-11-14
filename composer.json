@@ -29,7 +29,8 @@
   },
   "require-dev": {
     "phpunit/phpunit": "@stable",
-    "mockery/mockery": "*"
+    "mockery/mockery": "*",
+    "maksym/dumper": ">=1.1.0"
   },
   "autoload": {
     "files": [

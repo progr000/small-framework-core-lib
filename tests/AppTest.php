@@ -31,7 +31,7 @@ class AppTest extends _BaseTestCase
     public function testAppInitNoConfig()
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessageRegExp("*Configuration file is missing*");
+        $this->expectExceptionMessageRegExp("*is not a file or not readable file*");
         App::init(__DIR__);
     }
 
@@ -42,7 +42,7 @@ class AppTest extends _BaseTestCase
      */
     public function testAppInitOk()
     {
-        $app = App::init(__DIR__ . DIRECTORY_SEPARATOR . 'config');
+        $app = App::init(__DIR__ . DIRECTORY_SEPARATOR . "config/main.php");
         $this->assertInstanceOf(App::class, $app);
         $this->assertInstanceOf(ConfigDriver::class, $app::$config);
         $this->assertInstanceOf(SessionDriver::class, $app::$session);
