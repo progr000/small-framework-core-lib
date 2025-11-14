@@ -22,7 +22,7 @@
     "ext-openssl": "*",
     "ext-curl": "*",
     "ext-memcached": "*",
-    "maksym/config-lib": ">=1.0",
+    "maksym/config-lib": ">=1.0.1",
     "maksym/log-lib": ">=1.0",
     "maksym/sess-cook-lib": ">=1.0",
     "maksym/helper-functions": ">=1.0"

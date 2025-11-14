@@ -51,13 +51,13 @@ class App
     public static $locale;
 
     /**
-     * @param string $config_dir
+     * @param string $config_file
      * @throws ConfigException
      */
-    private function __construct($config_dir)
+    private function __construct($config_file)
     {
         /**/
-        self::$config = ConfigDriver::getInstance($config_dir);
+        self::$config = ConfigDriver::getInstance($config_file);
         self::$debug = (new DebugProvider())->register();
         self::$session = SessionDriver::getInstance(self::$config->get('session-container-name', 'app-small-framework'));
         self::$cookie = CookieDriver::getInstance(self::$config->get('cookie-enc-key', 'cookie-enc-key-value'));
