@@ -22,15 +22,15 @@
     "ext-openssl": "*",
     "ext-curl": "*",
     "ext-memcached": "*",
-    "maksym/config-lib": ">=1.1.0",
-    "maksym/log-lib": ">=1.1.0",
-    "maksym/sess-cook-lib": ">=1.1.0",
-    "maksym/helper-functions": ">=1.1.0"
+    "maksym/config-lib": "@stable",
+    "maksym/log-lib": "@stable",
+    "maksym/sess-cook-lib": "@stable",
+    "maksym/helper-functions": "@stable"
   },
   "require-dev": {
     "phpunit/phpunit": "@stable",
     "mockery/mockery": "*",
-    "maksym/dumper": ">=1.1.0"
+    "maksym/dumper": "@stable"
   },
   "autoload": {
     "files": [
