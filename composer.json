@@ -32,6 +32,13 @@
     "mockery/mockery": "*",
     "maksym/dumper": "@stable"
   },
+  "suggest": {
+    "maksym/db-lib": "Provide lib for work with mysql, sqlite, pgsql, mssql and lib for ActiveRecord",
+    "maksym/cache-lib": "Provide lib for caching with different drivers",
+    "maksym/wget-lib": "Provide lib for convinient work with curl",
+    "maksym/sendmail-lib": "Provide lib for sending mail with attachments and sign mail.",
+    "maksym/debug-panel": "Provide lib for convinient debug"
+  },
   "autoload": {
     "files": [
       "src/functions/helpers.php"
